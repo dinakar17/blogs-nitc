@@ -1,80 +1,160 @@
-import Link from "next/link";
-import React from "react";
+import { useState, useEffect, useContext } from 'react';
+import { useRouter } from 'next/router';
+import { useSnackbar } from 'notistack';
+import Spinner from '../../components/UI/Spinner';
+import Avatar from '@material-ui/core/Avatar';
+import Button from '@material-ui/core/Button';
+import Link from 'next/link';
+import Grid from '@material-ui/core/Grid';
+import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import Container from '@material-ui/core/Container';
+// import FormControlLabel from '@material-ui/core/FormControlLabel';
+// import Checkbox from '@material-ui/core/Checkbox';
 
-const login = () => {
+import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+
+import AuthContext from '../../store/auth-context';
+
+const useStyles = makeStyles((theme) => ({
+  paper: {
+    marginTop: theme.spacing(8),
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+  },
+  avatar: {
+    margin: theme.spacing(1),
+    backgroundColor: theme.palette.secondary.main,
+  },
+  form: {
+    width: '100%',
+    marginTop: theme.spacing(1),
+  },
+  submit: {
+    margin: theme.spacing(3, 0, 2),
+  },
+  link: {
+    color: theme.palette.primary.main,
+    cursor: 'pointer',
+  },
+}));
+
+const SignIn = (props) => {
+  const classes = useStyles();
+  const router = useRouter();
+
+  const { enqueueSnackbar } = useSnackbar();
+
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+
+  const authCtx = useContext(AuthContext);
+  // @ts-ignore: Unreachable code error
+  const { loading, error, user, token, login, clearError } = authCtx;
+
+  useEffect(() => {
+    if (!loading && user && token) {
+      router.push('/user/myBlogs');
+    }
+  }, [user, token, loading, router]);
+
+  useEffect(() => {
+    if (error) {
+      enqueueSnackbar(
+        error.message,
+        { variant: 'error' },
+        { options: { onClose: clearError() } }
+      );
+    }
+  }, [error, clearError, enqueueSnackbar]);
+
+  const submitHandler = (e) => {
+    e.preventDefault();
+    login(email, password);
+  };
+
   return (
-    <section className="h-screen lg:w-[80%] mx-auto">
-      <div className="px-6 h-full text-gray-800">
-        <div className="flex xl:justify-center lg:justify-between justify-center items-center flex-wrap h-full g-6">
-          <div className="grow-0 shrink-1 md:shrink-0 basis-auto xl:w-6/12 lg:w-6/12 md:w-9/12 mb-12 md:mb-0">
-            <img
-              src="https://mdbcdn.b-cdn.net/img/Photos/new-templates/bootstrap-login-form/draw2.webp"
-              className="w-full"
-              alt="Sample image"
+    <Container component='main' maxWidth='xs'>
+      <div className={classes.paper}>
+        <Avatar className={classes.avatar}>
+          <LockOutlinedIcon />
+        </Avatar>
+        <Typography component='h1' variant='h5'>
+          Log in
+        </Typography>
+        {loading ? (
+          <Spinner />
+        ) : (
+          <ValidatorForm className={classes.form} onSubmit={submitHandler}>
+            <TextValidator
+              variant='outlined'
+              margin='normal'
+              required
+              fullWidth
+              id='email'
+              label='Email Address'
+              name='email'
+              autoComplete='email'
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              autoFocus
+              validators={['required', 'isEmail']}
+              errorMessages={['this field is required']}
             />
-          </div>
-          <div className="xl:ml-20 xl:w-5/12 lg:w-5/12 md:w-8/12 mb-12 md:mb-0">
-            <form>
-              {/* Email input */}
-              <div className="mb-6">
-                <input
-                  type="text"
-                  className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                  id="exampleFormControlInput2"
-                  placeholder="Email address"
-                />
-              </div>
-              {/* Password input */}
-              <div className="mb-6">
-                <input
-                  type="password"
-                  className="form-control block w-full px-4 py-2 text-xl font-normal text-gray-700 bg-white bg-clip-padding border border-solid border-gray-300 rounded transition ease-in-out m-0 focus:text-gray-700 focus:bg-white focus:border-blue-600 focus:outline-none"
-                  id="exampleFormControlInput2"
-                  placeholder="Password"
-                />
-              </div>
-              <div className="flex justify-between items-center mb-6">
-                <div className="form-group form-check">
-                  <input
-                    type="checkbox"
-                    className="form-check-input appearance-none h-4 w-4 border border-gray-300 rounded-sm bg-white checked:bg-blue-600 checked:border-blue-600 focus:outline-none transition duration-200 mt-1 align-top bg-no-repeat bg-center bg-contain float-left mr-2 cursor-pointer"
-                    id="exampleCheck2"
-                  />
-                  <label
-                    className="form-check-label inline-block text-gray-800"
-                    htmlFor="exampleCheck2"
-                  >
-                    Remember me
-                  </label>
-                </div>
-                <a href="#!" className="text-gray-800">
-                  Forgot password?
-                </a>
-              </div>
-              <div className="text-center lg:text-left">
-                <button
-                  type="button"
-                  className="inline-block px-7 py-3 bg-blue-600 text-white font-medium text-sm leading-snug uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-                >
-                  Login
-                </button>
-                <p className="text-sm font-semibold mt-2 pt-1 mb-0">
-                  Don't have an account?
-                  <Link href="/auth/signup">
-                  <a
-                    className="text-red-600 hover:text-red-700 focus:text-red-700 transition duration-200 ease-in-out px-2"
-                  >
-                    Register
+            <TextValidator
+              variant='outlined'
+              margin='normal'
+              required
+              fullWidth
+              name='password'
+              label='Password'
+              type='password'
+              id='password'
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              autoComplete='current-password'
+              validators={['required']}
+              errorMessages={['this field is required']}
+            />
+            {/* <FormControlLabel
+            control={<Checkbox value='remember' color='primary' />}
+            label='Remember me'
+          /> */}
+            <Button
+              type='submit'
+              fullWidth
+              variant='contained'
+              color='primary'
+              className={classes.submit}
+            >
+              Sign In
+            </Button>
+            <Grid container>
+              <Grid item xs>
+                <Link href='/auth/forgotPassword' passHref>
+                  <a className={classes.link}>Forgot password?</a>
+                </Link>
+              </Grid>
+              <Grid item>
+                <Link href='/auth/signup' passHref>
+                  <a className={classes.link}>
+                    {"Don't have an account? Sign Up"}
                   </a>
-                  </Link>
-                </p>
-              </div>
-            </form>
-          </div>
-        </div>
+                </Link>
+              </Grid>
+              <Link href='/auth/resendSignupEmail' passHref>
+                <a className={classes.link} style={{ marginTop: '3rem' }}>
+                  {'Resend Confirmation Email'}
+                </a>
+              </Link>
+            </Grid>
+          </ValidatorForm>
+        )}
       </div>
-    </section>
+    </Container>
   );
 };
 
-export default login;
+export default SignIn;

@@ -4,6 +4,7 @@ import "../styles/globals.css";
 import type { AppProps } from "next/app";
 import Layout from "../components/Layout/Layout";
 import { ThemeProvider } from "next-themes";
+import { SnackbarProvider } from "notistack";
 
 import Head from "next/head";
 
@@ -17,9 +18,11 @@ function MyApp({ Component, pageProps }: AppProps) {
     </Head> */}
     {/* Including the attribute="class" is very important, since this tells the library to use the Tailwind dark theme class. */}
     <ThemeProvider attribute="class">
+      <SnackbarProvider maxSnack={3} preventDuplicate>
       <Layout>
         <Component {...pageProps} />
       </Layout>
+      </SnackbarProvider>
     </ThemeProvider>
     </>
   );

@@ -17,7 +17,7 @@ const AuthContext = createContext({
   signupSuccess: null,
   authenticating: null,
   login: (email, password) => {},
-  signup: (email, password, confirmPassword) => {},
+  signup: (name, email, password, confirmPassword) => {},
   logout: () => {},
   forgetPassword: () => {},
   clearSignupSuccess: () => {},
@@ -63,6 +63,7 @@ export const AuthContextProvider = (props) => {
   };
 
   const signup = async (name, email, password, passwordConfirm) => {
+    console.log("Signup request received")
     setSignupSuccess(false);
     setLoading(true);
     try {
@@ -102,6 +103,7 @@ export const AuthContextProvider = (props) => {
   };
 
   const clearSignupSuccess = () => {
+    // @ts-ignore: Unreachable code error
     setError(false);
   };
 
@@ -121,6 +123,7 @@ export const AuthContextProvider = (props) => {
   };
 
   return (
+    // @ts-ignore: Unreachable code error
     <AuthContext.Provider value={context}>
       {props.children}
     </AuthContext.Provider>
