@@ -1,116 +1,71 @@
-import { useState } from 'react';
-import axios from '../../helpers/axios-orders';
+import React, { useState } from "react";
+import { toast } from "react-toastify";
+import * as api from "../../api";
 
-import Spinner from '../../components/UI/Spinner';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import Alert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
+import Spinner from "../../components/UI/Spinner";
 
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
-
-import { useSnackbar } from 'notistack';
-
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    cursor: 'pointer',
-  },
-  alert: {
-    marginTop: '3rem'
-  }
-}));
-
-const ForgetPassword = (props) => {
-  const classes = useStyles();
-
-  const [email, setEmail] = useState('');
+const ForgetPassword = () => {
+  const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [messageSent, setMessageSent] = useState(false);
 
-  const { enqueueSnackbar } = useSnackbar();
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+  };
 
-  const submitHandler = async (e) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axios.post(`/api/v1/users/forgotPassword`, {
-        email,
-      });
+      await api.forgotPassword(email);
       setLoading(false);
-      setEmail('');
+      setEmail("");
       setMessageSent(true);
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
       let errMessage;
       if (error.response) {
         errMessage = error.response.data.message;
       } else if (error.message) errMessage = error.message;
-      else errMessage = 'Something went wrong, please try again later';
-      enqueueSnackbar(errMessage, { variant: 'error' });
+      else errMessage = "Something went wrong, please try again later";
+      toast(errMessage, {
+        type: "error",
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
     }
   };
 
   return (
-    <Container component='main' maxWidth='xs'>
-      <div className={classes.paper}>
-        <Typography component='h1' variant='h5'>
-          Forgot Password
-        </Typography>
+    // center the entire content using flex
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <div className="dark:bg-gray-700 bg-gray-100 p-10 w-[40%]">
+        <h1 className="text-3xl font-bold text-center">Forgot Password</h1>
         {messageSent ? (
-          <Alert severity='success' className={classes.alert}>
-            Email sent to your email account for resetting password.
-          </Alert>
+          <div className="text-center">
+            <p className="text-xl font-semibold">
+              A reset password link has been sent to your email
+            </p>
+            <p className="text-xl font-semibold">
+              Please check your email and follow the instructions
+            </p>
+          </div>
         ) : loading ? (
           <Spinner />
         ) : (
-          <ValidatorForm className={classes.form} onSubmit={submitHandler}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextValidator
-                  variant='outlined'
-                  required
-                  fullWidth
-                  id='email'
-                  label='Email Address'
-                  name='email'
-                  autoComplete='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  validators={['required', 'isEmail']}
-                  errorMessages={['this field is required']}
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type='submit'
-              fullWidth
-              variant='contained'
-              color='primary'
-              className={classes.submit}
-            >
-              Send Email
-            </Button>
-          </ValidatorForm>
+          <form onSubmit={handleSubmit}>
+            <label className="block mt-4"> Email </label>
+            <input type="email" value={email} onChange={handleEmail} className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" required />
+            <button className="block w-full mt-4 bg-blue-500 text-white p-2 rounded-md">Send Reset Link</button>
+          </form>
         )}
+        </div>
       </div>
-    </Container>
   );
 };
 

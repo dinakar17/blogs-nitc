@@ -10,9 +10,11 @@ type Props = {
 const Layout = ({children}: Props) => {
   return (
     <>
+    <div className='font-default'>
     <Header/>
     <div>{children}</div>
     <Footer/>
+    </div>
     </>
   )
 }

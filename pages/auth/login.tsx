@@ -1,160 +1,146 @@
-import { useState, useEffect, useContext } from 'react';
-import { useRouter } from 'next/router';
-import { useSnackbar } from 'notistack';
-import Spinner from '../../components/UI/Spinner';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-import Link from 'next/link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-// import FormControlLabel from '@material-ui/core/FormControlLabel';
-// import Checkbox from '@material-ui/core/Checkbox';
+import Image from "next/image";
+import Link from "next/link";
+import React from "react";
+import { useDispatch } from "react-redux";
+import { ToastContainer, toast, Slide } from "react-toastify";
+// https://fkhadra.github.io/react-toastify/introduction
+import * as api from "../../api";
+import { EmailValidator } from "../../helpers/Validators/EmailValidator";
+import { signIn } from "../../store/StatesContainer/auth/AuthSlice";
+import { AppDispatch } from "../../store/store";
 
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+const login = () => {
+  const dispatch = useDispatch<AppDispatch>();
 
-import AuthContext from '../../store/auth-context';
+  const [email, setEmail] = React.useState("");
+  const [emailError, setEmailError] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%',
-    marginTop: theme.spacing(1),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    cursor: 'pointer',
-  },
-}));
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    // verify whether the email is valid or not
+    // email should end with @nitc.ac.in
+    EmailValidator(e.target.value, setEmailError);
+  };
 
-const SignIn = (props) => {
-  const classes = useStyles();
-  const router = useRouter();
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    // verify whether the password is valid or not
+    // password should be at least 6 characters long and should contain at least one number and one special character and one uppercase letter and one lowercase letter and no spaces
+  };
 
-  const { enqueueSnackbar } = useSnackbar();
-
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-
-  const authCtx = useContext(AuthContext);
-  // @ts-ignore: Unreachable code error
-  const { loading, error, user, token, login, clearError } = authCtx;
-
-  useEffect(() => {
-    if (!loading && user && token) {
-      router.push('/user/myBlogs');
-    }
-  }, [user, token, loading, router]);
-
-  useEffect(() => {
-    if (error) {
-      enqueueSnackbar(
-        error.message,
-        { variant: 'error' },
-        { options: { onClose: clearError() } }
-      );
-    }
-  }, [error, clearError, enqueueSnackbar]);
-
-  const submitHandler = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    login(email, password);
+
+    // verify whether the email and password are valid or not
+    // if valid, then redirect to the home page
+    // if invalid, then show the error message
+    if (emailError === "" && passwordError === "") {
+      // redirect to the home page
+      // Todo: google auto filling causing login successful
+      const signInDetails = {email, password};
+      // Note: createAsyncThunk accepts only one argument (payload) because it is a thunk function
+      dispatch(signIn(signInDetails));
+    } else {
+      // show the error message
+      toast.error("email or password is invalid 😓", {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   };
 
   return (
-    <Container component='main' maxWidth='xs'>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component='h1' variant='h5'>
-          Log in
-        </Typography>
-        {loading ? (
-          <Spinner />
-        ) : (
-          <ValidatorForm className={classes.form} onSubmit={submitHandler}>
-            <TextValidator
-              variant='outlined'
-              margin='normal'
+    // create two columns using grid and make them responsive as well
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-screen font-default">
+      {/* Grid Block 1 */}
+      <div className="flex flex-col justify-center w-[60%] mx-auto gap-5">
+        <h1 className="text-4xl font-bold text-gray-800">Welcome Back</h1>
+        <p className="text-gray-600">Welcome Back! Please enter your details</p>
+        <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+          <div className="flex flex-col gap-2">
+            <label>Email</label>
+            <input
               required
-              fullWidth
-              id='email'
-              label='Email Address'
-              name='email'
-              autoComplete='email'
+              type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              autoFocus
-              validators={['required', 'isEmail']}
-              errorMessages={['this field is required']}
+              onChange={handleEmail}
+              placeholder="Enter your email"
+              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
             />
-            <TextValidator
-              variant='outlined'
-              margin='normal'
+            <p className="text-red-500 text-sm">{emailError && emailError}</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label>Password</label>
+            <input
               required
-              fullWidth
-              name='password'
-              label='Password'
-              type='password'
-              id='password'
+              placeholder="Enter your password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              autoComplete='current-password'
-              validators={['required']}
-              errorMessages={['this field is required']}
+              type="password"
+              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              onChange={handlePassword}
             />
-            {/* <FormControlLabel
-            control={<Checkbox value='remember' color='primary' />}
-            label='Remember me'
-          /> */}
-            <Button
-              type='submit'
-              fullWidth
-              variant='contained'
-              color='primary'
-              className={classes.submit}
-            >
-              Sign In
-            </Button>
-            <Grid container>
-              <Grid item xs>
-                <Link href='/auth/forgotPassword' passHref>
-                  <a className={classes.link}>Forgot password?</a>
-                </Link>
-              </Grid>
-              <Grid item>
-                <Link href='/auth/signup' passHref>
-                  <a className={classes.link}>
-                    {"Don't have an account? Sign Up"}
-                  </a>
-                </Link>
-              </Grid>
-              <Link href='/auth/resendSignupEmail' passHref>
-                <a className={classes.link} style={{ marginTop: '3rem' }}>
-                  {'Resend Confirmation Email'}
-                </a>
-              </Link>
-            </Grid>
-          </ValidatorForm>
-        )}
+            <p className="text-red-500 text-sm">
+              {passwordError && passwordError}
+            </p>
+          </div>
+          <div className="flex justify-between items-center">
+            <div className="flex">
+              <input type="checkbox" className="mr-2" />
+              <p>Remember me</p>
+            </div>
+            <p className="text-blue-500"><Link href="/auth/forgotPassword">Forgot Password?</Link></p>
+          </div>
+          <button className="bg-blue-500 text-white p-2 rounded-md">
+            Login
+          </button>
+          <ToastContainer
+            position="top-center"
+            transition={Slide}
+            autoClose={2000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+          />
+        </form>
+        {/* Don't have an account? Sign up for free */}
+        <div className="flex justify-center items-center gap-2">
+          <p>Don't have an account?</p>
+          {/* bottom decorator for "sign up for free" Link */}
+
+          <a href="/auth/signup" className="text-blue-500">
+            Sign up for free
+          </a>
+        </div>
       </div>
-    </Container>
+      {/* Grid Block 2 */}
+      <div className="hidden md:flex flex-col justify-center items-center w-full h-full relative">
+        <Image
+          src="/static/login-intro.jpg"
+          layout="fill"
+          className="object-cover"
+        />
+        {/* Create a Glassmorphic card of width 300px and height 300px with some content in it*/}
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-50/30 rounded-2xl flex flex-col justify-center items-center gap-4 p-4">
+          <h1 className="text-2xl font-bold text-gray-800">Welcome to</h1>
+          <h1 className="text-2xl font-bold text-gray-800">DevSpace</h1>
+          <p className="text-gray-600">
+            A place where you can share your knowledge with the world
+          </p>
+        </div>
+      </div>
+    </div>
   );
 };
 
-export default SignIn;
+export default login;

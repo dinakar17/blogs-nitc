@@ -8,7 +8,16 @@ module.exports = {
     './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
-    extend: {},
+    fontFamily: {
+      default: ['"Inter"', "sans-serif"],
+      opensans: ['"Open Sans"', "sans-serif"],
+      logo: ['"Pacifico"', "cursive"]
+    },
+    extend: {
+      colors: {
+        primary: "#8035dd",
+      },
+    },
   },
   plugins: [],
 }

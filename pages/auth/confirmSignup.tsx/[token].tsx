@@ -1,54 +1,94 @@
-import { useEffect } from 'react';
-import { useRouter } from 'next/router';
-import axios from '../../../helpers/axios-orders';
+// [token].tsx is the file that is called when the user clicks on the link in the email sent to him/her.
+// This file is used to confirm the user's email address.
+// The user is redirected to the login page after confirming his/her email address.
 
-import { useSnackbar } from "notistack";
+import { useEffect } from "react";
+import { useRouter } from "next/router";
+import * as api from "../../../api";
 
-const ConfirmSignup = (props) => {
+import { GetServerSideProps } from "next";
+import type { NextPage } from "next";
+import { ToastContainer, toast } from "react-toastify";
+
+type Props = {
+  error: string;
+  success: string;
+};
+
+const ConfirmSignup: NextPage<Props> = (props) => {
   const router = useRouter();
-
-  const { enqueueSnackbar } = useSnackbar();
 
   useEffect(() => {
     if (props.error) {
-      enqueueSnackbar(props.error, { variant: 'error' });
-      router.push('/auth/login');
+      toast.error(props.error, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+      router.push("/auth/login");
     } else if (props.success) {
-      enqueueSnackbar(
-        'Email confirmation successful. Please login to continue',
+      toast.success(
+        "Hurray! Email Confirmation Successful 😊. Please Login to continue",
         {
-          variant: 'success',
+          position: "top-center",
+          autoClose: 2000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
         }
       );
-      router.push('/auth/login');
+      router.push("/auth/login");
     }
-  }, [enqueueSnackbar, props.error, props.success, router]);
+  }, [toast, props.error, props.success, router]);
 
-  return null;
+  return (
+    <ToastContainer
+      position="top-center"
+      autoClose={2000}
+      hideProgressBar={false}
+      newestOnTop={false}
+      closeOnClick
+      rtl={false}
+      pauseOnFocusLoss
+      draggable
+      pauseOnHover
+    />
+  );
 };
 
-export async function getServerSideProps({ query }) {
+// Note: getServerSideProps is only called on the server side and runs before the page is rendered on the client side (browser)
+// Basically, getServerSideProps function runs first and then the page component is rendered with the props returned by getServerSideProps
+
+// Diff between getServerSideProps and getStaticProps: https://www.ohmycrawl.com/getstaticprops-vs-getserversideprops/
+export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { token } = query;
 
   try {
     if (!token) {
-      throw new Error('Invalid token, please try again with a valid token');
+      throw new Error("Invalid token, please try again with a valid token");
     }
 
-    await axios.post(`/api/v1/users/confirmSignup/${token}`);
+    // response - {  data: { success: true, message: "Email confirmed successfully" }, status: 200, statusText: "OK", headers: {…}, config: {…}, request: {…} }
+    await api.confirmSignup(token as string);
 
     return { props: { success: true } };
-  } catch (error) {
+  } catch (error: any) {
     let errMessage;
     if (error.response) {
       errMessage = error.response.data.message;
     } else if (error.message) errMessage = error.message;
-    else errMessage = 'Something went wrong, please try again later';
+    else errMessage = "Something went wrong, please try again later";
 
     return {
       props: { error: errMessage },
     };
   }
-}
+};
 
 export default ConfirmSignup;

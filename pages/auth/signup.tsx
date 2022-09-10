@@ -1,194 +1,186 @@
-import { useState, useEffect, useContext } from 'react';
-import { useSnackbar } from 'notistack';
+import React from "react";
+import * as api from "../../api";
+import { AppDispatch } from "../../store/store";
+import { useDispatch } from "react-redux";
+import { signUp } from "../../store/StatesContainer/auth/AuthSlice";
+import {
+  ConfirmPasswordValidator,
+  PasswordValidator,
+} from "../../helpers/Validators/PasswordValidator";
+import { EmailValidator } from "../../helpers/Validators/EmailValidator";
+import { toast, ToastContainer } from "react-toastify";
 
-import Spinner from '../../components/UI/Spinner';
-import Avatar from '@material-ui/core/Avatar';
-import Button from '@material-ui/core/Button';
-// import TextField from '@material-ui/core/TextField';
-import Link from 'next/link';
-import Grid from '@material-ui/core/Grid';
-import LockOutlinedIcon from '@material-ui/icons/LockOutlined';
-import Typography from '@material-ui/core/Typography';
-import Alert from '@material-ui/lab/Alert';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
-import AuthContext from '../../store/auth-context';
+const signup = () => {
+  const dispatch = useDispatch<AppDispatch>();
 
-import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
+  const [firstName, setFirstName] = React.useState("");
+  const [lastName, setLastName] = React.useState("");
+  const [email, setEmail] = React.useState("");
+  const [emailError, setEmailError] = React.useState("");
+  const [password, setPassword] = React.useState("");
+  const [passwordError, setPasswordError] = React.useState("");
+  const [confirmPassword, setConfirmPassword] = React.useState("");
+  const [confirmPasswordError, setConfirmPasswordError] = React.useState("");
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  avatar: {
-    margin: theme.spacing(1),
-    backgroundColor: theme.palette.secondary.main,
-  },
-  form: {
-    width: '100%', // Fix IE 11 issue.
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    cursor: 'pointer',
-  },
-  alert: {
-    marginTop: theme.spacing(3),
-  },
-}));
+  const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setEmail(e.target.value);
+    // verify whether the email is valid or not
+    // email should end with @nitc.ac.in
+    EmailValidator(e.target.value, setEmailError);
+  };
 
-export default function SignUp() {
-  const classes = useStyles();
+  const handlePassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setPassword(e.target.value);
+    // verify whether the password is valid or not
+    // password should be at least 6 characters long and should contain at least one number and one special character and one uppercase letter and one lowercase letter and no spaces
+    PasswordValidator(e.target.value, setPasswordError);
+  };
 
-  const { enqueueSnackbar } = useSnackbar();
+  const handleConfirmPassword = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setConfirmPassword(e.target.value);
+    // verify whether the confirm password is valid or not
+    // confirm password should be equal to password
+    ConfirmPasswordValidator(password, e.target.value, setConfirmPasswordError);
+  };
 
-  const [name, setName] = useState('');
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [passwordConfirm, setPasswordConfirm] = useState('');
-  const authCtx = useContext(AuthContext);
-  // @ts-ignore: Unreachable code error
-  const { loading, error, signup, signupSuccess, clearError } = authCtx;
-
-  useEffect(() => {
-    if (error) {
-      enqueueSnackbar(
-        error.message,
-        { variant: 'error' },
-        { options: { onClose: clearError() } }
-      );
-    }
-  }, [error, clearError, enqueueSnackbar]);
-
-  useEffect(() => {
-    ValidatorForm.addValidationRule('passwordLength', (value) => {
-      if (value.length < 8) {
-        return false;
-      }
-      return true;
-    });
-  }, []);
-
-  const submitHandler = (e) => {
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    console.log('submitHandler');
-    if (password !== passwordConfirm) {
-      enqueueSnackbar(`Passwords don't match`, { variant: 'error' });
-    } else signup(name, email, password, passwordConfirm);
+    // verify whether the email, password and confirm password are valid or not
+    // if valid, then send a post request to the backend to create a new user
+    // if invalid, then display the error message
+    // Note: In the case where Google auto fills the email field, we need to verify the email again
+    // And also, during the initial render, emailError, passwordError and confirmPasswordError are empty strings. So, we need to verify them again
+    // because the email field is not updated when the email is auto filled
+    EmailValidator(email, setEmailError);
+    PasswordValidator(password, setPasswordError);
+    ConfirmPasswordValidator(
+      password,
+      confirmPassword,
+      setConfirmPasswordError
+    );
+    if (
+      emailError === "" &&
+      passwordError === "" &&
+      confirmPasswordError === ""
+    ) {
+      // send a post request to the backend to create a new user
+      dispatch(
+        signUp({ firstName, lastName, email, password, confirmPassword })
+      );
+    } else {
+      // display the error message using toasitfy
+      toast.error("Enter valid details", {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   };
 
   return (
-    <Container component='main' maxWidth='xs'>
-      <div className={classes.paper}>
-        <Avatar className={classes.avatar}>
-          <LockOutlinedIcon />
-        </Avatar>
-        <Typography component='h1' variant='h5'>
-          Sign up
-        </Typography>
-        {signupSuccess ? (
-          <Alert severity='success' className={classes.alert}>
-            Signup Successful. Verification Email sent to you email address.
-            Please verify email to login
-          </Alert>
-        ) : loading ? (
-          <Spinner />
-        ) : (
-          <ValidatorForm className={classes.form} onSubmit={submitHandler}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextValidator
-                  autoComplete='name'
-                  name='name'
-                  variant='outlined'
-                  required
-                  fullWidth
-                  id='name'
-                  label='Name'
-                  value={name}
-                  onChange={(e) => setName(e.target.value)}
-                  autoFocus
-                  validators={['required']}
-                  errorMessages={['This field is required']}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextValidator
-                  variant='outlined'
-                  required
-                  fullWidth
-                  id='email'
-                  label='Email Address'
-                  name='email'
-                  autoComplete='email'
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  validators={['required', 'isEmail']}
-                  errorMessages={['This field is required']}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextValidator
-                  variant='outlined'
-                  required
-                  fullWidth
-                  name='password'
-                  label='Password'
-                  type='password'
-                  id='password'
-                  autoComplete='current-password'
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  validators={['passwordLength', 'required']}
-                  errorMessages={[
-                    'Password must be at least 8 characters',
-                    'This field is required',
-                  ]}
-                />
-              </Grid>
-              <Grid item xs={12}>
-                <TextValidator
-                  variant='outlined'
-                  required
-                  fullWidth
-                  name='passwordConfirm'
-                  label='Password Confirm'
-                  type='password'
-                  id='passwordConfirm'
-                  value={passwordConfirm}
-                  onChange={(e) => setPasswordConfirm(e.target.value)}
-                  validators={['required']}
-                  errorMessages={['this field is required']}
-                />
-              </Grid>
-            </Grid>
-            <Button
-              type='submit'
-              fullWidth
-              variant='contained'
-              color='primary'
-              className={classes.submit}
-            >
-              Sign Up
-            </Button>
-            <Grid container justify='flex-end'>
-              <Grid item>
-                <Link href='/auth/login' passHref>
-                  <a className={classes.link}>
-                    {'Already have an account? Log In'}
-                  </a>
-                </Link>
-              </Grid>
-            </Grid>
-          </ValidatorForm>
-        )}
+    // create a register form
+    <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
+      <div className="flex flex-col gap-5 md:w-[60%] mx-auto">
+        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
+          Create account
+        </h1>
+        <div>
+          <p className="text-sm">
+            {" "}
+            Thanks for taking the first step to contribute to the community.
+          </p>
+          <p className="text-sm">
+            {" "}
+            Please fill in the form below to create your account.
+          </p>
+        </div>
+        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+          <div className="flex gap-5">
+            <div className="flex flex-col gap-2">
+              <label>First Name</label>
+              <input
+                type="text"
+                required
+                value={firstName}
+                placeholder="Enter your name"
+                onChange={(e) => setFirstName(e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              />
+            </div>
+            <div className="flex flex-col gap-2">
+              <label htmlFor="password">Last Name</label>
+              <input
+                type="text"
+                required
+                value={lastName}
+                placeholder="Enter your last name"
+                onChange={(e) => setLastName(e.target.value)}
+                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+              />
+            </div>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password">Email</label>
+            <input
+              type="email"
+              placeholder="Enter your email"
+              value={email}
+              onChange={handleEmail}
+              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+            <p className="text-red-500 text-sm">{emailError}</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password">Password</label>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={handlePassword}
+              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+            <p className="text-red-500 text-sm">{passwordError}</p>
+          </div>
+          <div className="flex flex-col gap-2">
+            <label htmlFor="password">Confirm Password</label>
+            <input
+              type="password"
+              placeholder="Confirm your password"
+              value={confirmPassword}
+              onChange={handleConfirmPassword}
+              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+            <p className="text-red-500 text-sm">{confirmPasswordError}</p>
+          </div>
+          <button className="bg-blue-500 text-white p-2 rounded-md">
+            Register
+          </button>
+          <div>
+            Already have an account?{" "}
+            <a href="/auth/login" className="text-blue-500">
+              Login
+            </a>
+          </div>
+        </form>
       </div>
-    </Container>
+      <div></div>
+      <ToastContainer
+        position="top-center"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </div>
   );
-}
+};
+
+export default signup;

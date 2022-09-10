@@ -1,0 +1,3 @@
+This folder is an API for the application. It consists of API endpoints that are used to communicate with the backend.
+Although NEXTjs provides API folder by default but it is not used in this project.
+At some point in the future, NEXTjs default API folder is used as a backend for the application.

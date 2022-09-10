@@ -50,7 +50,7 @@ const ForgetPassword = (props) => {
     e.preventDefault();
     try {
       setLoading(true);
-      await axios.post(`/api/v1/users//resendSignupToken`, {
+      await axios.post(`/api/v1/users/resendSignupToken`, {
         email,
       });
       setLoading(false);
