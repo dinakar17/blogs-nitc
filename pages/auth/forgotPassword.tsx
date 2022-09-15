@@ -17,6 +17,7 @@ const ForgetPassword = () => {
     e.preventDefault();
     try {
       setLoading(true);
+      // If this request fails, the error will be caught in the catch block
       await api.forgotPassword(email);
       setLoading(false);
       setEmail("");
@@ -43,8 +44,8 @@ const ForgetPassword = () => {
 
   return (
     // center the entire content using flex
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <div className="dark:bg-gray-700 bg-gray-100 p-10 w-[40%]">
+    <div className="flex flex-col items-center justify-center min-h-screen">
+      <div className="dark:bg-gray-700 bg-gray-100 p-10 w-[40%]">
         <h1 className="text-3xl font-bold text-center">Forgot Password</h1>
         {messageSent ? (
           <div className="text-center">
@@ -60,12 +61,20 @@ const ForgetPassword = () => {
         ) : (
           <form onSubmit={handleSubmit}>
             <label className="block mt-4"> Email </label>
-            <input type="email" value={email} onChange={handleEmail} className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500" required />
-            <button className="block w-full mt-4 bg-blue-500 text-white p-2 rounded-md">Send Reset Link</button>
+            <input
+              type="email"
+              value={email}
+              onChange={handleEmail}
+              className="block w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:border-blue-500"
+              required
+            />
+            <button className="block w-full mt-4 bg-blue-500 text-white p-2 rounded-md">
+              Send Reset Link
+            </button>
           </form>
         )}
-        </div>
       </div>
+    </div>
   );
 };
 

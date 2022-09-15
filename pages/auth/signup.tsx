@@ -84,7 +84,7 @@ const signup = () => {
   return (
     // create a register form
     <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
-      <div className="flex flex-col gap-5 md:w-[60%] mx-auto">
+      <div className="flex flex-col justify-center gap-5 md:w-[60%] mx-auto">
         <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
           Create account
         </h1>
@@ -168,17 +168,7 @@ const signup = () => {
         </form>
       </div>
       <div></div>
-      <ToastContainer
-        position="top-center"
-        autoClose={5000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
+      
     </div>
   );
 };

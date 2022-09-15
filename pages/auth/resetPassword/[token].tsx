@@ -1,39 +1,18 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import axios from '../../../helpers/axios-orders';
 
 import Spinner from '../../../components/UI/Spinner';
-import Button from '@material-ui/core/Button';
-import TextField from '@material-ui/core/TextField';
-import Grid from '@material-ui/core/Grid';
-import Typography from '@material-ui/core/Typography';
-import { makeStyles } from '@material-ui/core/styles';
-import Container from '@material-ui/core/Container';
 
-import { useSnackbar } from 'notistack';
+import * as api from '../../../api';
+import { GetServerSideProps, NextPage } from 'next';
 
-const useStyles = makeStyles((theme) => ({
-  paper: {
-    marginTop: theme.spacing(8),
-    display: 'flex',
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
-  form: {
-    width: '100%',
-    marginTop: theme.spacing(3),
-  },
-  submit: {
-    margin: theme.spacing(3, 0, 2),
-  },
-  link: {
-    color: theme.palette.primary.main,
-    cursor: 'pointer',
-  },
-}));
+// Todo: Password Validation on the client side
+type Props = {
+  token: string;
+  error: string;
+}
 
-const ResetPassword = (props) => {
-  const classes = useStyles();
+const ResetPassword: NextPage<Props> = (props) => {
   const router = useRouter();
 
   const [password, setPassword] = useState('');
@@ -42,6 +21,7 @@ const ResetPassword = (props) => {
 
   const { enqueueSnackbar } = useSnackbar();
 
+  // The reason why 'useEffect()' is used here since 'useRouter()' is not available on the server side and will throw an error 
   useEffect(() => {
     if (props.error) {
       enqueueSnackbar(props.error, { variant: 'error' });
@@ -51,20 +31,19 @@ const ResetPassword = (props) => {
     }
   }, [enqueueSnackbar, props.error, props.token, router]);
 
-  const submitHandler = async (e) => {
+  const submitHandler = async (e : React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
       setLoading(true);
       if(password!==passwordConfirm) throw new Error(`Passwords don't match`)
-      await axios.patch(`/api/v1/users/resetPassword/${props.token}`, {
-        password,
-        passwordConfirm,
-      });
+      // If this request fails, the error will be caught in the catch block
+      // If the request is successful, the user will be redirected to the login page
+      await api.resetPassword(props.token, password, passwordConfirm);
       enqueueSnackbar('Password reset successful. Please login to continue', {
         variant: 'success',
       });
       router.push('/auth/login');
-    } catch (error) {
+    } catch (error: any) {
       setLoading(false);
       let errMessage;
       if (error.response) {
@@ -76,61 +55,51 @@ const ResetPassword = (props) => {
   };
 
   return (
-    <Container component='main' maxWidth='xs'>
-      <div className={classes.paper}>
-        <Typography component='h1' variant='h5'>
+    <div >
+      <div>
+        <h1>
           Reset Password
-        </Typography>
+        </h1>
         {loading ? (
           <Spinner />
         ) : (
-          <form className={classes.form} noValidate onSubmit={submitHandler}>
-            <Grid container spacing={2}>
-              <Grid item xs={12}>
-                <TextField
-                  variant='outlined'
+          <form  noValidate onSubmit={submitHandler}>
+            <div>
+              <div>
+                <input
                   required
-                  fullWidth
                   name='password'
-                  label='New Password'
                   type='password'
                   id='password'
                   autoComplete='current-password'
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                 />
-              </Grid>
-              <Grid item xs={12}>
-                <TextField
-                  variant='outlined'
+              </div>
+              <div>
+                <input
                   required
-                  fullWidth
                   name='passwordConfirm'
-                  label='Password Confirm'
                   type='password'
                   id='passwordConfirm'
                   value={passwordConfirm}
                   onChange={(e) => setPasswordConfirm(e.target.value)}
                 />
-              </Grid>
-            </Grid>
-            <Button
+              </div>
+            </div>
+            <button
               type='submit'
-              fullWidth
-              variant='contained'
-              color='primary'
-              className={classes.submit}
             >
               Reset Password
-            </Button>
+            </button>
           </form>
         )}
       </div>
-    </Container>
+    </div>
   );
 };
+const getServerSideProps: GetServerSideProps = async ({query}) => {
 
-export async function getServerSideProps({ query }) {
   const { token } = query;
   if (!token) {
     return {

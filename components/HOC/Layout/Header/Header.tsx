@@ -1,7 +1,7 @@
 import React from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
-import Toggle from "../../../helpers/Toggle/toggle";
+import Toggle from "../../../../helpers/Toggle/toggle";
 import { useRouter } from "next/router";
 
 const Header = () => {
