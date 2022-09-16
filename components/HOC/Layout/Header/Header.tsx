@@ -3,11 +3,13 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import Toggle from "../../../../helpers/Toggle/toggle";
 import { useRouter } from "next/router";
-import { useSelector } from "react-redux";
-import { RootState } from "../../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../../store/store";
+import { logOut } from "../../../../store/StatesContainer/auth/AuthSlice";
 
 const Header = () => {
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user);
   const {authData, token} = user;
   console.log(authData);
@@ -41,11 +43,12 @@ const Header = () => {
             </Link>
           ))}
         </ul>
-        {token ? (
+        { authData ? (
           <div className="flex items-center gap-5">
             <Link href="/profile">
               <a>{authData.name}</a>
             </Link>
+            <button onClick={() => dispatch(logOut())}>Logout</button>
           </div>
         ) : (
           <button

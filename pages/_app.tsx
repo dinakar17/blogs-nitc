@@ -15,8 +15,12 @@ import Head from "next/head";
 import PrivateRoute from "../components/HOC/WithAuth";
 import "katex/dist/katex.min.css";
 import { ToastContainer } from "react-toastify";
-import { useEffect } from "react";
+import { persistStore } from 'redux-persist'
+import { PersistGate } from 'redux-persist/integration/react'
 // Todo: https://stackoverflow.com/questions/66914855/next-js-opt-out-of-layout-component-for-specific-pages-from-app-js
+
+// | Step 6: Import persistStore to persist the store
+const persistor = persistStore(store);
 
 function MyApp({ Component, pageProps }: AppProps) {
   // const { authData, token } = useSelector((state: RootState) => state.user);
@@ -52,6 +56,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* https://medium.com/47billion/loading-spinner-is-one-of-the-most-used-progress-indicators-in-the-user-interface-design-650839fe4040 */}
       <NextProgress delay={200} color="#29D" options={{ showSpinner: false }} />
       <Provider store={store}>
+      <PersistGate loading={<div> Loading... </div>} persistor={persistor}>
           <PrivateRoute protectedRoutes={protectedRoutes}>
             <ThemeProvider attribute="class">
               {/* Ref for ThemeProvider is in Google docs */}
@@ -71,6 +76,7 @@ function MyApp({ Component, pageProps }: AppProps) {
               </Layout>
             </ThemeProvider>
           </PrivateRoute>
+        </PersistGate>
       </Provider>
     </>
   );

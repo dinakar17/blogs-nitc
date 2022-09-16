@@ -75,10 +75,9 @@ const authSlice = createSlice({
   reducers: {
     logOut: (state) => {
       state.authData = null;
+      state.token = "";
       state.loading = false;
       state.error = "";
-      localStorage.removeItem("userInfo");
-      localStorage.removeItem("loginToken");
     },
   },
   // extraReducers - allows us to handle actions that are not created by createSlice or createAsyncThunk (e.g. signIn)
@@ -91,14 +90,15 @@ const authSlice = createSlice({
     builder.addCase(signIn.fulfilled, (state, action) => {
       state.loading = false;
       // response.data === action.payload
-      state.authData = action.payload.data;
+      state.authData = action.payload.data.user;
+      state.token = action.payload.token;
       state.signUpSuccess = false;
       // As soon as we logged in we add the profile to localStorage
-      localStorage.setItem("loginToken", JSON.stringify(action.payload.token));
-      localStorage.setItem("userInfo", JSON.stringify(action.payload.data.user));
+      // localStorage.setItem("loginToken", JSON.stringify(action.payload.token));
+      // localStorage.setItem("userInfo", JSON.stringify(action.payload.data.user));
 
-      state.authData = JSON.parse(localStorage.getItem("userInfo") as string);
-      state.token = JSON.parse(localStorage.getItem("loginToken") as string);
+      // state.authData = JSON.parse(localStorage.getItem("userInfo") as string);
+      // state.token = JSON.parse(localStorage.getItem("loginToken") as string);
       // console.log(`AuthData: action.payload`);
       // console.log(`LocalStore: localStorage.getItem("profile")`);
     });
