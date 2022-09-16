@@ -1,4 +1,11 @@
 // AuthSlice : Piece of State that stores all the user login information
+// https://github.com/reduxjs/redux-toolkit/issues/390
+
+// Problem: https://stackoverflow.com/questions/61704805/getting-an-error-a-non-serializable-value-was-detected-in-the-state-when-using
+// Solved by returning error.response.data instead of error.response
+
+// Problem: https://stackoverflow.com/questions/68139501/how-to-access-backend-errors-with-redux-createasyncthunk
+// Accessed the server sent error response through rejectWithValue(error.response.data)
 
 // * Step 1: Import createSlice and createAsyncThunk (for asynchronous actions)
 // createSlice - creates a slice of state and returns an object with the action creators and reducer
@@ -13,6 +20,7 @@ interface AuthState {
   loading: boolean;
   error: string;
   signUpSuccess: boolean;
+  token: string;
 }
 
 // * Step 2: Initialize initialState
@@ -21,6 +29,7 @@ const initialState: AuthState = {
   authData: null,
   error: "",
   signUpSuccess: false,
+  token: "",
 };
 
 // * Step 3: Configure Asynchronous action creators
@@ -31,20 +40,30 @@ const initialState: AuthState = {
 export const signIn = createAsyncThunk(
   // "auth/signIn" is the name of Action type that will be dispatched when the action creator is called
   "auth/signIn",
-  async (signInDetails: SignInFormData) => {
+  async (signInDetails: SignInFormData, { rejectWithValue }) => {
+    try{
     const response = await api.signIn(signInDetails);
   // response.data - { status: 'success', token, data: { user: { _id: '5f9e9b9b9b9b9b9b9b9b9b9b', name: 'John Doe', email: 'john@gmail.com', role: undefined, isVerified: undefined } } }
     return response.data;
+    }
+    catch(error: any){
+      return rejectWithValue(error.response.data);
+    }
   }
 );
 
 export const signUp = createAsyncThunk(
   "auth/signUp",
-  async (signUpDetails: SignUpFormData) => {
+  async (signUpDetails: SignUpFormData, { rejectWithValue }) => {
     // Example of AxiosResponse object returned by the API. For more info visit https://zetcode.com/javascript/axios/
     // { status: 200, data: { status: "success", message: "User created successfully" }, headers: {…}, config: {…}, request: {…}, statusText: "OK" }
+    try{
     const response = await api.signUp(signUpDetails);
-    return response.data;
+     return response;
+    } catch (error: any) {
+      return rejectWithValue(error.response.data);
+    }
+    // action.payload === response if the promise is resolved 
   }
 );
 
@@ -58,7 +77,8 @@ const authSlice = createSlice({
       state.authData = null;
       state.loading = false;
       state.error = "";
-      localStorage.removeItem("profile");
+      localStorage.removeItem("userInfo");
+      localStorage.removeItem("loginToken");
     },
   },
   // extraReducers - allows us to handle actions that are not created by createSlice or createAsyncThunk (e.g. signIn)
@@ -71,9 +91,14 @@ const authSlice = createSlice({
     builder.addCase(signIn.fulfilled, (state, action) => {
       state.loading = false;
       // response.data === action.payload
-      state.authData = action.payload;
+      state.authData = action.payload.data;
+      state.signUpSuccess = false;
       // As soon as we logged in we add the profile to localStorage
-      localStorage.setItem("profile", JSON.stringify(action.payload));
+      localStorage.setItem("loginToken", JSON.stringify(action.payload.token));
+      localStorage.setItem("userInfo", JSON.stringify(action.payload.data.user));
+
+      state.authData = JSON.parse(localStorage.getItem("userInfo") as string);
+      state.token = JSON.parse(localStorage.getItem("loginToken") as string);
       // console.log(`AuthData: action.payload`);
       // console.log(`LocalStore: localStorage.getItem("profile")`);
     });
@@ -82,7 +107,7 @@ const authSlice = createSlice({
       state.authData = null;
       // Here action.error.message is the *automatic message* generated when the logic in signUp function fails!
       // Ex: If we use navigate.push("/projects") then action.error.message = "navigate.push is not a function"
-      state.error = action.error.message as string;
+      state.error = action.payload.message as string;
     });
 
     builder.addCase(signUp.pending, (state) => {
@@ -91,11 +116,14 @@ const authSlice = createSlice({
     builder.addCase(signUp.fulfilled, (state, action) => {
       state.loading = false;
       state.authData = action.payload;
+      state.signUpSuccess = true;
     });
     builder.addCase(signUp.rejected, (state, action) => {
       state.loading = false;
       state.authData = null;
-      state.error = action.error.message as string;
+      console.log(action);
+      state.error = action.payload.message as string;
+      console.log(state.error);
     });
   },
 });

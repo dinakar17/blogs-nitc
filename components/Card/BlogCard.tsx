@@ -2,9 +2,9 @@ import React from "react";
 
 const BlogCard = () => {
   return (
-    <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800">
+    <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800 w-[300px] shadow-lg">
       {/* Design and display a blog card */}
-      <div className="flex flex-col h-[400px] w-[300px]  rounded-t-lg shadow-lg ">
+      <div className="flex flex-col h-[400px] w-[300px]  rounded-t-lg ">
         {/* Card Image */}
         <div className="w-full h-[45%]">
           <img
@@ -53,7 +53,7 @@ const BlogCard = () => {
         </div>
       </div>
       {/* Liked by others */}
-      <div className="flex flex-col gap-2 bg-white dark:bg-gray-800 text-sm p-2 border border-gray-300 rounded-b-md w-[300px] shadow-lg">
+      <div className="flex flex-col gap-2 bg-white dark:bg-gray-800 text-sm p-2 border border-gray-300 rounded-b-md w-[300px]">
         <p className="text-gray-500 text-center">
           10 people found this exciting
         </p>

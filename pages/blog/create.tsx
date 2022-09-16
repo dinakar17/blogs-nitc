@@ -14,6 +14,7 @@ import "katex/dist/katex.min.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useRouter } from "next/router";
+import { AxiosError, AxiosResponse } from "axios";
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
 });
@@ -78,36 +79,23 @@ const Home: NextPage = () => {
       // enqueueSnackbar(errMessage, { variant: 'error' });
     }
   };
-
-  const setOptions = {
-    buttonList: [
-      ["undo", "redo"],
-      ["font", "fontSize", "formatBlock"],
-      ["paragraphStyle", "blockquote"],
-      ["bold", "underline", "italic", "strike", "subscript", "superscript"],
-      ["fontColor", "hiliteColor", "textStyle"],
-      ["removeFormat"],
-      // "/", // Line break
-      ["outdent", "indent"],
-      ["align", "horizontalRule", "list", "lineHeight"],
-      ["table", "link", "image", "video", "audio", "math"], // You must add the 'katex' library at options to use the 'math' plugin.
-      // ["imageGallery"],
-      ["fullScreen", "showBlocks", "codeView"],
-      ["preview", "print"],
-      ["save", "template"],
-    ],
-    height: 400,
-    width: "100%",
-    placeholder: "Type here...",
-    showPathLabel: false,
-    resizingBar: false,
-    charCounter: true,
-    katex: katex,
-    imageUploadUrl: process.env.NEXT_PUBLIC_IMAGE_API_URL,
+  // console.log(featuredImage);
+ const imageUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("image", file);
+    try {
+      const response: AxiosResponse = await api.uploadImage(formData);
+      console.log(response);
+      // console.log(response.data.data);
+      setFeaturedImage(response.data.result[0].url);
+    } catch (error: any) {
+      console.log(error);
+    }
   };
 
   return (
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
+    <>
     <Editor
       title={title}
       setTitle={setTitle}
@@ -122,7 +110,11 @@ const Home: NextPage = () => {
       saveContent={saveContent}
       editor={editor}
       setDraft={setDraft}
+      imageUpload={imageUpload}
     />
+    {/* Upload Image to the server */}
+    
+    </>
   );
 };
 

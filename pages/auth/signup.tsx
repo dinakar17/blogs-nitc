@@ -1,20 +1,22 @@
-import React from "react";
+import React, { useEffect } from "react";
 import * as api from "../../api";
-import { AppDispatch } from "../../store/store";
-import { useDispatch } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
 import { signUp } from "../../store/StatesContainer/auth/AuthSlice";
 import {
   ConfirmPasswordValidator,
   PasswordValidator,
 } from "../../helpers/Validators/PasswordValidator";
 import { EmailValidator } from "../../helpers/Validators/EmailValidator";
-import { toast, ToastContainer } from "react-toastify";
+import { Slide, toast, ToastContainer } from "react-toastify";
+import SignupSuccess from "../../helpers/SignupSuccess";
 
 const signup = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const userStatus = useSelector((state: RootState) => state.user);
+  const { signUpSuccess, loading, error } = userStatus;
 
-  const [firstName, setFirstName] = React.useState("");
-  const [lastName, setLastName] = React.useState("");
+  const [userName, setUserName] = React.useState("");
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
   const [password, setPassword] = React.useState("");
@@ -65,7 +67,12 @@ const signup = () => {
     ) {
       // send a post request to the backend to create a new user
       dispatch(
-        signUp({ firstName, lastName, email, password, confirmPassword })
+        signUp({
+          name: userName,
+          email,
+          password,
+          passwordConfirm: confirmPassword,
+        })
       );
     } else {
       // display the error message using toasitfy
@@ -81,95 +88,118 @@ const signup = () => {
     }
   };
 
+  useEffect(() => {
+    if (error) {
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 5000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
+  }, [error]);
+
+  console.log(error);
+
   return (
     // create a register form
-    <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
-      <div className="flex flex-col justify-center gap-5 md:w-[60%] mx-auto">
-        <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
-          Create account
-        </h1>
-        <div>
-          <p className="text-sm">
-            {" "}
-            Thanks for taking the first step to contribute to the community.
-          </p>
-          <p className="text-sm">
-            {" "}
-            Please fill in the form below to create your account.
-          </p>
+    <>
+      {signUpSuccess ? (
+        <SignupSuccess />
+      ) : loading ? (
+        <div>Loading</div>
+      ) : (
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
+          <div className="flex flex-col justify-center gap-5 md:w-[60%] mx-auto">
+            <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
+              Create account
+            </h1>
+            <div>
+              <p className="text-sm">
+                {" "}
+                Thanks for taking the first step to contribute to the community.
+              </p>
+              <p className="text-sm">
+                {" "}
+                Please fill in the form below to create your account.
+              </p>
+            </div>
+            <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
+              <div className="flex flex-col gap-2">
+                <label>Username</label>
+                <input
+                  type="text"
+                  required
+                  value={userName}
+                  placeholder="Enter your name"
+                  onChange={(e) => setUserName(e.target.value)}
+                  className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="password">Email</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  value={email}
+                  onChange={handleEmail}
+                  className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                <p className="text-red-500 text-sm">{emailError}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="password">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  value={password}
+                  onChange={handlePassword}
+                  className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                <p className="text-red-500 text-sm">{passwordError}</p>
+              </div>
+              <div className="flex flex-col gap-2">
+                <label htmlFor="password">Confirm Password</label>
+                <input
+                  type="password"
+                  placeholder="Confirm your password"
+                  value={confirmPassword}
+                  onChange={handleConfirmPassword}
+                  className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                />
+                <p className="text-red-500 text-sm">{confirmPasswordError}</p>
+              </div>
+              <button className="bg-blue-500 text-white p-2 rounded-md">
+                Register
+              </button>
+              <div>
+                Already have an account?{" "}
+                <a href="/auth/login" className="text-blue-500">
+                  Login
+                </a>
+              </div>
+            </form>
+          </div>
+          <div></div>
         </div>
-        <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
-          <div className="flex gap-5">
-            <div className="flex flex-col gap-2">
-              <label>First Name</label>
-              <input
-                type="text"
-                required
-                value={firstName}
-                placeholder="Enter your name"
-                onChange={(e) => setFirstName(e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-            </div>
-            <div className="flex flex-col gap-2">
-              <label htmlFor="password">Last Name</label>
-              <input
-                type="text"
-                required
-                value={lastName}
-                placeholder="Enter your last name"
-                onChange={(e) => setLastName(e.target.value)}
-                className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-              />
-            </div>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password">Email</label>
-            <input
-              type="email"
-              placeholder="Enter your email"
-              value={email}
-              onChange={handleEmail}
-              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            />
-            <p className="text-red-500 text-sm">{emailError}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password">Password</label>
-            <input
-              type="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={handlePassword}
-              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            />
-            <p className="text-red-500 text-sm">{passwordError}</p>
-          </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="password">Confirm Password</label>
-            <input
-              type="password"
-              placeholder="Confirm your password"
-              value={confirmPassword}
-              onChange={handleConfirmPassword}
-              className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-            />
-            <p className="text-red-500 text-sm">{confirmPasswordError}</p>
-          </div>
-          <button className="bg-blue-500 text-white p-2 rounded-md">
-            Register
-          </button>
-          <div>
-            Already have an account?{" "}
-            <a href="/auth/login" className="text-blue-500">
-              Login
-            </a>
-          </div>
-        </form>
-      </div>
-      <div></div>
-      
-    </div>
+      )}
+      <ToastContainer
+        position="top-center"
+        transition={Slide}
+        autoClose={1000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+      />
+    </>
   );
 };
 

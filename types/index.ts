@@ -1,9 +1,8 @@
 export type SignUpFormData = {
-  firstName: string;
-  lastName: string;
+  name: string;
   email: string;
   password: string;
-  confirmPassword: string;
+  passwordConfirm: string;
 };
 
 export type SignInFormData = {

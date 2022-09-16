@@ -1,6 +1,7 @@
 // [token].tsx is the file that is called when the user clicks on the link in the email sent to him/her.
 // This file is used to confirm the user's email address.
 // The user is redirected to the login page after confirming his/her email address.
+// Note: Ran into a problem due to folder name of confirmSignup.tsx
 
 import { useEffect } from "react";
 import { useRouter } from "next/router";
@@ -45,21 +46,9 @@ const ConfirmSignup: NextPage<Props> = (props) => {
       );
       router.push("/auth/login");
     }
-  }, [toast, props.error, props.success, router]);
+  }, [props.error, props.success, router]);
 
-  return (
-    <ToastContainer
-      position="top-center"
-      autoClose={2000}
-      hideProgressBar={false}
-      newestOnTop={false}
-      closeOnClick
-      rtl={false}
-      pauseOnFocusLoss
-      draggable
-      pauseOnHover
-    />
-  );
+  return null;
 };
 
 // Note: getServerSideProps is only called on the server side and runs before the page is rendered on the client side (browser)
@@ -68,6 +57,7 @@ const ConfirmSignup: NextPage<Props> = (props) => {
 // Diff between getServerSideProps and getStaticProps: https://www.ohmycrawl.com/getstaticprops-vs-getserversideprops/
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { token } = query;
+  console.log(token);
 
   try {
     if (!token) {

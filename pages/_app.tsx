@@ -14,9 +14,13 @@ import { store } from "../store/store";
 import Head from "next/head";
 import PrivateRoute from "../components/HOC/WithAuth";
 import "katex/dist/katex.min.css";
+import { ToastContainer } from "react-toastify";
+import { useEffect } from "react";
 // Todo: https://stackoverflow.com/questions/66914855/next-js-opt-out-of-layout-component-for-specific-pages-from-app-js
 
 function MyApp({ Component, pageProps }: AppProps) {
+  // const { authData, token } = useSelector((state: RootState) => state.user);
+
   const protectedRoutes = [
     "/user/myBlogs",
     "/user/myProfile",
@@ -44,18 +48,29 @@ function MyApp({ Component, pageProps }: AppProps) {
           content="Web app for blogging application Blog App"
         />
       </Head>
-      
+
       {/* https://medium.com/47billion/loading-spinner-is-one-of-the-most-used-progress-indicators-in-the-user-interface-design-650839fe4040 */}
       <NextProgress delay={200} color="#29D" options={{ showSpinner: false }} />
       <Provider store={store}>
-        <PrivateRoute protectedRoutes={protectedRoutes}>
-          <ThemeProvider attribute="class">
-            {/* Ref for ThemeProvider is in Google docs */}
-            <Layout noLayoutRoutes={noLayoutRoutes}>
-              <Component {...pageProps} />
-            </Layout>
-          </ThemeProvider>
-        </PrivateRoute>
+          <PrivateRoute protectedRoutes={protectedRoutes}>
+            <ThemeProvider attribute="class">
+              {/* Ref for ThemeProvider is in Google docs */}
+              <ToastContainer
+                position="top-center"
+                autoClose={2000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss
+                draggable
+                pauseOnHover
+              />
+              <Layout noLayoutRoutes={noLayoutRoutes}>
+                <Component {...pageProps} />
+              </Layout>
+            </ThemeProvider>
+          </PrivateRoute>
       </Provider>
     </>
   );

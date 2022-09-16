@@ -3,9 +3,15 @@ import { useTheme } from "next-themes";
 import Link from "next/link";
 import Toggle from "../../../../helpers/Toggle/toggle";
 import { useRouter } from "next/router";
+import { useSelector } from "react-redux";
+import { RootState } from "../../../../store/store";
 
 const Header = () => {
   const router = useRouter();
+  const user = useSelector((state: RootState) => state.user);
+  const {authData, token} = user;
+  console.log(authData);
+
   const { theme, setTheme } = useTheme();
   const [toggled, setToggled] = React.useState(false);
   const handleClick = () => {
@@ -35,14 +41,21 @@ const Header = () => {
             </Link>
           ))}
         </ul>
-        {/* Sign In Button */}
-        <button
-          className="bg-blue-500 hover:bg-blue-600 font-bold py-2 px-4 rounded"
-          type="button"
-          onClick={() => router.push("/auth/login")}
-        >
-          Sign In
-        </button>
+        {token ? (
+          <div className="flex items-center gap-5">
+            <Link href="/profile">
+              <a>{authData.name}</a>
+            </Link>
+          </div>
+        ) : (
+          <button
+            className="bg-blue-500 hover:bg-blue-600 font-bold py-2 px-4 rounded"
+            type="button"
+            onClick={() => router.push("/auth/login")}
+          >
+            Sign In
+          </button>
+        )}
         {/* Problem: Extra space is being added here */}
         <div className="scale-[0.25] overflow-hidden">
           <Toggle toggled={toggled} onClick={handleClick} />

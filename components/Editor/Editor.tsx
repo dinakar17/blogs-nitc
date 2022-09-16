@@ -7,7 +7,6 @@ import TagsInput from "react-tagsinput";
 
 import "react-tagsinput/react-tagsinput.css";
 
-
 import { RefObject } from "react";
 import axios, { AxiosError, AxiosResponse } from "axios";
 import { uploadImage } from "../../api";
@@ -31,6 +30,7 @@ type EditorProps = {
   handleSelection: (branch: any) => void;
   editor: RefObject<SunEditorCore>;
   setDraft: (draft: boolean) => void;
+  // imageUpload: (file: File) => Promise<void>;
 };
 
 const options = [
@@ -58,9 +58,9 @@ const Editor = (props: EditorProps) => {
     handleSelection,
     editor,
     setDraft,
+    // imageUpload
   } = props;
 
-  
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
     editor.current = sunEditor;
   };
@@ -71,20 +71,21 @@ const Editor = (props: EditorProps) => {
     info: { imageUploadUrl: string; imageUploadHeader: string },
     uploadHandler: any
   ) => {
-    // const formData = new FormData();
-    // formData.append("profile-file", files[0]);
-    // // console.log(info, uploadHandler, files);
+    const formData = new FormData();
+    formData.append("profile-file", files[0]);
+    // console.log(info, uploadHandler, files);
 
-    // uploadImage(formData)
-    //   .then((res) => {
-    //     console.log(res);
-    //     res.data.result[0].url = process.env.NEXT_PUBLIC_IMAGE_API_URL + res.data.result[0].url;
-    //     uploadHandler(res.data);
-    //   })
-    //   .catch((err) => {
-    //     console.log(err);
-    //     alert("Image upload failed");
-    //   });
+    uploadImage(formData)
+      .then((res) => {
+        console.log(res);
+        res.data.result[0].url =
+          process.env.NEXT_PUBLIC_IMAGE_API_URL + res.data.result[0].url.replace(/\\/g, "/");
+        uploadHandler(res.data);
+      })
+      .catch((err) => {
+        console.log(err);
+        alert("Image upload failed");
+      });
     // const response = {
     //   // The response must have a "result" array.
     //   result: [
@@ -117,6 +118,24 @@ const Editor = (props: EditorProps) => {
     // targetImgElement.src = "https://picsum.photos/200/300";
   };
 
+  const imageUpload = async (file: File) => {
+    console.log(file);
+    const formData = new FormData();
+    formData.append("profile-file", file);
+    try {
+      const response: AxiosResponse = await uploadImage(formData);
+      console.log(response);
+      // console.log(response.data.data);
+      const url = response.data.result[0].url;
+      const modified_url =
+        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
+      console.log(modified_url);
+      setFeaturedImage(modified_url);
+    } catch (error: any) {
+      console.log(error);
+    }
+  };
+
   return (
     <div className="flex flex-col gap-5 w-[90%] mx-auto">
       {/* Title for the blog */}
@@ -143,20 +162,26 @@ const Editor = (props: EditorProps) => {
           className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
         />
       </div>
-      <img src="https://imagev2api.linoxcloud.com/uploads/koong.jpg" alt="something" />
-      
+
       {/* Featured Image */}
       <div className="flex flex-col gap-2">
         {/* Todo: Hover effect */}
         <label>Featured Image</label>
         <input
-          required
-          value={featuredImage}
-          onChange={(e) => setFeaturedImage(e.target.value)}
           type="file"
+          onChange={(e) => imageUpload(e.target.files[0])}
           placeholder="Enter the summary of the blog"
           className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
         />
+        {featuredImage && (
+          <div className="w-24 h-10">
+            <img
+              src={featuredImage}
+              alt="featured"
+              className="w-full h-full object-cover"
+            />
+          </div>
+        )}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
         {/* Select the branch */}
@@ -180,7 +205,7 @@ const Editor = (props: EditorProps) => {
           setOptions={setOptions}
           height="900px"
           setDefaultStyle="font-family: 'Inter', sans-serif; font-size: 1.1rem;"
-          // onImageUploadBefore={onImageUploadBefore}
+          onImageUploadBefore={onImageUploadBefore}
           // onImageUpload={onImageUpload}
         />
       </div>
