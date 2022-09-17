@@ -7,6 +7,7 @@ import storage from 'redux-persist/lib/storage'
 import userSliceReducer from "./StatesContainer/auth/AuthSlice";
 // thunk middleware is used to handle async actions in redux
 // import thunk from 'redux-thunk'
+// ? redux-persist failed to create sync storage. falling back to noop storage.
 import {
   persistStore,
   persistReducer,

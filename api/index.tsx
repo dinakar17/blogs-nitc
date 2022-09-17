@@ -1,8 +1,11 @@
 import axios, { AxiosRequestConfig } from 'axios';
 import { BlogPost, SignInFormData, SignUpFormData } from '../types';
+import qs from 'qs';
 
 // axio.create() returns an instance of axios with a custom config
 const API = axios.create({ baseURL: 'http://localhost:5000' });
+// change the content type of the request to application/x-www-form-urlencoded
+API.defaults.headers.post['Content-Type'] = 'application/x-www-form-urlencoded';
 
 // create another instance of axios with a custom config
 const API2 = axios.create({ baseURL: process.env.NEXT_PUBLIC_IMAGE_API_URL });
@@ -30,7 +33,7 @@ Access to XMLHttpRequest at 'Server' from origin 'Client' has been blocked by CO
 // export const likePost = (id) => API.patch(`/posts/${id}/likePost`);
 // export const updatePost = (id, updatedPost) => API.patch(`/posts/${id}`, updatedPost);
 // export const deletePost = (id) => API.delete(`/posts/${id}`);
-export const createPost = (newPost: BlogPost, config: AxiosRequestConfig) => API.post('/api/v1/blogs', newPost, config);
+export const createPost = (newPost: BlogPost, config: AxiosRequestConfig) => API.post('/api/v1/blogs', qs.stringify(newPost), config);
 
 // Note: In this case url = 'api/v1/blogs/slug/${slug}'
 export const getSpecificPost = (url: string) => API.get(url);

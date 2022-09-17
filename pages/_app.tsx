@@ -56,7 +56,7 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* https://medium.com/47billion/loading-spinner-is-one-of-the-most-used-progress-indicators-in-the-user-interface-design-650839fe4040 */}
       <NextProgress delay={200} color="#29D" options={{ showSpinner: false }} />
       <Provider store={store}>
-      <PersistGate loading={<div> Loading... </div>} persistor={persistor}>
+      <PersistGate loading={<div> Persist Loading... </div>} persistor={persistor}>
           <PrivateRoute protectedRoutes={protectedRoutes}>
             <ThemeProvider attribute="class">
               {/* Ref for ThemeProvider is in Google docs */}
