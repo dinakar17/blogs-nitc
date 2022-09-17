@@ -24,3 +24,6 @@ module.exports = {
     require('@tailwindcss/typography'),
   ],
 }
+
+// warning: LF will be replaced by CRLF in tailwind.config.js.
+// The file will have its original line endings in your working directory
