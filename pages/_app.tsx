@@ -1,6 +1,8 @@
 // _app.tsx is the root component of the application. It wraps all the pages and components of the application. It is a good place to add global styles and other global components.
 
 import "../styles/globals.css";
+import "katex/dist/katex.min.css";
+
 import type { AppProps } from "next/app";
 import Layout from "../components/HOC/Layout/Layout";
 import { ThemeProvider } from "next-themes";
@@ -13,14 +15,13 @@ import { store } from "../store/store";
 
 import Head from "next/head";
 import PrivateRoute from "../components/HOC/WithAuth";
-import "katex/dist/katex.min.css";
 import { ToastContainer } from "react-toastify";
-import { persistStore } from 'redux-persist'
-import { PersistGate } from 'redux-persist/integration/react'
+import { persistStore } from "redux-persist";
+import { PersistGate } from "redux-persist/integration/react";
 // Todo: https://stackoverflow.com/questions/66914855/next-js-opt-out-of-layout-component-for-specific-pages-from-app-js
 
 // | Step 6: Import persistStore to persist the store
-const persistor = persistStore(store);
+export const persistor = persistStore(store);
 
 function MyApp({ Component, pageProps }: AppProps) {
   // const { authData, token } = useSelector((state: RootState) => state.user);
@@ -56,23 +57,26 @@ function MyApp({ Component, pageProps }: AppProps) {
       {/* https://medium.com/47billion/loading-spinner-is-one-of-the-most-used-progress-indicators-in-the-user-interface-design-650839fe4040 */}
       <NextProgress delay={200} color="#29D" options={{ showSpinner: false }} />
       <Provider store={store}>
-      <PersistGate loading={<div> Persist Loading... </div>} persistor={persistor}>
+        <PersistGate
+          loading={<div> Persist Loading... </div>}
+          persistor={persistor}
+        >
           <PrivateRoute protectedRoutes={protectedRoutes}>
             <ThemeProvider attribute="class">
               {/* Ref for ThemeProvider is in Google docs */}
-              <ToastContainer
-                position="top-center"
-                autoClose={2000}
-                hideProgressBar={false}
-                newestOnTop={false}
-                closeOnClick
-                rtl={false}
-                pauseOnFocusLoss
-                draggable
-                pauseOnHover
-              />
               <Layout noLayoutRoutes={noLayoutRoutes}>
                 <Component {...pageProps} />
+                <ToastContainer
+                  position="top-center"
+                  autoClose={2000}
+                  hideProgressBar={false}
+                  newestOnTop={false}
+                  closeOnClick
+                  rtl={false}
+                  pauseOnFocusLoss
+                  draggable
+                  pauseOnHover
+                />
               </Layout>
             </ThemeProvider>
           </PrivateRoute>

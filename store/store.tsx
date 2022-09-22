@@ -1,5 +1,6 @@
 import { configureStore } from "@reduxjs/toolkit";
 // configuring redux persist with redux toolkit
+// ? redux-persist failed to create sync storage. falling back to noop storage.
 // | Step 1: Import storage, persistReducer
 import storage from 'redux-persist/lib/storage'
 // https://github.com/rt2zz/redux-persist/issues/988

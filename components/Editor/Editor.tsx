@@ -8,7 +8,7 @@ import TagsInput from "react-tagsinput";
 import "react-tagsinput/react-tagsinput.css";
 
 import { RefObject } from "react";
-import axios, { AxiosError, AxiosResponse } from "axios";
+import {  AxiosResponse } from "axios";
 import { uploadImage } from "../../api";
 import { setOptions } from "./EditorOptions";
 
@@ -16,20 +16,23 @@ const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
 });
 
+type BranchProps = {
+  value: string;
+  label: string;
+};
+
 type EditorProps = {
-  title: string;
   setTitle: (title: string) => void;
-  description: string;
   setDescription: (description: string) => void;
   featuredImage: string;
   setFeaturedImage: (featuredImage: string) => void;
-  branch: string;
+  setBranch: (branch: BranchProps) => void;
   tags: string[];
+  setTags: (tags: string[]) => void;
   saveContent: () => void;
-  handleTags: (tags: string[]) => void;
-  handleSelection: (branch: any) => void;
   editor: RefObject<SunEditorCore>;
   setDraft: (draft: boolean) => void;
+  loading: boolean;
   // imageUpload: (file: File) => Promise<void>;
 };
 
@@ -46,22 +49,22 @@ const options = [
 
 const Editor = (props: EditorProps) => {
   const {
-    title,
     setTitle,
-    description,
     setDescription,
     featuredImage,
     setFeaturedImage,
+    setBranch,
     tags,
+    setTags,
     saveContent,
-    handleTags,
-    handleSelection,
     editor,
     setDraft,
+    loading
     // imageUpload
   } = props;
 
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
+    // @ts-ignore
     editor.current = sunEditor;
   };
 
@@ -79,7 +82,8 @@ const Editor = (props: EditorProps) => {
       .then((res) => {
         console.log(res);
         res.data.result[0].url =
-          process.env.NEXT_PUBLIC_IMAGE_API_URL + res.data.result[0].url.replace(/\\/g, "/");
+          process.env.NEXT_PUBLIC_IMAGE_API_URL +
+          res.data.result[0].url.replace(/\\/g, "/");
         uploadHandler(res.data);
       })
       .catch((err) => {
@@ -99,27 +103,27 @@ const Editor = (props: EditorProps) => {
     // uploadHandler(response);
   };
 
-  const onImageUpload = (
-    targetImgElement: HTMLImageElement,
-    index: number,
-    state: string,
-    imageInfo: {
-      name: string;
-      size: number;
-      type: string;
-      width: number;
-      height: number;
-      alt: string;
-      link: string;
-    },
-    remainingFilesCount: number
-  ) => {
-    console.log(targetImgElement, index, state, imageInfo, remainingFilesCount);
-    // targetImgElement.src = "https://picsum.photos/200/300";
-  };
+  // const onImageUpload = (
+  //   targetImgElement: HTMLImageElement,
+  //   index: number,
+  //   state: string,
+  //   imageInfo: {
+  //     name: string;
+  //     size: number;
+  //     type: string;
+  //     width: number;
+  //     height: number;
+  //     alt: string;
+  //     link: string;
+  //   },
+  //   remainingFilesCount: number
+  // ) => {
+  //   console.log(targetImgElement, index, state, imageInfo, remainingFilesCount);
+  //   // targetImgElement.src = "https://picsum.photos/200/300";
+  // };
 
   const imageUpload = async (file: File) => {
-    console.log(file);
+    // console.log(file);
     const formData = new FormData();
     formData.append("profile-file", file);
     try {
@@ -129,10 +133,11 @@ const Editor = (props: EditorProps) => {
       const url = response.data.result[0].url;
       const modified_url =
         process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
-      console.log(modified_url);
+      // console.log(modified_url);
       setFeaturedImage(modified_url);
     } catch (error: any) {
       console.log(error);
+      alert(error);
     }
   };
 
@@ -144,7 +149,6 @@ const Editor = (props: EditorProps) => {
         <input
           required
           type="text"
-          value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="Enter the title of the blog"
           className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
@@ -155,7 +159,6 @@ const Editor = (props: EditorProps) => {
         <label>Description</label>
         <textarea
           required
-          value={description}
           rows={2}
           onChange={(e) => setDescription(e.target.value)}
           placeholder="Enter the Description of the blog"
@@ -169,7 +172,7 @@ const Editor = (props: EditorProps) => {
         <label>Featured Image</label>
         <input
           type="file"
-          onChange={(e) => imageUpload(e.target.files[0])}
+          onChange={(e: any) => imageUpload(e.target.files[0])}
           placeholder="Enter the summary of the blog"
           className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
         />
@@ -190,21 +193,23 @@ const Editor = (props: EditorProps) => {
           <Select
             options={options}
             className="z-[1000]"
-            onChange={handleSelection}
+            onChange={(e: any) => setBranch(e) as any}
           />
         </div>
         {/* Tags */}
         <div className="flex flex-col gap-2">
           <label>Tags</label>
-          <TagsInput value={tags} onChange={handleTags} />
+          <TagsInput value={tags} onChange={(tags: any) => setTags(tags)} />
         </div>
       </div>
       <div>
         <SunEditor
           getSunEditorInstance={getSunEditorInstance}
+          // @ts-ignore
           setOptions={setOptions}
           height="900px"
           setDefaultStyle="font-family: 'Inter', sans-serif; font-size: 1.1rem;"
+          // @ts-ignore
           onImageUploadBefore={onImageUploadBefore}
           // onImageUpload={onImageUpload}
         />
@@ -214,7 +219,7 @@ const Editor = (props: EditorProps) => {
           onClick={saveContent}
           className="bg-green-500 text-white p-2 rounded-md"
         >
-          Publish
+          {loading ? "Saving..." : "Save"}
         </button>
         <button
           className="bg-red-500 text-white p-2 rounded-md"

@@ -62,7 +62,7 @@ const login = () => {
 
   useEffect(() => {
     if (!loading && authData) {
-      router.push("/");
+    router.push("/");
     }
   }, [authData, loading, router]);
 

@@ -1,12 +1,12 @@
 import React from "react";
-import BlogCard from "../Card/BlogCard";
+import BlogCard, { BlogProps } from "../Card/BlogCard";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
 const responsive = {
   desktop: {
     breakpoint: { max: 3000, min: 1024 },
-    items: 3,
+    items: 4,
     slidesToSlide: 3
   },
   tablet: {
@@ -21,7 +21,7 @@ const responsive = {
   }
 };
 
-const LatestBlogs = () => {
+const LatestBlogs = ({data}) => {
   return (
     // render 10 blog
     <section className="min-h-screen flex flex-col gap-10 justify-center items-center"> 
@@ -31,19 +31,22 @@ const LatestBlogs = () => {
           swipeable={false}
           draggable={false}
           */
+          
           responsive={responsive}
           ssr
+          partialVisbile={false}
           infinite={false}
           // beforeChange={() => this.setState({ isMoving: true })}
           // afterChange={() => this.setState({ isMoving: false })}
           containerClass="first-carousel-container container"
-          itemClass="first-carousel-item"
+          itemClass="first-carousel-item py-5"
+          // show 4 cards at a time
+          removeArrowOnDeviceType={["tablet", "mobile"]}
           // deviceType={this.props.deviceType}
           >
-        {/* Render 10 blog cards */}
-        {[...Array(10)].map((_, index) => (
-          <BlogCard />
-        ))}
+          {data.map((blog: BlogProps) => (
+            <BlogCard key={blog._id} data={blog} />
+          ))}
       </Carousel>
     </section>
   );

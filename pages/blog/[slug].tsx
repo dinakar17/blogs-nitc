@@ -1,6 +1,9 @@
 import { AxiosResponse } from "axios";
 import { GetServerSideProps, NextPage } from "next";
 import Head from "next/head";
+import { toast } from "react-toastify";
+
+import parse from "html-react-parser";
 
 import * as api from "../../api";
 
@@ -12,28 +15,28 @@ type Props = {
 const BlogDetail: NextPage<Props> = (props) => {
   const { data, error } = props;
 
-  const { enqueueSnackbar } = useSnackbar();
-
   if (error) {
-    enqueueSnackbar(error, { variant: "error" });
+    toast(error, { type: "error" });
     return null;
   }
 
   return (
-    <div>
+    <div className="mx-auto p-4 prose max-w-screen-xl prose-indigo prose-md">
       <Head>
         <title>{data.data.title}</title>
         <meta name="description" content={data.data.description} />
       </Head>
 
-      <h4>{data.data.title}</h4>
+      <h4 className="text-2xl font-bold">{data.data.title}</h4>
 
-      <p>{data.data.description}</p>
-      <img src={data.data.featuredImage} alt={data.data.description} />
+      <p className="text-sm text-gray-500"> {data.data.description}</p>
+      <img
+        src={data.data.featuredImage}
+        alt={data.data.description}
+        className="w-full mt-4 max-h-96 object-cover"
+      />
 
-      <div>
-        {data.data.content}
-      </div>
+      <div className="mt-4">{parse(data.data.content)}</div>
       <hr />
     </div>
   );

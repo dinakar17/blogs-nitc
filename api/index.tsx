@@ -33,6 +33,10 @@ Access to XMLHttpRequest at 'Server' from origin 'Client' has been blocked by CO
 // export const likePost = (id) => API.patch(`/posts/${id}/likePost`);
 // export const updatePost = (id, updatedPost) => API.patch(`/posts/${id}`, updatedPost);
 // export const deletePost = (id) => API.delete(`/posts/${id}`);
+export const getAllPosts = (query: string) => API.get(`/api/v1/blogs?${query}`);
+
+export const getLatestPosts = (url: string) => API.get(url);
+
 export const createPost = (newPost: BlogPost, config: AxiosRequestConfig) => API.post('/api/v1/blogs', qs.stringify(newPost), config);
 
 // Note: In this case url = 'api/v1/blogs/slug/${slug}'

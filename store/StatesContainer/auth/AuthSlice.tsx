@@ -74,6 +74,8 @@ const authSlice = createSlice({
   // reducers is an object that contains all the action creators that are synchronous in nature
   reducers: {
     logOut: (state) => {
+      // clear the presist state
+      // https://stackoverflow.com/questions/72265273/how-to-remove-value-from-localstorage-in-redux-persist
       state.authData = null;
       state.token = "";
       state.loading = false;
@@ -125,6 +127,10 @@ const authSlice = createSlice({
       state.error = action.payload.message as string;
       console.log(state.error);
     });
+
+    // builder.addCase(PURGE, (state) => {
+    //   storage.removeItem(state);
+    // })
   },
 });
 

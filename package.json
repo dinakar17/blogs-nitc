@@ -6,6 +6,8 @@
     "start": "next start"
   },
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
+    "@material-ui/lab": "^4.0.0-alpha.61",
     "@reduxjs/toolkit": "^1.8.5",
     "axios": "^0.27.2",
     "codemirror": "^6.0.1",
