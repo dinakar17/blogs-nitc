@@ -33,6 +33,7 @@ const Home: NextPage = () => {
   const [description, setDescription] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
   const [branch, setBranch] = useState<BranchProps>({ value: "", label: "" });
+  const [semester, setSemester] = useState<BranchProps>({ value: "", label: "" });
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState(false);
   const [blogData, setBlogData] = useState(null);
@@ -92,6 +93,8 @@ const Home: NextPage = () => {
     }
   };
 
+  console.log(branch);
+
   return (
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
     <>
@@ -100,7 +103,10 @@ const Home: NextPage = () => {
         setDescription={setDescription}
         featuredImage={featuredImage}
         setFeaturedImage={setFeaturedImage}
+        branch={branch}
         setBranch={setBranch}
+        semester={semester}
+        setSemester={setSemester}
         tags={tags}
         setTags={setTags}
         saveContent={saveContent}

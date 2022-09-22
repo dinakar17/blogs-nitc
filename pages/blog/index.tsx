@@ -11,6 +11,7 @@ import Spinner from "../../components/UI/Spinner";
 import { GetServerSideProps, NextPage } from "next";
 import { getAllPosts } from "../../api";
 import BlogCard, { BlogProps } from "../../components/Card/BlogCard";
+import { toast } from "react-toastify";
 
 // const fetcher = (url) => axios.get(url).then((res) => res.data);
 
@@ -28,7 +29,10 @@ const Home: NextPage<Props> = (props) => {
       errMessage = error.response.data.message;
     } else errMessage = "Something went wrong, Please reload to view content";
 
-    // enqueueSnackbar(errMessage, { variant: "error" });
+    toast(errMessage, {
+      type: "error",
+    });
+
     return null;
   }
 
@@ -64,7 +68,11 @@ const Home: NextPage<Props> = (props) => {
         />
       </Head>
       <div className="w-full">
-        <input type="text" placeholder="Search" className="w-full p-2 m-4 focus:outline-none border border-gray-300 rounded-md" /> 
+        <input
+          type="text"
+          placeholder="Search"
+          className="w-full p-2 m-4 focus:outline-none border border-gray-300 rounded-md"
+        />
       </div>
       <div>
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">

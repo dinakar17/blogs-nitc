@@ -8,7 +8,7 @@ import TagsInput from "react-tagsinput";
 import "react-tagsinput/react-tagsinput.css";
 
 import { RefObject } from "react";
-import {  AxiosResponse } from "axios";
+import { AxiosResponse } from "axios";
 import { uploadImage } from "../../api";
 import { setOptions } from "./EditorOptions";
 
@@ -26,7 +26,10 @@ type EditorProps = {
   setDescription: (description: string) => void;
   featuredImage: string;
   setFeaturedImage: (featuredImage: string) => void;
+  branch: BranchProps;
   setBranch: (branch: BranchProps) => void;
+  semester: BranchProps;
+  setSemester: (semester: BranchProps) => void;
   tags: string[];
   setTags: (tags: string[]) => void;
   saveContent: () => void;
@@ -47,19 +50,33 @@ const options = [
   { value: "chem", label: "Chemical" },
 ];
 
+const semesterOptions = [
+  { value: "1", label: "1st Semester" },
+  { value: "2", label: "2nd Semester" },
+  { value: "3", label: "3rd Semester" },
+  { value: "4", label: "4th Semester" },
+  { value: "5", label: "5th Semester" },
+  { value: "6", label: "6th Semester" },
+  { value: "7", label: "7th Semester" },
+  { value: "8", label: "8th Semester" },
+];
+
 const Editor = (props: EditorProps) => {
   const {
     setTitle,
     setDescription,
     featuredImage,
     setFeaturedImage,
+    branch,
     setBranch,
+    semester,
+    setSemester,
     tags,
     setTags,
     saveContent,
     editor,
     setDraft,
-    loading
+    loading,
     // imageUpload
   } = props;
 
@@ -195,6 +212,16 @@ const Editor = (props: EditorProps) => {
             className="z-[1000]"
             onChange={(e: any) => setBranch(e) as any}
           />
+          {branch && (
+            <div className="flex flex-col gap-2">
+              <label className="">Select the semester</label>
+              <Select
+                options={semesterOptions}
+                className="z-[1000]"
+                onChange={(e: any) => setSemester(e) as any}
+              />
+            </div>
+          )}
         </div>
         {/* Tags */}
         <div className="flex flex-col gap-2">

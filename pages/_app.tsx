@@ -3,6 +3,9 @@
 import "../styles/globals.css";
 import "katex/dist/katex.min.css";
 
+
+// https://stackoverflow.com/questions/53012355/how-to-delay-splashscreen-of-redux-persist-gate
+
 import type { AppProps } from "next/app";
 import Layout from "../components/HOC/Layout/Layout";
 import { ThemeProvider } from "next-themes";
@@ -18,9 +21,11 @@ import PrivateRoute from "../components/HOC/WithAuth";
 import { ToastContainer } from "react-toastify";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
+import Loader from "../components/Loader/Loader";
 // Todo: https://stackoverflow.com/questions/66914855/next-js-opt-out-of-layout-component-for-specific-pages-from-app-js
 
 // | Step 6: Import persistStore to persist the store
+// Todo: export persistor from store.tsx
 export const persistor = persistStore(store);
 
 function MyApp({ Component, pageProps }: AppProps) {
@@ -58,8 +63,11 @@ function MyApp({ Component, pageProps }: AppProps) {
       <NextProgress delay={200} color="#29D" options={{ showSpinner: false }} />
       <Provider store={store}>
         <PersistGate
-          loading={<div> Persist Loading... </div>}
+          loading={<Loader />}
           persistor={persistor}
+          onBeforeLift={() =>
+            new Promise((resolve) => setTimeout(resolve, 1000))
+          }
         >
           <PrivateRoute protectedRoutes={protectedRoutes}>
             <ThemeProvider attribute="class">
