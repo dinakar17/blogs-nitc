@@ -32,8 +32,8 @@ function MyApp({ Component, pageProps }: AppProps) {
   // const { authData, token } = useSelector((state: RootState) => state.user);
 
   const protectedRoutes = [
-    "/user/myBlogs",
-    "/user/myProfile",
+    "/user/edit-profile",
+    "/user/my-profile",
     "/blog/edit/[slug]",
     "/blog/create",
   ];
@@ -69,7 +69,7 @@ function MyApp({ Component, pageProps }: AppProps) {
             new Promise((resolve) => setTimeout(resolve, 700))
           }
         >
-          {/* <PrivateRoute protectedRoutes={protectedRoutes}> */}
+          <PrivateRoute protectedRoutes={protectedRoutes}>
             <ThemeProvider attribute="class">
               {/* Ref for ThemeProvider is in Google docs */}
               <Layout noLayoutRoutes={noLayoutRoutes}>
@@ -88,7 +88,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 />
               </Layout>
             </ThemeProvider>
-          {/* </PrivateRoute> */}
+          </PrivateRoute>
         </PersistGate>
       </Provider>
     </>

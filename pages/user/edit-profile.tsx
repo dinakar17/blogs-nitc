@@ -1,14 +1,20 @@
 import { useRouter } from "next/router";
-import React from "react";
-import { useSelector } from "react-redux";
+import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 import useSWR from "swr";
-import { getEditProfile, updateProfile, uploadImage } from "../../api";
+import {
+  deleteImage,
+  getEditProfile,
+  updateProfile,
+  uploadImage,
+} from "../../api";
 import Loader from "../../components/Loader/Loader";
-import { RootState } from "../../store/store";
+import { AppDispatch, RootState } from "../../store/store";
 import Button from "@material-ui/core/Button";
 import { MdPhotoCamera } from "react-icons/md";
 import { AxiosResponse } from "axios";
+import { updateAuthData } from "../../store/StatesContainer/auth/AuthSlice";
 
 const fetchWithToken = (url: string, token: string) =>
   getEditProfile(url, token).then((res) => res.data);
@@ -16,13 +22,30 @@ const fetchWithToken = (url: string, token: string) =>
 const Edit = () => {
   const { token } = useSelector((state: RootState) => state.user);
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
 
   const [name, setName] = React.useState("");
   const [bio, setBio] = React.useState("");
-  // photo is a file
-  const [photo, setPhoto] = React.useState(null);
-  const [preview, setPreview] = React.useState(null);
-  const [shouldEdit, setShouldEdit] = React.useState(false);
+  // here blob means binary large object similar to File object. It is used to store binary data.
+  const [photo, setPhoto] = React.useState<File | null | Blob>(null);
+  const [preview, setPreview] = React.useState<string | ArrayBuffer | null>(
+    null
+  );
+  const [loading, setLoading] = React.useState(false);
+
+  useEffect(() => {
+    if (!photo) {
+      setPreview(null);
+      return;
+    }
+
+    // URL.createObjectURL() creates a DOMString containing a URL representing the object given in the parameter
+    const objectUrl = URL.createObjectURL(photo);
+    setPreview(objectUrl);
+
+    // free memory when ever this component is unmounted
+    return () => URL.revokeObjectURL(objectUrl);
+  }, [photo]);
 
   const { data, error } = useSWR(
     token ? [`api/v1/users/editProfile`, token] : null,
@@ -38,22 +61,43 @@ const Edit = () => {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    const formData = new FormData();
-    formData.append("profile-file", photo);
-    try{
-    const res: AxiosResponse = await uploadImage(formData);
-    const url = res.data.result[0].url;
-      const modified_url =
-        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
-      // console.log(modified_url);
-    
-      // upload the name, bio and modified_url to the server
-      const response = await updateProfile({name, bio, modified_url}, token);
-    }catch(err: any){
+    setLoading(true);
+
+    try {
+      let modified_url: string = "";
+      if (photo) {
+        const formData = new FormData();
+        formData.append("profile-file", photo as Blob);
+        const photoUrl = data.data.user.photo.replace(
+          process.env.NEXT_PUBLIC_IMAGE_API_URL,
+          ""
+        );
+        await deleteImage(`filePath=${photoUrl}`);
+
+        const res: AxiosResponse = await uploadImage(formData);
+        const url = res.data.result[0].url;
+        modified_url =
+          process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
+      }
+      let dataToUpdate = {
+        name,
+        bio,
+      };
+      if (modified_url) {
+        // @ts-ignore
+        dataToUpdate = { ...dataToUpdate, photo: modified_url };
+      }
+      const updatedResponse = await updateProfile(dataToUpdate, token);
+      // Note: updatedResponse.data is AxiosResponse and remaining is the data from the response
+      dispatch(updateAuthData(updatedResponse.data.data.user));
+
+      setLoading(false);
+      toast.success("Profile updated successfully");
+    } catch (err: any) {
+      setLoading(false);
+      toast.error(err.message);
       console.log(err);
     }
-
-
   };
 
   if (!data) return <Loader />;
@@ -64,14 +108,19 @@ const Edit = () => {
   }
 
   //   console.log(data);
-  console.log(name, bio, photo);
 
   return (
     <div>
       <h1>Edit Profile</h1>
       <div>
         <img
-          src={data.data.user.photo}
+          src={
+            preview
+              ? preview
+              : data.data.user.photo
+              ? data.data.user.photo
+              : null
+          }
           alt="profile"
           className="w-20 h-20 rounded-full object-cover"
         />
@@ -80,7 +129,7 @@ const Edit = () => {
           className="hidden"
           id="profile-upload"
           type="file"
-          onChange={(e) => setPhoto(e.target.files[0])}
+          onChange={(e) => setPhoto(e.target.files[0] as File)}
         />
         <label htmlFor="profile-upload">
           <Button
@@ -102,11 +151,16 @@ const Edit = () => {
         <p></p>
         <input
           type="text"
+          // add elegant css to this input
+          className="w-full h-40"
           value={bio}
           onChange={(e) => setBio(e.target.value)}
         />
         <button onClick={() => router.push("/user/my-profile")}>Cancel</button>
-        <button disabled={name === ""}> Save Changes </button>
+        <button disabled={name === ""}>
+          {" "}
+          {loading ? "Saving changes..." : "Save Changes"}
+        </button>
       </form>
     </div>
   );

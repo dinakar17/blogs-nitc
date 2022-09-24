@@ -147,7 +147,7 @@ const Header = () => {
                     </Link>
                   </motion.li>
                   <motion.li variants={itemVariants} className="cursor-pointer">
-                    <Link href="/user/my-blogs">
+                    <Link href="/user/my-profile">
                       <div className="flex items-center gap-2">
                         <MdCollectionsBookmark className="w-5 h-5 text-gray-500" />
                         <a>My Blogs</a>

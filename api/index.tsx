@@ -64,8 +64,10 @@ export const getProfile = (url: string, token: string) => API.get(url, { headers
 
 export const getEditProfile = (url: string, token: string) => API.get(url, { headers: { Authorization: `Bearer ${token}` } });
 
-export const updateProfile = (updatedProfile: any, token: string) => API.patch('/api/v1/users/updateProfile', updatedProfile, { headers: { Authorization: `Bearer ${token}` } });
+export const updateProfile = (updatedProfile: any, token: string) => API.patch('/api/v1/users/editProfile', updatedProfile, { headers: { Authorization: `Bearer ${token}` } });
 
 
 // ------------------ IMAGE ------------------  //
 export const uploadImage = (formData: FormData) => API2.post('/imagev2api/profile-upload-single', formData);
+
+export const deleteImage = (query: string) => API2.delete(`/delete-file?${query}`);
