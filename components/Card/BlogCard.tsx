@@ -20,7 +20,7 @@ interface Props {
 }
 
 const BlogCard = ({ data }: Props) => {
-  console.log(data.tags);
+  // console.log(data.tags);
   return (
     <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800 w-[300px] shadow-lg">
       {/* Design and display a blog card */}

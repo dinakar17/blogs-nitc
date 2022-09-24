@@ -1,8 +1,7 @@
+
 import dynamic from "next/dynamic";
 import SunEditorCore from "suneditor/src/lib/core";
 import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
-// import { buttonList } from "suneditor-react";
-import Select from "react-select";
 import TagsInput from "react-tagsinput";
 
 import "react-tagsinput/react-tagsinput.css";
@@ -11,6 +10,10 @@ import { RefObject } from "react";
 import { AxiosResponse } from "axios";
 import { uploadImage } from "../../api";
 import { setOptions } from "./EditorOptions";
+import Branch from "../../helpers/Options/Branch";
+import Semester from "../../helpers/Options/Semester";
+import Subject from "../../helpers/Options/Subject";
+import Link from "next/link";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -27,9 +30,7 @@ type EditorProps = {
   featuredImage: string;
   setFeaturedImage: (featuredImage: string) => void;
   branch: BranchProps;
-  setBranch: (branch: BranchProps) => void;
   semester: BranchProps;
-  setSemester: (semester: BranchProps) => void;
   tags: string[];
   setTags: (tags: string[]) => void;
   saveContent: () => void;
@@ -39,28 +40,6 @@ type EditorProps = {
   // imageUpload: (file: File) => Promise<void>;
 };
 
-const options = [
-  // list of of all engineering branches
-  { value: "cse", label: "Computer Science" },
-  { value: "ece", label: "Electronics and Communication" },
-  { value: "mech", label: "Mechanical" },
-  { value: "civil", label: "Civil" },
-  { value: "eee", label: "Electrical and Electronics" },
-  { value: "it", label: "Information Technology" },
-  { value: "chem", label: "Chemical" },
-];
-
-const semesterOptions = [
-  { value: "1", label: "1st Semester" },
-  { value: "2", label: "2nd Semester" },
-  { value: "3", label: "3rd Semester" },
-  { value: "4", label: "4th Semester" },
-  { value: "5", label: "5th Semester" },
-  { value: "6", label: "6th Semester" },
-  { value: "7", label: "7th Semester" },
-  { value: "8", label: "8th Semester" },
-];
-
 const Editor = (props: EditorProps) => {
   const {
     setTitle,
@@ -68,22 +47,21 @@ const Editor = (props: EditorProps) => {
     featuredImage,
     setFeaturedImage,
     branch,
-    setBranch,
     semester,
-    setSemester,
     tags,
     setTags,
     saveContent,
     editor,
     setDraft,
     loading,
-    // imageUpload
   } = props;
 
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
     // @ts-ignore
     editor.current = sunEditor;
   };
+
+  // Todo: Add custom keyboard shortcuts
 
   // https://github.com/mkhstar/suneditor-react/issues/128
   const onImageUploadBefore = (
@@ -158,6 +136,16 @@ const Editor = (props: EditorProps) => {
     }
   };
 
+  const isBranch = (value: string) => {
+    if (value === "general" || value === "campus_placements" || value === "") {
+      // in order to prevent showing select subject option
+      // The below line of code freezes the app for some reason
+      // setSemester({ value: "", label: "Select Semester" });
+      return false;
+    }
+    return true;
+  };
+
   return (
     <div className="flex flex-col gap-5 w-[90%] mx-auto">
       {/* Title for the blog */}
@@ -205,21 +193,19 @@ const Editor = (props: EditorProps) => {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
         {/* Select the branch */}
-        <div className="flex flex-col gap-2">
+        <div className="flex flex-col gap-2 z-[1000]">
           <label className="">Select the branch</label>
-          <Select
-            options={options}
-            className="z-[1000]"
-            onChange={(e: any) => setBranch(e) as any}
-          />
-          {branch && (
+          <Branch />
+          {isBranch(branch.value) && (
             <div className="flex flex-col gap-2">
               <label className="">Select the semester</label>
-              <Select
-                options={semesterOptions}
-                className="z-[1000]"
-                onChange={(e: any) => setSemester(e) as any}
-              />
+              <Semester/>
+            </div>
+          )}
+          {semester.value && (
+            <div className="flex flex-col gap-2">
+              <label className="">Select the Subject </label>
+              <Subject branch={branch.value} semester={semester.value} />
             </div>
           )}
         </div>
@@ -248,6 +234,12 @@ const Editor = (props: EditorProps) => {
         >
           {loading ? "Saving..." : "Save"}
         </button>
+        {/* Preview button */}
+        <Link href="/temp">
+          <a className="bg-blue-500 text-white p-2 rounded-md" target="_blank">
+            Preview
+          </a>
+        </Link>
         <button
           className="bg-red-500 text-white p-2 rounded-md"
           onClick={() => setDraft(true)}

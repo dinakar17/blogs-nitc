@@ -13,7 +13,7 @@ import "react-tagsinput/react-tagsinput.css";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { toast } from "react-toastify";
-import  { useRouter } from "next/router";
+import { useRouter } from "next/router";
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
 });
@@ -28,15 +28,13 @@ const Home: NextPage = () => {
 
   const editor = useRef<SunEditorCore>(null);
   const token = useSelector((state: RootState) => state.user.token);
+  const {branch, semester, subject} = useSelector((state: RootState) => state.filter);
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [featuredImage, setFeaturedImage] = useState("");
-  const [branch, setBranch] = useState<BranchProps>({ value: "", label: "" });
-  const [semester, setSemester] = useState<BranchProps>({ value: "", label: "" });
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState(false);
-  const [blogData, setBlogData] = useState(null);
 
   const [loading, setLoading] = useState(false);
 
@@ -44,11 +42,11 @@ const Home: NextPage = () => {
     // It is not possible to create "custom message" with "beforeUnload" event
     window.addEventListener("beforeunload", (e) => {
       e.preventDefault();
-      // alert("Are you sure you want to leave?");
+      alert("Are you sure you want to leave?");
       // e.returnValue = "";
     });
   });
-  
+
   const saveContent = async () => {
     const config = {
       headers: {
@@ -93,8 +91,6 @@ const Home: NextPage = () => {
     }
   };
 
-  console.log(branch);
-
   return (
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
     <>
@@ -104,9 +100,7 @@ const Home: NextPage = () => {
         featuredImage={featuredImage}
         setFeaturedImage={setFeaturedImage}
         branch={branch}
-        setBranch={setBranch}
         semester={semester}
-        setSemester={setSemester}
         tags={tags}
         setTags={setTags}
         saveContent={saveContent}

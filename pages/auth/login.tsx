@@ -6,15 +6,16 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 // https://fkhadra.github.io/react-toastify/introduction
 import * as api from "../../api";
+import Loader from "../../components/Loader/Loader";
 import { EmailValidator } from "../../helpers/Validators/EmailValidator";
 import { signIn } from "../../store/StatesContainer/auth/AuthSlice";
 import { AppDispatch, RootState } from "../../store/store";
 
 const login = () => {
-  const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
   const userInfo = useSelector((state: RootState) => state.user);
-  const { authData, loading, error } = userInfo;
+  const {authData, loading, error } = userInfo;
 
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
@@ -45,7 +46,11 @@ const login = () => {
       // Todo: google auto filling causing login successful
       const signInDetails = { email, password };
       // Note: createAsyncThunk accepts only one argument (payload) because it is a thunk function
-      dispatch(signIn(signInDetails));
+      try {
+        dispatch(signIn(signInDetails));
+      } catch (error: any) {
+        toast.error(error.message);
+      }
     } else {
       // show the error message
       toast.error("email or password is invalid 😓", {
@@ -60,31 +65,35 @@ const login = () => {
     }
   };
 
-  useEffect(() => {
-    if (!loading && authData) {
-    router.push("/");
-    }
-  }, [authData, loading, router]);
+  // useEffect(() => {
+  //   if (!loading && authData) {
+  //     router.push("/");
+  //   }
+  // }, [authData, loading, router]);
 
   useEffect(() => {
-    if (error) {
-      toast.error(error, {
-        position: "top-center",
-        autoClose: 2000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    }
-  }, [error]);
+    // Todo: Clear the persist:root state in the local storage since that is storing error message
+  if(authData){
+    router.push("/");
+  }
+  if (!loading && error) {
+    toast.error(error, {
+      position: "top-center",
+      autoClose: 2000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+  }
+  }, [error, loading]);
 
   return (
     // create two columns using grid and make them responsive as well
     <>
       {loading ? (
-        <div>Loading...</div>
+        <Loader/>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-screen font-default">
           {/* Grid Block 1 */}

@@ -4,6 +4,7 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useTypewriter, Cursor } from "react-simple-typewriter";
 import TextTransition, { presets } from "react-text-transition";
+import Link from "next/link";
 
 const TEXTS = ["Share", "Grow"];
 
@@ -45,10 +46,12 @@ const Intro = () => {
           <h1 className="text-8xl font-bold">
             {text} <Cursor />
           </h1>
-          <button className="bg-blue-500 text-2xl text-white px-4 py-2 rounded-md mr-auto mt-12">
-            {" "}
-            See all posts
-          </button>
+          <Link href="/blog">
+            <button className="bg-blue-500 text-2xl text-white px-4 py-2 rounded-md mr-auto mt-12">
+              {" "}
+              See all posts
+            </button>
+          </Link>
         </div>
         <div>
           <Image src="/static/hero.jpg" width={500} height={500} />

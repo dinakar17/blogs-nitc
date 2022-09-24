@@ -61,7 +61,7 @@ const Header = () => {
   const dispatch = useDispatch<AppDispatch>();
   const user = useSelector((state: RootState) => state.user);
   const { authData } = user;
-  console.log(authData);
+  // console.log(authData);
 
   const { theme, setTheme } = useTheme();
   const [isDarkMode, setIsDarkMode] = React.useState(false);
@@ -135,15 +135,9 @@ const Header = () => {
                   initial="hidden"
                   animate="visible"
                   exit="collapsed"
+                  onClick={() => setMounted((s) => !s)}
                 >
-                  <motion.li variants={itemVariants} className="cursor-pointer">
-                    <Link href="/user/profile">
-                      <div className="flex items-center gap-2">
-                        <CgProfile className="w-5 h-5 text-gray-500" />
-                        <a>Profile</a>
-                      </div>
-                    </Link>
-                  </motion.li>
+                  
                   <motion.li variants={itemVariants} className="cursor-pointer">
                     <Link href="/blog/create">
                       <div className="flex items-center gap-2">
@@ -163,7 +157,7 @@ const Header = () => {
                   <motion.li variants={itemVariants} className="cursor-pointer">
                     <Link href="/user/edit-profile">
                       <div className="flex items-center gap-2">
-                        <GrCreditCard className="w-5 h-5 text-gray-500" />
+                        <CgProfile className="w-5 h-5 text-gray-500" />
                         <a>Edit Profile</a>
                       </div>
                     </Link>

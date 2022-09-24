@@ -37,6 +37,8 @@ export const getAllPosts = (query: string) => API.get(`/api/v1/blogs?${query}`);
 
 export const getLatestPosts = (url: string) => API.get(url);
 
+export const getFilteredPosts = (url: string) => API.get(url);
+
 export const createPost = (newPost: BlogPost, config: AxiosRequestConfig) => API.post('/api/v1/blogs', qs.stringify(newPost), config);
 
 // Note: In this case url = 'api/v1/blogs/slug/${slug}'
@@ -56,6 +58,13 @@ export const signIn = (formData: SignInFormData) => API.post('/api/v1/users/logi
 export const forgotPassword = (email: string) => API.post('/api/v1/users/forgotPassword', email);
 
 export const resetPassword = (token: string, password: string, passwordConfirm: string) => API.patch(`/api/v1/users/resetPassword/${token}`, { password, passwordConfirm });
+
+// ------------------ USER ------------------  //
+export const getProfile = (url: string, token: string) => API.get(url, { headers: { Authorization: `Bearer ${token}` } });
+
+export const getEditProfile = (url: string, token: string) => API.get(url, { headers: { Authorization: `Bearer ${token}` } });
+
+export const updateProfile = (updatedProfile: any, token: string) => API.patch('/api/v1/users/updateProfile', updatedProfile, { headers: { Authorization: `Bearer ${token}` } });
 
 
 // ------------------ IMAGE ------------------  //

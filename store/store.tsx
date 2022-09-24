@@ -6,6 +6,7 @@ import storage from 'redux-persist/lib/storage'
 // https://github.com/rt2zz/redux-persist/issues/988
 // import postsSliceReducer from "./StatesContainer/posts/postsSlice";
 import userSliceReducer from "./StatesContainer/auth/AuthSlice";
+import filtersSliceReducer from "./StatesContainer/filters/FilterSlice";
 // thunk middleware is used to handle async actions in redux
 // import thunk from 'redux-thunk'
 // ? redux-persist failed to create sync storage. falling back to noop storage.
@@ -35,6 +36,7 @@ export const store = configureStore({
     // we access the state through this name "user" i.e., user.authData or user.loading or user.error
     // | Step 5: use the persisted reducer instead of the original reducer. Now head over to _app.tsx for the next step
     user: persistedReducer,
+    filter: filtersSliceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

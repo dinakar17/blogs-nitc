@@ -18,7 +18,7 @@ import { store } from "../store/store";
 
 import Head from "next/head";
 import PrivateRoute from "../components/HOC/WithAuth";
-import { ToastContainer } from "react-toastify";
+import { Slide, ToastContainer } from "react-toastify";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
 import Loader from "../components/Loader/Loader";
@@ -66,15 +66,16 @@ function MyApp({ Component, pageProps }: AppProps) {
           loading={<Loader />}
           persistor={persistor}
           onBeforeLift={() =>
-            new Promise((resolve) => setTimeout(resolve, 1000))
+            new Promise((resolve) => setTimeout(resolve, 700))
           }
         >
-          <PrivateRoute protectedRoutes={protectedRoutes}>
+          {/* <PrivateRoute protectedRoutes={protectedRoutes}> */}
             <ThemeProvider attribute="class">
               {/* Ref for ThemeProvider is in Google docs */}
               <Layout noLayoutRoutes={noLayoutRoutes}>
                 <Component {...pageProps} />
                 <ToastContainer
+                  transition={Slide}
                   position="top-center"
                   autoClose={2000}
                   hideProgressBar={false}
@@ -87,7 +88,7 @@ function MyApp({ Component, pageProps }: AppProps) {
                 />
               </Layout>
             </ThemeProvider>
-          </PrivateRoute>
+          {/* </PrivateRoute> */}
         </PersistGate>
       </Provider>
     </>

@@ -16,7 +16,7 @@ export const setOptions = {
       // ["imageGallery"],
       ["fullScreen", "showBlocks", "codeView"],
       ["preview", "print"],
-      ["save", "template"],
+      // ["save", "template"],
       // (min-width: 992)
       [
         "%992",
@@ -51,7 +51,7 @@ export const setOptions = {
             "preview",
             "print",
             "save",
-            "template",
+            // "template",
           ],
           [
             "-right",
@@ -119,7 +119,7 @@ export const setOptions = {
             "preview",
             "print",
             "save",
-            "template",
+            // "template",
           ],
         ],
       ],
@@ -177,7 +177,7 @@ export const setOptions = {
             "preview",
             "print",
             "save",
-            "template",
+            // "template",
           ],
         ],
       ],

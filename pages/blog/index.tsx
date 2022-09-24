@@ -2,27 +2,55 @@
 // Todo: Pagination
 // Todo: Fetch the blogs from the database
 
-import React, { ChangeEvent } from "react";
+import React, { ChangeEvent, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
 import Pagination from "@material-ui/lab/Pagination";
 
-import Spinner from "../../components/UI/Spinner";
 import { GetServerSideProps, NextPage } from "next";
-import { getAllPosts } from "../../api";
+import { getAllPosts, getFilteredPosts } from "../../api";
 import BlogCard, { BlogProps } from "../../components/Card/BlogCard";
 import { toast } from "react-toastify";
-
-// const fetcher = (url) => axios.get(url).then((res) => res.data);
+import Branch from "../../helpers/Options/Branch";
+import Semester from "../../helpers/Options/Semester";
+import Select from "react-select";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
+import useSWR from "swr";
 
 type Props = {
   data: any;
   error: any;
 };
 
+const sortOptions = [
+  { value: "newest", label: "Newest" },
+  { value: "oldest", label: "Oldest" },
+  { value: "popular", label: "Popular" },
+];
+
+const fetcher = (url: string) => getFilteredPosts(url).then((res) => res.data);
+
 const Home: NextPage<Props> = (props) => {
+  const { branch, semester, subject } = useSelector(
+    (state: RootState) => state.filter
+  );
   const router = useRouter();
+  let query: string = "";
+
+  // Todo: Fix this issue
+  // useEffect(() => {
+  //   // clear all query names in the url
+  //   // shallow means
+  //   router.replace(router.pathname, router.pathname, { shallow: false });
+  // }, []);
+
   const { data, error } = props;
+
+  const [search, setSearch] = React.useState("");
+  const [sort, setSort] = React.useState({ value: "", label: "" });
+  const [shouldFetch, setShouldFetch] = React.useState(false);
+
   if (error) {
     let errMessage;
     if (error.response) {
@@ -44,7 +72,7 @@ const Home: NextPage<Props> = (props) => {
   //   fetcher
   // );
 
-  if (!data) return <Spinner />;
+  // if (!data) return <Spinner />;
 
   const paginationHandler = (event: ChangeEvent<unknown>, page: number) => {
     const currentPath = router.pathname;
@@ -57,7 +85,111 @@ const Home: NextPage<Props> = (props) => {
     });
   };
 
-  console.log(data);
+  // console.log(data);
+  const handleSearch = (choice: string) => {
+    // if search is not empty then add it to the query
+    if (choice === "Search") {
+      if (search && router.query.search !== search) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, search },
+        });
+      } else if (!search && router.query.search) {
+        // if search is empty and there is a search query in the url then remove it
+        const currentQuery = router.query;
+        delete currentQuery.search;
+        router.push({
+          pathname: router.pathname,
+          query: currentQuery,
+        });
+      }
+    }
+
+    if (choice === "Filter") {
+      // if branch is not empty then add it to the query
+      if (branch.value && router.query.branch !== branch.value) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, branch: branch.value },
+        });
+      } else if (!branch.value && router.query.branch) {
+        // if branch is empty and there is a branch query in the url then remove it
+        const currentQuery = router.query;
+        delete currentQuery.branch;
+        router.push({
+          pathname: router.pathname,
+          query: currentQuery,
+        });
+      }
+      if (semester.value && router.query.semester !== semester.value) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, semester: semester.value },
+        });
+      } else if (!semester.value && router.query.semester) {
+        // if semester is empty and there is a semester query in the url then remove it
+        const currentQuery = router.query;
+        delete currentQuery.semester;
+        router.push({
+          pathname: router.pathname,
+          query: currentQuery,
+        });
+      }
+    }
+
+    if (choice === "Sort") {
+      // if sort is not empty then add it to the query
+      if (sort.value && router.query.sort !== sort.value) {
+        router.push({
+          pathname: router.pathname,
+          query: { ...router.query, sort: sort.value },
+        });
+      } else if (!sort.value && router.query.sort) {
+        // if sort is empty and there is a sort query in the url then remove it
+        const currentQuery = router.query;
+        delete currentQuery.sort;
+        router.push({
+          pathname: router.pathname,
+          query: currentQuery,
+        });
+      }
+    }
+
+    // // if subject is not empty then add it to the query
+    // if (subject.value) {
+    //   router.push({
+    //     pathname: router.pathname,
+    //     query: { ...router.query, subject: subject.value },
+    //   });
+    // } else if (!subject.value && router.query.subject) {
+    //   // if subject is empty and there is a subject query in the url then remove it
+    //   const currentQuery = router.query;
+    //   delete currentQuery.subject;
+    //   router.push({
+    //     pathname: router.pathname,
+    //     query: currentQuery,
+    //   });
+    // }
+
+    // setShouldFetch(true);
+    setShouldFetch(true);
+  };
+
+  // https://swr.vercel.app/docs/conditional-fetching
+  // if (shouldFetch) {  // Rendered more hooks than during the previous render
+  query = `${router.query.search ? `&search=${router.query.search}` : ""}${
+    router.query.branch ? `&branch=${router.query.branch}` : ""
+  }${router.query.semester ? `&semester=${router.query.semester}` : ""}${
+    router.query.sort ? `&sort=${router.query.sort}` : ""
+  }`;
+  query = query.startsWith("&") ? query.slice(1) : query;
+  const res = useSWR(
+    shouldFetch && query ? `api/v1/blogs/search?${query}` : null,
+    fetcher
+  );
+
+  const dataToDisplay = res.data ? res.data : data;
+
   return (
     <div className="w-[90%] mx-auto">
       <Head>
@@ -67,17 +199,46 @@ const Home: NextPage<Props> = (props) => {
           content="All blogs list for blogging application Blog App"
         />
       </Head>
-      <div className="w-full">
+      <div className="flex w-full items-center gap-4">
         <input
           type="text"
           placeholder="Search"
-          className="w-full p-2 m-4 focus:outline-none border border-gray-300 rounded-md"
+          className="w-full p-2 my-4 focus:outline-none border border-gray-300 rounded-md"
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
         />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={() => handleSearch("Search")}
+        >
+          Search
+        </button>
+      </div>
+      {/* Filters here */}
+      <div className="w-full flex flex-col md:flex-row items-center my-4 gap-5">
+        <Branch />
+        <Semester />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          // handle change in branch and semester separately
+          onClick={() => handleSearch("Filter")}
+        >
+          Filter
+        </button>
+        <Select options={sortOptions} onChange={(e: any) => setSort(e)} />
+        <button
+          className="bg-blue-500 text-white px-4 py-2 rounded-md"
+          onClick={() => handleSearch("Sort")}
+        >
+          Sort
+        </button>
       </div>
       <div>
+        {/* Todo: Display number of blogs and also the time */}
+        {/* <p>Found {dataToDisplay.length} blogs</p> */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {/* <BlogCards data={data.data} /> */}
-          {data.data.map((blog: BlogProps) => (
+          {dataToDisplay.data.map((blog: BlogProps) => (
             <BlogCard key={blog._id} data={blog} />
           ))}
         </div>

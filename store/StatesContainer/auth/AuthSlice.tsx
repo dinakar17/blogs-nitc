@@ -32,6 +32,8 @@ const initialState: AuthState = {
   token: "",
 };
 
+
+
 // * Step 3: Configure Asynchronous action creators
 // Note: signIn is an asynchronous action creator that goes through 3 stages(just like ascending a stairs to reach a goal):
 // 1. signIn.pending: the action creator returns a promise
@@ -95,6 +97,10 @@ const authSlice = createSlice({
       state.authData = action.payload.data.user;
       state.token = action.payload.token;
       state.signUpSuccess = false;
+      state.error = "";
+      // Note: useRouter doesn't work in the slice file. So, we have to use window.location.href to redirect the user to the home page
+      // const router = useRouter();
+      // router.push("/");
       // As soon as we logged in we add the profile to localStorage
       // localStorage.setItem("loginToken", JSON.stringify(action.payload.token));
       // localStorage.setItem("userInfo", JSON.stringify(action.payload.data.user));
@@ -109,7 +115,13 @@ const authSlice = createSlice({
       state.authData = null;
       // Here action.error.message is the *automatic message* generated when the logic in signUp function fails!
       // Ex: If we use navigate.push("/projects") then action.error.message = "navigate.push is not a function"
+      if(action.payload){
+        // @ts-ignore
       state.error = action.payload.message as string;
+      }
+      else{
+        state.error = "Something went wrong. Please try again later."
+      }
     });
 
     builder.addCase(signUp.pending, (state) => {
@@ -119,11 +131,13 @@ const authSlice = createSlice({
       state.loading = false;
       state.authData = action.payload;
       state.signUpSuccess = true;
+      state.error = "";
     });
     builder.addCase(signUp.rejected, (state, action) => {
       state.loading = false;
       state.authData = null;
       console.log(action);
+      // @ts-ignore
       state.error = action.payload.message as string;
       console.log(state.error);
     });
