@@ -15,24 +15,26 @@ import { RootState } from "../../store/store";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { AxiosResponse } from "axios";
+
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
 });
 
 // Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 const Home: NextPage = () => {
+  console.log("I am create page and helps in creating a blog and I am rendered");
   const router = useRouter();
 
   const token = useSelector((state: RootState) => state.user.token);
   const { branch, semester, subject } = useSelector(
     (state: RootState) => state.filter
   );
-  const editor = useRef<SunEditorCore>(null);
-  
+  const { title, description, featuredImage, content } = useSelector(
+    (state: RootState) => state.post
+  );
 
-  const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
-  const [featuredImage, setFeaturedImage] = useState<File | null | Blob>(null);
+  const editor = useRef<SunEditorCore>(null);
+
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState(false);
 
@@ -73,8 +75,10 @@ const Home: NextPage = () => {
     try {
       setLoading(true);
       // if the below code returns error, then it will be caught by the catch block since it is an async function and it will be handled by the catch block
-      const photoUrl = await imageUpload(featuredImage as File);
-
+      let photoUrl = "";
+      if (featuredImage) {
+        photoUrl = await imageUpload(featuredImage as File);
+      }
       const dataToSend = {
         title,
         description,
@@ -108,10 +112,7 @@ const Home: NextPage = () => {
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
     <>
       <Editor
-        setTitle={setTitle}
-        setDescription={setDescription}
         featuredImage={featuredImage}
-        setFeaturedImage={setFeaturedImage}
         branch={branch}
         semester={semester}
         tags={tags}
