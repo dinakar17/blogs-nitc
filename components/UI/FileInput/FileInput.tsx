@@ -1,14 +1,20 @@
+import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React, { useEffect } from "react";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
 
 type Props = {
-  setImage: React.Dispatch<React.SetStateAction<Blob | File | null>>;
+  setImage: ActionCreatorWithPayload<any, string>;
   image: Blob | File | null;
 };
 
 const FileInput = ({ setImage, image }: Props) => {
+  const dispatch = useDispatch<AppDispatch>();
+
   const [preview, setPreview] = React.useState<string | ArrayBuffer | null>(
     null
   );
+
   useEffect(() => {
     if (!image) {
       setImage(null);
@@ -28,12 +34,12 @@ const FileInput = ({ setImage, image }: Props) => {
       >
         {preview ? (
           <div className="flex justify-center items-center w-full h-full">
-          <img
-            src={preview as string}
-            alt="preview"
-            // if height set to auto then the image will be stretched to fit the container
-            className="max-w-full h-full object-cover bg-white border rounded p-1"
-          />
+            <img
+              src={preview as string}
+              alt="preview"
+              // if height set to auto then the image will be stretched to fit the container
+              className="max-w-full h-full object-cover bg-white border rounded p-1"
+            />
           </div>
         ) : (
           <div className="flex flex-col justify-center items-center pt-5 pb-6">
@@ -66,7 +72,7 @@ const FileInput = ({ setImage, image }: Props) => {
           type="file"
           className="hidden"
           onChange={(e) => {
-            if (e.target.files) setImage(e.target.files[0]);
+            if (e.target.files) dispatch(setImage(e.target.files[0]));
           }}
         />
       </label>

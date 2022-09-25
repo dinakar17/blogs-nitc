@@ -16,6 +16,7 @@ import Link from "next/link";
 import FileInput from "../UI/FileInput/FileInput";
 import InputField from "../UI/InputField/InputField";
 import TextArea from "../UI/TextArea/TextArea";
+import { setDescription, setFeaturedImage, setTitle } from "../../store/StatesContainer/post/PostSlice";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -27,10 +28,7 @@ type BranchProps = {
 };
 
 type EditorProps = {
-  setTitle: (title: string) => void;
-  setDescription: (description: string) => void;
   featuredImage: File | null | Blob;
-  setFeaturedImage: React.Dispatch<React.SetStateAction<File | Blob | null>>;
   branch: BranchProps;
   semester: BranchProps;
   tags: string[];
@@ -44,10 +42,7 @@ type EditorProps = {
 
 const Editor = (props: EditorProps) => {
   const {
-    setTitle,
-    setDescription,
     featuredImage,
-    setFeaturedImage,
     branch,
     semester,
     tags,

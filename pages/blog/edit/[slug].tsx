@@ -181,3 +181,7 @@ const EditBlog: NextPage = () => {
 };
 
 export default EditBlog;
+
+const getServerSideProps: GetServerSideProps = async (context) => {
+  // make a request based 
+}
