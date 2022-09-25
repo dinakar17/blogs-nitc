@@ -79,6 +79,10 @@ const Header = () => {
       name: "About",
       href: "/about",
     },
+    {
+      name: "Issues",
+      href: "/issues",
+    },
   ];
 
   const handleLogOut = () => {
@@ -92,7 +96,7 @@ const Header = () => {
   return (
     // Note: w-[80%] mx-auto is a Tailwind class that sets the width to 80% and centers the element and this is common practice for most websites.
     <motion.header
-      className="flex items-center w-[80%] mx-auto my-4"
+      className="flex items-center w-[80%] mx-auto py-4"
       variants={variants}
       initial="hidden"
       animate="visible"
@@ -137,7 +141,6 @@ const Header = () => {
                   exit="collapsed"
                   onClick={() => setMounted((s) => !s)}
                 >
-                  
                   <motion.li variants={itemVariants} className="cursor-pointer">
                     <Link href="/blog/create">
                       <div className="flex items-center gap-2">

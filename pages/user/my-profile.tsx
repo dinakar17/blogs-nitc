@@ -3,7 +3,7 @@ import Head from "next/head";
 import useSWR from "swr";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
-import Loader from "../../components/Loader/Loader";
+import Loader from "../../components/UI/Loader/Loader";
 import { getProfile } from "../../api";
 import { toast } from "react-toastify";
 import BlogCard, { BlogProps } from "../../components/Card/BlogCard";

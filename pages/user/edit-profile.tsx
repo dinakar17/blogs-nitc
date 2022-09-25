@@ -9,7 +9,7 @@ import {
   updateProfile,
   uploadImage,
 } from "../../api";
-import Loader from "../../components/Loader/Loader";
+import Loader from "../../components/UI/Loader/Loader";
 import { AppDispatch, RootState } from "../../store/store";
 import Button from "@material-ui/core/Button";
 import { MdPhotoCamera } from "react-icons/md";

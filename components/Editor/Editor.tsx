@@ -1,4 +1,3 @@
-
 import dynamic from "next/dynamic";
 import SunEditorCore from "suneditor/src/lib/core";
 import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
@@ -14,6 +13,9 @@ import Branch from "../../helpers/Options/Branch";
 import Semester from "../../helpers/Options/Semester";
 import Subject from "../../helpers/Options/Subject";
 import Link from "next/link";
+import FileInput from "../UI/FileInput/FileInput";
+import InputField from "../UI/InputField/InputField";
+import TextArea from "../UI/TextArea/TextArea";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -147,40 +149,16 @@ const Editor = (props: EditorProps) => {
   };
 
   return (
-    <div className="flex flex-col gap-5 w-[90%] mx-auto">
+    <div className="flex flex-col gap-4 w-[90%] mx-auto">
       {/* Title for the blog */}
-      <div className="flex flex-col gap-2">
-        <label>Title</label>
-        <input
-          required
-          type="text"
-          onChange={(e) => setTitle(e.target.value)}
-          placeholder="Enter the title of the blog"
-          className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-        />
-      </div>
+      <InputField label="Title" setState={setTitle} placeholder="Enter the title of the blog" />
       {/* Summary of the blog */}
-      <div className="flex flex-col gap-2">
-        <label>Description</label>
-        <textarea
-          required
-          rows={2}
-          onChange={(e) => setDescription(e.target.value)}
-          placeholder="Enter the Description of the blog"
-          className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-        />
-      </div>
-
+      <TextArea label="Description" setState={setDescription} placeholder="Enter the description of the blog" />
       {/* Featured Image */}
       <div className="flex flex-col gap-2">
         {/* Todo: Hover effect */}
-        <label>Featured Image</label>
-        <input
-          type="file"
-          onChange={(e: any) => imageUpload(e.target.files[0])}
-          placeholder="Enter the summary of the blog"
-          className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-        />
+        <label className="block mb-2 text-base font-medium text-gray-900 dark:text-gray-400">Featured Image</label>
+        <FileInput imageUpload={imageUpload} />
         {featuredImage && (
           <div className="w-24 h-10">
             <img
@@ -199,7 +177,7 @@ const Editor = (props: EditorProps) => {
           {isBranch(branch.value) && (
             <div className="flex flex-col gap-2">
               <label className="">Select the semester</label>
-              <Semester/>
+              <Semester />
             </div>
           )}
           {semester.value && (

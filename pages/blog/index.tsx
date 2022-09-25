@@ -1,4 +1,5 @@
 // Todo: Search and Filter the blogs
+// https://stackoverflow.com/questions/42217121/how-to-start-search-only-when-user-stops-typing
 // Todo: Pagination
 // Todo: Fetch the blogs from the database
 
@@ -17,6 +18,8 @@ import Select from "react-select";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import useSWR from "swr";
+import SkeletonCard from "../../components/UI/Loader/SkeletonCard";
+import SearchInput from "../../components/UI/Search/SearchInput";
 
 type Props = {
   data: any;
@@ -39,11 +42,11 @@ const Home: NextPage<Props> = (props) => {
   let query: string = "";
 
   // Todo: Fix this issue
-  // useEffect(() => {
-  //   // clear all query names in the url
-  //   // shallow means
-  //   router.replace(router.pathname, router.pathname, { shallow: false });
-  // }, []);
+  useEffect(() => {
+    // clear all query names in the url
+    // shallow means
+    router.replace("/blog", undefined, { shallow: true });
+  }, []);
 
   const { data, error } = props;
 
@@ -87,6 +90,7 @@ const Home: NextPage<Props> = (props) => {
 
   // console.log(data);
   const handleSearch = (choice: string) => {
+    console.log(choice);
     // if search is not empty then add it to the query
     if (choice === "Search") {
       if (search && router.query.search !== search) {
@@ -183,12 +187,29 @@ const Home: NextPage<Props> = (props) => {
     router.query.sort ? `&sort=${router.query.sort}` : ""
   }`;
   query = query.startsWith("&") ? query.slice(1) : query;
+
+  const conditionToDisplayFilteredData = () => {
+    if (
+      router.query.search ||
+      router.query.branch ||
+      router.query.semester ||
+      router.query.sort
+    ) {
+      return true;
+    }
+    return false;
+  };
   const res = useSWR(
-    shouldFetch && query ? `api/v1/blogs/search?${query}` : null,
+    conditionToDisplayFilteredData() && query
+      ? `api/v1/blogs/search?${query}`
+      : null,
     fetcher
   );
 
-  const dataToDisplay = res.data ? res.data : data;
+  // if (shouldFetch && !res.data) return <SkeletonCards />;
+
+  // const dataToDisplay = res.data ? res.data : data;
+  // console.log(res.data);
 
   return (
     <div className="w-[90%] mx-auto">
@@ -199,21 +220,13 @@ const Home: NextPage<Props> = (props) => {
           content="All blogs list for blogging application Blog App"
         />
       </Head>
-      <div className="flex w-full items-center gap-4">
-        <input
-          type="text"
-          placeholder="Search"
-          className="w-full p-2 my-4 focus:outline-none border border-gray-300 rounded-md"
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-        />
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          onClick={() => handleSearch("Search")}
-        >
-          Search
-        </button>
-      </div>
+
+      <SearchInput
+        handleSearch={handleSearch}
+        setSearch={setSearch}
+        search={search}
+      />
+
       {/* Filters here */}
       <div className="w-full flex flex-col md:flex-row items-center my-4 gap-5">
         <Branch />
@@ -238,13 +251,27 @@ const Home: NextPage<Props> = (props) => {
         {/* <p>Found {dataToDisplay.length} blogs</p> */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
           {/* <BlogCards data={data.data} /> */}
-          {dataToDisplay.data.map((blog: BlogProps) => (
-            <BlogCard key={blog._id} data={blog} />
-          ))}
+          {!conditionToDisplayFilteredData() &&
+            data &&
+            data.data.map((blog: BlogProps) => (
+              <BlogCard key={blog._id} data={blog} />
+            ))}
+          {conditionToDisplayFilteredData() && !res.data
+            ? // display 6 skeleton cards while fetching
+              [...Array(6)].map((_, i) => <SkeletonCard key={i} />)
+            : res.data &&
+              res.data.data.map((blog: BlogProps) => (
+                <BlogCard key={blog._id} data={blog} />
+              ))}
+          {/* {} */}
         </div>
         <div style={{ alignSelf: "center", marginTop: "3rem" }}>
           <Pagination
-            count={Math.ceil(data.totalResults / limit)}
+            count={
+              res.data
+                ? Math.ceil(res.data.totalBlogs / limit)
+                : Math.ceil(data.totalBlogs / limit)
+            }
             page={Number(page) * 1}
             onChange={paginationHandler}
           />
@@ -259,7 +286,7 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const query = `page=${page}`;
   try {
     const res = await getAllPosts(query);
-    console.log(res);
+    // console.log(res);
     return {
       props: {
         data: res.data,

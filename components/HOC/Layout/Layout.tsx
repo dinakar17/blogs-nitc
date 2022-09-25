@@ -28,7 +28,7 @@ const Layout = ({ children, noLayoutRoutes }: Props) => {
     <>
       <AnimatePresence>
         <motion.div
-          className="font-default"
+          className="font-default dark:bg-[#1F2028] dark:text-gray-100"
           variants={variants}
           initial="hidden"
           animate="visible"

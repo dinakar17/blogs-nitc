@@ -2,7 +2,7 @@ import { useRouter } from 'next/router';
 import React, {useEffect, FC} from 'react'
 import { useSelector } from 'react-redux';
 import { RootState } from '../../store/store';
-import Loader from '../Loader/Loader';
+import Loader from '../UI/Loader/Loader';
 
 type Props = {
     children: React.ReactNode;
@@ -22,9 +22,9 @@ const PrivateRoute: FC<Props> = (props) => {
     }
   }, [token, pathIsProtected]);
 
-  // if (!token && pathIsProtected) {
-  //   return <Loader />;
-  // }
+  if (!token && pathIsProtected) {
+    return <Loader />;
+  }
 
   return (
     <>

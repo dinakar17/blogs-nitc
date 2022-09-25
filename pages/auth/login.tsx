@@ -6,7 +6,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
 // https://fkhadra.github.io/react-toastify/introduction
 import * as api from "../../api";
-import Loader from "../../components/Loader/Loader";
+import Loader from "../../components/UI/Loader/Loader";
 import { EmailValidator } from "../../helpers/Validators/EmailValidator";
 import { signIn } from "../../store/StatesContainer/auth/AuthSlice";
 import { AppDispatch, RootState } from "../../store/store";
@@ -15,7 +15,7 @@ const login = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
   const userInfo = useSelector((state: RootState) => state.user);
-  const {authData, loading, error } = userInfo;
+  const { authData, loading, error } = userInfo;
 
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
@@ -73,27 +73,27 @@ const login = () => {
 
   useEffect(() => {
     // Todo: Clear the persist:root state in the local storage since that is storing error message
-  if(authData){
-    router.push("/");
-  }
-  if (!loading && error) {
-    toast.error(error, {
-      position: "top-center",
-      autoClose: 2000,
-      hideProgressBar: false,
-      closeOnClick: true,
-      pauseOnHover: true,
-      draggable: true,
-      progress: undefined,
-    });
-  }
+    if (authData) {
+      router.push("/");
+    }
+    if (!loading && error) {
+      toast.error(error, {
+        position: "top-center",
+        autoClose: 2000,
+        hideProgressBar: false,
+        closeOnClick: true,
+        pauseOnHover: true,
+        draggable: true,
+        progress: undefined,
+      });
+    }
   }, [error, loading]);
 
   return (
     // create two columns using grid and make them responsive as well
     <>
       {loading ? (
-        <Loader/>
+        <Loader />
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-screen font-default">
           {/* Grid Block 1 */}
@@ -163,12 +163,15 @@ const login = () => {
               className="object-cover"
             />
             {/* Create a Glassmorphic card of width 300px and height 300px with some content in it*/}
-            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-gray-50/30 rounded-2xl flex flex-col justify-center items-center gap-4 p-4">
-              <h1 className="text-2xl font-bold text-gray-800">Welcome to</h1>
-              <h1 className="text-2xl font-bold text-gray-800">DevSpace</h1>
-              <p className="text-gray-600">
-                A place where you can share your knowledge with the world
+            <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-white bg-opacity-10 backdrop-blur-sm rounded-2xl flex flex-col justify-center items-center gap-4 p-4 text-white/90">
+              <h2 className="text-2xl font-bold">
+                Here's a motivational quote for you to get started
+              </h2>
+              <p>
+                If something is important enough, you do it even if the odds are
+                not in your favor.{" "}
               </p>
+              <p className="font-bold">- Elon Musk</p>
             </div>
           </div>
         </div>

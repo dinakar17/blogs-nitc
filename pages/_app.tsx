@@ -21,7 +21,7 @@ import PrivateRoute from "../components/HOC/WithAuth";
 import { Slide, ToastContainer } from "react-toastify";
 import { persistStore } from "redux-persist";
 import { PersistGate } from "redux-persist/integration/react";
-import Loader from "../components/Loader/Loader";
+import Loader from "../components/UI/Loader/Loader";
 // Todo: https://stackoverflow.com/questions/66914855/next-js-opt-out-of-layout-component-for-specific-pages-from-app-js
 
 // | Step 6: Import persistStore to persist the store
