@@ -7,6 +7,8 @@ import storage from 'redux-persist/lib/storage'
 // import postsSliceReducer from "./StatesContainer/posts/postsSlice";
 import userSliceReducer from "./StatesContainer/auth/AuthSlice";
 import filtersSliceReducer from "./StatesContainer/filters/FilterSlice";
+import postSliceReducer from "./StatesContainer/post/PostSlice";
+
 // thunk middleware is used to handle async actions in redux
 // import thunk from 'redux-thunk'
 // ? redux-persist failed to create sync storage. falling back to noop storage.
@@ -37,6 +39,7 @@ export const store = configureStore({
     // | Step 5: use the persisted reducer instead of the original reducer. Now head over to _app.tsx for the next step
     user: persistedReducer,
     filter: filtersSliceReducer,
+    post : postSliceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

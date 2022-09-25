@@ -129,7 +129,7 @@ const Edit = () => {
           className="hidden"
           id="profile-upload"
           type="file"
-          onChange={(e) => setPhoto(e.target.files[0] as File)}
+          onChange={(e) => {if(e.target.files) setPhoto(e.target.files[0])}}
         />
         <label htmlFor="profile-upload">
           <Button

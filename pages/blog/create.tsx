@@ -14,25 +14,25 @@ import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
+import { AxiosResponse } from "axios";
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
 });
 
-interface BranchProps {
-  value: string;
-  label: string;
-}
-
+// Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 const Home: NextPage = () => {
   const router = useRouter();
 
-  const editor = useRef<SunEditorCore>(null);
   const token = useSelector((state: RootState) => state.user.token);
-  const {branch, semester, subject} = useSelector((state: RootState) => state.filter);
+  const { branch, semester, subject } = useSelector(
+    (state: RootState) => state.filter
+  );
+  const editor = useRef<SunEditorCore>(null);
+  
 
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
-  const [featuredImage, setFeaturedImage] = useState("");
+  const [featuredImage, setFeaturedImage] = useState<File | null | Blob>(null);
   const [tags, setTags] = useState<string[]>([]);
   const [draft, setDraft] = useState(false);
 
@@ -47,32 +47,45 @@ const Home: NextPage = () => {
     });
   });
 
+  const imageUpload = async (file: File) => {
+    // console.log(file);
+    const formData = new FormData();
+    formData.append("profile-file", file);
+    try {
+      const response: AxiosResponse = await api.uploadImage(formData);
+      console.log(response);
+      // console.log(response.data.data);
+      const url = response.data.result[0].url;
+      const modified_url =
+        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
+      // console.log(modified_url);
+      return modified_url;
+    } catch (error: any) {
+      console.log(error);
+      alert(error);
+    }
+  };
+
   const saveContent = async () => {
-    const config = {
-      headers: {
-        //https://stackoverflow.com/questions/9870523/what-are-the-differences-between-application-json-and-application-x-www-form-url
-        //https://dev.to/bcanseco/request-body-encoding-json-x-www-form-urlencoded-ad9
-        "Content-Type": "application/x-www-form-urlencoded",
-        // Todo: fetch the token from the local storage or redux store
-        Authorization: `Bearer ${token}`,
-      },
-    };
     // @ts-ignore
     const content = editor.current?.getContents();
 
-    const dataToSend = {
-      title,
-      description,
-      featuredImage,
-      branch: branch.value,
-      tags,
-      content,
-      draft,
-    };
     try {
       setLoading(true);
+      // if the below code returns error, then it will be caught by the catch block since it is an async function and it will be handled by the catch block
+      const photoUrl = await imageUpload(featuredImage as File);
+
+      const dataToSend = {
+        title,
+        description,
+        featuredImage: photoUrl,
+        branch: branch.value,
+        tags,
+        content,
+        draft,
+      };
       // // response - {data: {status: "success", data: doc}, status: 201, statusText: "Created", headers: {…}, config: {…}, …}
-      const response = await api.createPost(dataToSend, config);
+      const response = await api.createPost(dataToSend, token);
       setLoading(false);
       console.log(response);
       toast.success("Blog created successfully");

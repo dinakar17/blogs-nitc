@@ -29,8 +29,8 @@ type BranchProps = {
 type EditorProps = {
   setTitle: (title: string) => void;
   setDescription: (description: string) => void;
-  featuredImage: string;
-  setFeaturedImage: (featuredImage: string) => void;
+  featuredImage: File | null | Blob;
+  setFeaturedImage: React.Dispatch<React.SetStateAction<File | Blob | null>>;
   branch: BranchProps;
   semester: BranchProps;
   tags: string[];
@@ -119,25 +119,6 @@ const Editor = (props: EditorProps) => {
   //   // targetImgElement.src = "https://picsum.photos/200/300";
   // };
 
-  const imageUpload = async (file: File) => {
-    // console.log(file);
-    const formData = new FormData();
-    formData.append("profile-file", file);
-    try {
-      const response: AxiosResponse = await uploadImage(formData);
-      console.log(response);
-      // console.log(response.data.data);
-      const url = response.data.result[0].url;
-      const modified_url =
-        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
-      // console.log(modified_url);
-      setFeaturedImage(modified_url);
-    } catch (error: any) {
-      console.log(error);
-      alert(error);
-    }
-  };
-
   const isBranch = (value: string) => {
     if (value === "general" || value === "campus_placements" || value === "") {
       // in order to prevent showing select subject option
@@ -151,23 +132,24 @@ const Editor = (props: EditorProps) => {
   return (
     <div className="flex flex-col gap-4 w-[90%] mx-auto">
       {/* Title for the blog */}
-      <InputField label="Title" setState={setTitle} placeholder="Enter the title of the blog" />
+      <InputField
+        label="Title"
+        setState={setTitle}
+        placeholder="Enter the title of the blog"
+      />
       {/* Summary of the blog */}
-      <TextArea label="Description" setState={setDescription} placeholder="Enter the description of the blog" />
+      <TextArea
+        label="Description"
+        setState={setDescription}
+        placeholder="Enter the description of the blog"
+      />
       {/* Featured Image */}
       <div className="flex flex-col gap-2">
         {/* Todo: Hover effect */}
-        <label className="block mb-2 text-base font-medium text-gray-900 dark:text-gray-400">Featured Image</label>
-        <FileInput imageUpload={imageUpload} />
-        {featuredImage && (
-          <div className="w-24 h-10">
-            <img
-              src={featuredImage}
-              alt="featured"
-              className="w-full h-full object-cover"
-            />
-          </div>
-        )}
+        <label className="block mb-2 text-base font-medium text-gray-900 dark:text-gray-400">
+          Featured Image
+        </label>
+        <FileInput setImage={setFeaturedImage} image={featuredImage} />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
         {/* Select the branch */}
