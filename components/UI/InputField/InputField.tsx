@@ -11,7 +11,10 @@ type Props = {
 
 const InputField = ({label, setState, placeholder}: Props) => {
   const dispatch = useDispatch<AppDispatch>();
+<<<<<<< HEAD
 
+=======
+>>>>>>> 748073c1ccdc46afca09533f158e97719a36c3f4
   return (
     <div className="">
       <label

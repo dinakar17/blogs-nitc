@@ -16,7 +16,13 @@ import Link from "next/link";
 import FileInput from "../UI/FileInput/FileInput";
 import InputField from "../UI/InputField/InputField";
 import TextArea from "../UI/TextArea/TextArea";
-import { setDescription, setFeaturedImage, setTitle } from "../../store/StatesContainer/post/PostSlice";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../store/store";
+import {
+  setDescription,
+  setFeaturedImage,
+  setTitle,
+} from "../../store/StatesContainer/post/PostSlice";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -41,6 +47,7 @@ type EditorProps = {
 };
 
 const Editor = (props: EditorProps) => {
+  console.log("I am editor component just for editor and I am rendered");
   const {
     featuredImage,
     branch,
@@ -189,15 +196,18 @@ const Editor = (props: EditorProps) => {
         >
           {loading ? "Saving..." : "Save"}
         </button>
-        {/* Preview button */}
-        <Link href="/temp">
+        {/* Todo: Future Feature if required 
+        <Link href="/blog/preview"> 
           <a className="bg-blue-500 text-white p-2 rounded-md" target="_blank">
             Preview
           </a>
-        </Link>
+        </Link> */}
         <button
           className="bg-red-500 text-white p-2 rounded-md"
-          onClick={() => setDraft(true)}
+          onClick={() => {
+            setDraft(true);
+            saveContent();
+          }}
         >
           Save as Draft
         </button>

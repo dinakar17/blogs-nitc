@@ -15,19 +15,21 @@ import { RootState } from "../../store/store";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { AxiosResponse } from "axios";
+
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
 });
 
 // Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 const Home: NextPage = () => {
+  console.log("I am create page and helps in creating a blog and I am rendered");
   const router = useRouter();
 
   const token = useSelector((state: RootState) => state.user.token);
   const { branch, semester, subject } = useSelector(
     (state: RootState) => state.filter
   );
-  const { title, description, featuredImage } = useSelector(
+  const { title, description, featuredImage, content } = useSelector(
     (state: RootState) => state.post
   );
 
@@ -77,7 +79,6 @@ const Home: NextPage = () => {
       if (featuredImage) {
         photoUrl = await imageUpload(featuredImage as File);
       }
-
       const dataToSend = {
         title,
         description,
