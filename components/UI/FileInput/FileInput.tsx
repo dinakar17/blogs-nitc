@@ -1,7 +1,7 @@
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React, { useEffect } from "react";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
 
 type Props = {
   setImage: ActionCreatorWithPayload<any, string>;
@@ -9,6 +9,8 @@ type Props = {
 };
 
 const FileInput = ({ setImage, image }: Props) => {
+  const { authData } = useSelector((state: RootState) => state.user);
+  const { featuredImageURL } = useSelector((state: RootState) => state.post);
   const dispatch = useDispatch<AppDispatch>();
 
   const [preview, setPreview] = React.useState<string | ArrayBuffer | null>(
@@ -32,10 +34,10 @@ const FileInput = ({ setImage, image }: Props) => {
         htmlFor="dropzone-file"
         className="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
       >
-        {preview ? (
+        {preview || featuredImageURL ? (
           <div className="flex justify-center items-center w-full h-full">
             <img
-              src={preview as string}
+              src={preview ? preview.toString() : featuredImageURL}
               alt="preview"
               // if height set to auto then the image will be stretched to fit the container
               className="max-w-full h-full object-cover bg-white border rounded p-1"
@@ -71,8 +73,16 @@ const FileInput = ({ setImage, image }: Props) => {
           id="dropzone-file"
           type="file"
           className="hidden"
+          required
           onChange={(e) => {
-            if (e.target.files) dispatch(setImage(e.target.files[0]));
+            if (e.target.files) {
+              // The below code creates a new File [e.target.files[0]] with the same properties as the original File [image] but with a new name [authData?.username + Date.now() + e.target.files[0].name]
+              const file = new File(
+                [e.target.files[0]],
+                `${authData.name}_${authData._id}_${Date.now()}`
+              );
+              dispatch(setImage(file));
+            }
           }}
         />
       </label>

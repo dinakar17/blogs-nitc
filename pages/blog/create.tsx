@@ -15,6 +15,7 @@ import { RootState } from "../../store/store";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { AxiosResponse } from "axios";
+import Head from "next/head";
 
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
@@ -22,14 +23,16 @@ const Editor = dynamic(() => import("../../components/Editor/Editor"), {
 
 // Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 const Home: NextPage = () => {
-  console.log("I am create page and helps in creating a blog and I am rendered");
+  console.log(
+    "I am create page and helps in creating a blog and I am rendered"
+  );
   const router = useRouter();
 
   const token = useSelector((state: RootState) => state.user.token);
   const { branch, semester, subject } = useSelector(
     (state: RootState) => state.filter
   );
-  const { title, description, featuredImage, content } = useSelector(
+  const { title, description, featuredImage } = useSelector(
     (state: RootState) => state.post
   );
 
@@ -51,6 +54,7 @@ const Home: NextPage = () => {
 
   const imageUpload = async (file: File) => {
     // console.log(file);
+
     const formData = new FormData();
     formData.append("profile-file", file);
     try {
@@ -83,11 +87,14 @@ const Home: NextPage = () => {
         title,
         description,
         featuredImage: photoUrl,
-        branch: branch.value,
+        branch,
+        semester,
+        subject,
         tags,
         content,
         draft,
       };
+      console.log(dataToSend);
       // // response - {data: {status: "success", data: doc}, status: 201, statusText: "Created", headers: {…}, config: {…}, …}
       const response = await api.createPost(dataToSend, token);
       setLoading(false);
@@ -111,7 +118,19 @@ const Home: NextPage = () => {
   return (
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
     <>
+    <Head>
+      <title>Create Blog</title>
+
+      <meta name="description" content="Create a blog" />
+      <link rel="icon" href="/favicon.ico" />
+
+      <meta property="og:title" content="Create Blog" />
+      <meta property="og:description" content="Create a blog" />
+      
+    </Head>
       <Editor
+        title={title}
+        description={description}
         featuredImage={featuredImage}
         branch={branch}
         semester={semester}
@@ -121,6 +140,7 @@ const Home: NextPage = () => {
         editor={editor}
         setDraft={setDraft}
         loading={loading}
+        editorContent=""
       />
       {/* Upload Image to the server */}
       {/* Convert this string html "<p>You faith you ne<span style=\"color: rgb(255, 0, 0);\">ed to prove&nbsp;</span></p>" to normal html*/}

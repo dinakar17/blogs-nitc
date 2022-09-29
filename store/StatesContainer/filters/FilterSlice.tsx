@@ -1,4 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
+import { branches } from "../../../helpers/Options/Branch";
+import { semesterOptions } from "../../../helpers/Options/Semester";
 
 const initialState = {
   branch: { value: "", label: "" },
@@ -19,9 +21,14 @@ const filterSlice = createSlice({
     setSubject: (state, action) => {
       state.subject = action.payload;
     },
+    setFilter: (state, action) => {
+      state.branch = action.payload.branch;
+      state.semester = action.payload.semester;
+      state.subject = action.payload.subject;
+    },
   },
 });
 
-export const { setBranch, setSemester, setSubject } = filterSlice.actions;
+export const { setBranch, setSemester, setSubject, setFilter } = filterSlice.actions;
 
 export default filterSlice.reducer;

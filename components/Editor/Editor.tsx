@@ -6,23 +6,21 @@ import TagsInput from "react-tagsinput";
 import "react-tagsinput/react-tagsinput.css";
 
 import { RefObject } from "react";
-import { AxiosResponse } from "axios";
 import { uploadImage } from "../../api";
 import { setOptions } from "./EditorOptions";
 import Branch from "../../helpers/Options/Branch";
 import Semester from "../../helpers/Options/Semester";
 import Subject from "../../helpers/Options/Subject";
-import Link from "next/link";
 import FileInput from "../UI/FileInput/FileInput";
 import InputField from "../UI/InputField/InputField";
 import TextArea from "../UI/TextArea/TextArea";
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store/store";
+
 import {
   setDescription,
   setFeaturedImage,
   setTitle,
 } from "../../store/StatesContainer/post/PostSlice";
+import Publish from "./Publish";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
@@ -34,30 +32,38 @@ type BranchProps = {
 };
 
 type EditorProps = {
+  title: string;
+  description: string;
   featuredImage: File | null | Blob;
   branch: BranchProps;
   semester: BranchProps;
   tags: string[];
   setTags: (tags: string[]) => void;
   saveContent: () => void;
-  editor: RefObject<SunEditorCore>;
   setDraft: (draft: boolean) => void;
   loading: boolean;
+  editor: RefObject<SunEditorCore>;
+  editorContent: string;
+  editorForUpdate: boolean;
   // imageUpload: (file: File) => Promise<void>;
 };
 
 const Editor = (props: EditorProps) => {
   console.log("I am editor component just for editor and I am rendered");
   const {
+    title,
+    description,
     featuredImage,
     branch,
     semester,
     tags,
     setTags,
     saveContent,
-    editor,
     setDraft,
     loading,
+    editor,
+    editorContent,
+    editorForUpdate,
   } = props;
 
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
@@ -131,88 +137,110 @@ const Editor = (props: EditorProps) => {
     return true;
   };
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    saveContent();
+  };
+
   return (
-    <div className="flex flex-col gap-4 w-[90%] mx-auto">
-      {/* Title for the blog */}
-      <InputField
-        label="Title"
-        setState={setTitle}
-        placeholder="Enter the title of the blog"
-      />
-      {/* Summary of the blog */}
-      <TextArea
-        label="Description"
-        setState={setDescription}
-        placeholder="Enter the description of the blog"
-      />
-      {/* Featured Image */}
-      <div className="flex flex-col gap-2">
-        {/* Todo: Hover effect */}
-        <label className="block mb-2 text-base font-medium text-gray-900 dark:text-gray-400">
-          Featured Image
-        </label>
-        <FileInput setImage={setFeaturedImage} image={featuredImage} />
-      </div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
-        {/* Select the branch */}
-        <div className="flex flex-col gap-2 z-[1000]">
-          <label className="">Select the branch</label>
-          <Branch />
-          {isBranch(branch.value) && (
-            <div className="flex flex-col gap-2">
-              <label className="">Select the semester</label>
-              <Semester />
-            </div>
-          )}
-          {semester.value && (
-            <div className="flex flex-col gap-2">
-              <label className="">Select the Subject </label>
-              <Subject branch={branch.value} semester={semester.value} />
-            </div>
-          )}
-        </div>
-        {/* Tags */}
-        <div className="flex flex-col gap-2">
-          <label>Tags</label>
-          <TagsInput value={tags} onChange={(tags: any) => setTags(tags)} />
-        </div>
-      </div>
-      <div>
-        <SunEditor
-          getSunEditorInstance={getSunEditorInstance}
-          // @ts-ignore
-          setOptions={setOptions}
-          height="900px"
-          setDefaultStyle="font-family: 'Inter', sans-serif; font-size: 1.1rem;"
-          // @ts-ignore
-          onImageUploadBefore={onImageUploadBefore}
-          // onImageUpload={onImageUpload}
+    <form
+      className="flex justify-center gap-10 mx-auto"
+      onSubmit={handleSubmit}
+    >
+      <div className="flex flex-col gap-4 w-[60%]">
+        {/* Title for the blog */}
+        <InputField
+          value={title}
+          label="Title"
+          setState={setTitle}
+          placeholder="Enter the title of the blog"
         />
-      </div>
-      <div className="flex justify-center gap-10">
-        <button
-          onClick={saveContent}
-          className="bg-green-500 text-white p-2 rounded-md"
-        >
-          {loading ? "Saving..." : "Save"}
-        </button>
-        {/* Todo: Future Feature if required 
+        {/* Summary of the blog */}
+        <TextArea
+          value={description}
+          label="Description"
+          setState={setDescription}
+          placeholder="Enter the description of the blog"
+        />
+        {/* Featured Image */}
+        <div className="flex flex-col gap-2">
+          {/* Todo: Hover effect */}
+          <label className="block mb-2 text-base font-medium text-gray-900 dark:text-gray-400">
+            Featured Image
+          </label>
+          <FileInput setImage={setFeaturedImage} image={featuredImage} />
+        </div>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
+          {/* Select the branch */}
+          <div className="flex flex-col gap-2 z-[1000]">
+            <label className="">Select the branch</label>
+            <Branch />
+            {isBranch(branch.value) && (
+              <div className="flex flex-col gap-2">
+                <label className="">Select the semester</label>
+                <Semester />
+              </div>
+            )}
+            {semester.value && (
+              <div className="flex flex-col gap-2">
+                <label className="">Select the Subject </label>
+                <Subject branch={branch.value} semester={semester.value} />
+              </div>
+            )}
+          </div>
+          {/* Tags */}
+          <div className="flex flex-col gap-2">
+            <label>Tags</label>
+            <TagsInput
+              required
+              value={tags}
+              onChange={(tags: any) => setTags(tags)}
+            />
+          </div>
+        </div>
+        <div>
+          <SunEditor
+            getSunEditorInstance={getSunEditorInstance}
+            // @ts-ignore
+            setOptions={setOptions}
+            height="900px"
+            setDefaultStyle="font-family: 'Inter', sans-serif; font-size: 1rem;"
+            // @ts-ignore
+            onImageUploadBefore={onImageUploadBefore}
+            defaultValue={editorContent}
+            // onImageUpload={onImageUpload}
+          />
+        </div>
+        {/* <fo className="flex justify-center gap-10">
+          <button
+            onClick={saveContent}
+            className="bg-green-500 text-white p-2 rounded-md"
+          >
+            {loading ? "Saving..." : "Save"}
+          </button>
+          {/* Todo: Future Feature if required 
         <Link href="/blog/preview"> 
           <a className="bg-blue-500 text-white p-2 rounded-md" target="_blank">
             Preview
           </a>
         </Link> */}
-        <button
-          className="bg-red-500 text-white p-2 rounded-md"
-          onClick={() => {
-            setDraft(true);
-            saveContent();
-          }}
-        >
-          Save as Draft
-        </button>
+        {/* <button
+            className="bg-red-500 text-white p-2 rounded-md"
+            onClick={() => {
+              setDraft(true);
+              saveContent();
+            }}
+          >
+            Save as Draft
+          </button> */}
+        {/* </div> */}
       </div>
-    </div>
+      <div className="w-[25%] m-4">
+        <div className="sticky top-0">
+          <Publish setDraft={setDraft} saveContent={saveContent} editorForUpdate={editorForUpdate} />
+        </div>
+      </div>
+    </form>
   );
 };
 

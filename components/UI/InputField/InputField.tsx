@@ -7,14 +7,11 @@ type Props = {
     label: string;
     placeholder: string;
     setState: ActionCreatorWithPayload<any, string>;
+    value: string;
 }
 
-const InputField = ({label, setState, placeholder}: Props) => {
+const InputField = ({label, setState, placeholder, value}: Props) => {
   const dispatch = useDispatch<AppDispatch>();
-<<<<<<< HEAD
-
-=======
->>>>>>> 748073c1ccdc46afca09533f158e97719a36c3f4
   return (
     <div className="">
       <label
@@ -26,7 +23,8 @@ const InputField = ({label, setState, placeholder}: Props) => {
       <input
         type="text"
         id="default-input"
-        className="bg-gray-50 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
+        value={value}
+        className="bg-gray-50 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         onChange={(e) => dispatch(setState(e.target.value))}
         placeholder={placeholder}
         required

@@ -2,11 +2,11 @@ import React from "react";
 import Select from "react-select";
 
 // Redux imports
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setBranch } from "../../store/StatesContainer/filters/FilterSlice";
-import { AppDispatch } from "../../store/store";
+import { AppDispatch, RootState } from "../../store/store";
 
-const branches = [
+export const branches = [
   {value: "general", label: "General"},
   {value: "campus_placements", label: "Campus Placements"},
   { value: "cse", label: "Computer Science and Engineering" },
@@ -30,10 +30,12 @@ type BranchProps = {
 };
 
 const Branch = () => {
+  const {branch} = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
   
   return (
     <Select
+      value={branch}
       options={branches}
       onChange={(e: any) => dispatch(setBranch(e))}
       placeholder="Select Branch"

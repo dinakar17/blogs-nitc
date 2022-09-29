@@ -20,6 +20,7 @@ import { RootState } from "../../store/store";
 import useSWR from "swr";
 import SkeletonCard from "../../components/UI/Loader/SkeletonCard";
 import SearchInput from "../../components/UI/Search/SearchInput";
+import BlogCards from "../../components/Card/BlogCard";
 
 type Props = {
   data: any;
@@ -42,11 +43,11 @@ const Home: NextPage<Props> = (props) => {
   let query: string = "";
 
   // Todo: Fix this issue
-  useEffect(() => {
-    // clear all query names in the url
-    // shallow means
-    router.replace("/blog", undefined, { shallow: true });
-  }, []);
+  // useEffect(() => {
+  //   // clear all query names in the url
+  //   // shallow means
+  //   router.replace("/blog", undefined, { shallow: true });
+  // }, []);
 
   const { data, error } = props;
 
@@ -70,13 +71,6 @@ const Home: NextPage<Props> = (props) => {
   const page = router.query.page || 1;
   const limit = 20;
 
-  // const { data, error } = useSWR(
-  //   `api/v1/blogs?limit=${limit}&fields=title,description,featuredImage,user,slug,createdAt,updatedAt&page=${page}`,
-  //   fetcher
-  // );
-
-  // if (!data) return <Spinner />;
-
   const paginationHandler = (event: ChangeEvent<unknown>, page: number) => {
     const currentPath = router.pathname;
     const currentQuery = router.query;
@@ -90,7 +84,6 @@ const Home: NextPage<Props> = (props) => {
 
   // console.log(data);
   const handleSearch = (choice: string) => {
-    console.log(choice);
     // if search is not empty then add it to the query
     if (choice === "Search") {
       if (search && router.query.search !== search) {
@@ -206,6 +199,10 @@ const Home: NextPage<Props> = (props) => {
     fetcher
   );
 
+  if (!res.data && conditionToDisplayFilteredData()) {
+    return <div>Loading...</div>;
+  }
+
   // if (shouldFetch && !res.data) return <SkeletonCards />;
 
   // const dataToDisplay = res.data ? res.data : data;
@@ -250,23 +247,15 @@ const Home: NextPage<Props> = (props) => {
         {/* Todo: Display number of blogs and also the time */}
         {/* <p>Found {dataToDisplay.length} blogs</p> */}
         <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* <BlogCards data={data.data} /> */}
-          {!conditionToDisplayFilteredData() &&
-            data &&
-            data.data.map((blog: BlogProps) => (
-              <BlogCard key={blog._id} data={blog} />
-            ))}
-          {conditionToDisplayFilteredData() && !res.data
-            ? // display 6 skeleton cards while fetching
-              [...Array(6)].map((_, i) => <SkeletonCard key={i} />)
-            : res.data &&
-              res.data.data.map((blog: BlogProps) => (
-                <BlogCard key={blog._id} data={blog} />
-              ))}
-          {/* {} */}
+          {/* Is && data required? */}
+          {!conditionToDisplayFilteredData() && data && (
+            <BlogCards data={data} />
+          )}
+          {conditionToDisplayFilteredData() && <BlogCards data={res.data} />}
         </div>
         <div style={{ alignSelf: "center", marginTop: "3rem" }}>
           <Pagination
+           className="flex justify-center"
             count={
               res.data
                 ? Math.ceil(res.data.totalBlogs / limit)

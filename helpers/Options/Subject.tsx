@@ -1,5 +1,8 @@
 import React from "react";
+import { useDispatch, useSelector } from "react-redux";
 import Select from "react-select";
+import { setSubject } from "../../store/StatesContainer/filters/FilterSlice";
+import { AppDispatch, RootState } from "../../store/store";
 
 // Do not declare any variables outside the component since when the component re-renders the variable will have its previous value
 // let subjects: any;
@@ -13,6 +16,9 @@ console.log("I am not displayed when the component re-renders");
 // Note: || operator won't work in the case statement i.e., case branch || semester won't work
 
 const Subject = ({ branch, semester }: SubjectProps) => {
+  const { subject } = useSelector((state: RootState) => state.filter);
+  const dispatch = useDispatch<AppDispatch>();
+
   let subjects: any;
   switch (semester) {
     case "1":
@@ -226,7 +232,13 @@ const Subject = ({ branch, semester }: SubjectProps) => {
       break;
   }
   return (
-    <Select options={subjects} placeholder="Select Subject" className="z-[11]" />
+    <Select
+      options={subjects}
+      placeholder="Select Subject"
+      className="z-[11]"
+      value={subject}
+      onChange={(e) => dispatch(setSubject(e))}
+    />
   );
 };
 

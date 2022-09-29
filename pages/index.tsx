@@ -2,14 +2,14 @@ import type { NextPage } from "next";
 import useSWR from "swr";
 import { getLatestPosts } from "../api";
 import { Intro, LatestBlogs } from "../components";
-// dynamic import
 
+// Note: res.data === {data: [array of posts], currentBlogsCount: number}
 const fetcher = (url: string) => getLatestPosts(url).then((res) => res.data);
 
 const Home: NextPage = () => {
   const { data, error } = useSWR("api/v1/blogs/latest", fetcher);
 
-  console.log(data);
+  // console.log(data); // Here data === res.data
 
   // if (error) return <div>Something went wrong</div>;
   // if (!data) return <div>Loading...</div>;
@@ -22,7 +22,7 @@ const Home: NextPage = () => {
       ) : !data ? (
         <div>Loading</div>
       ) : (
-        <LatestBlogs data={data.data} />
+        <LatestBlogs data={data} />
       )}
     </div>
   );

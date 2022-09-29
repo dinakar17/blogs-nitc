@@ -3,6 +3,7 @@ import parse from "html-react-parser";
 import Head from "next/head";
 
 const BlogPost = ({data}) => {
+  console.log(data);
     const {title, description, featuredImage, content} = data.data;
   return (
     <div className="mx-auto p-4 prose max-w-screen-xl prose-indigo prose-md">

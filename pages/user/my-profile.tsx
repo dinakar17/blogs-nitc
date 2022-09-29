@@ -6,7 +6,7 @@ import { RootState } from "../../store/store";
 import Loader from "../../components/UI/Loader/Loader";
 import { getProfile } from "../../api";
 import { toast } from "react-toastify";
-import BlogCard, { BlogProps } from "../../components/Card/BlogCard";
+import {BlogCard, BlogProps } from "../../components/Card/BlogCard";
 import { Pagination } from "@material-ui/lab";
 import { useRouter } from "next/router";
 
@@ -37,7 +37,6 @@ const MyProfile = () => {
 
   if (!data) return <Loader />;
   // Todo: Deal when there are no blogs
-  console.log(data);
 
   const paginationHandler = (event: ChangeEvent<unknown>, page: number) => {
     const currentPath = router.pathname;
@@ -76,7 +75,7 @@ const MyProfile = () => {
           <h2 className="text-2xl font-semibold text-center">My Blogs</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             {data.data.blogs.map((blog: BlogProps) => (
-              <BlogCard key={blog._id} data={blog} />
+              <BlogCard key={blog._id} blog={blog} />
             ))}
           </div>
           {/* Pagination */}

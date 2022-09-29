@@ -2,11 +2,11 @@ import React from "react";
 import Select from "react-select";
 
 // Redux imports
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import { setSemester } from "../../store/StatesContainer/filters/FilterSlice";
-import { AppDispatch } from "../../store/store";
+import { AppDispatch, RootState } from "../../store/store";
 
-const semesterOptions = [
+export const semesterOptions = [
   { value: "1", label: "1st Semester" },
   { value: "2", label: "2nd Semester" },
   { value: "3", label: "3rd Semester" },
@@ -27,9 +27,11 @@ type SemesterProps = {
 };
 
 const Semester = () => {
+  const {semester} = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
   return (
     <Select
+      value={semester}
       options={semesterOptions}
       placeholder="Select Semester"
       onChange={(e: any) => dispatch(setSemester(e))}

@@ -14,7 +14,19 @@ export type BlogPost = {
   title: string;
   description: string;
   featuredImage: string;
-  branch: string;
+  branch: {
+    value: string;
+    label: string;
+  }
+  semester: {
+    value: string;
+    label: string;
+  };
+  subject: {
+    value: string;
+    label: string;
+  },
   tags: string[];
   content: string | undefined;
+  draft ?: boolean;
 };

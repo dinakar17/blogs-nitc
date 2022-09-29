@@ -42,15 +42,16 @@ export const getFilteredPosts = (url: string) => API.get(url);
 //https://stackoverflow.com/questions/9870523/what-are-the-differences-between-application-json-and-application-x-www-form-url
 //https://dev.to/bcanseco/request-body-encoding-json-x-www-form-urlencoded-ad9
 export const createPost = (newPost: BlogPost, token: string) =>
-  API.post("/api/v1/blogs", qs.stringify(newPost), {
+  API.post("/api/v1/blogs", newPost, {
     headers: {
-      "Content-Type": "application/x-www-form-urlencoded",
+      // set content type to json
+      "Content-Type": "application/json",
       Authorization: `Bearer ${token}`,
     },
   });
 
 // Note: In this case url = 'api/v1/blogs/slug/${slug}'
-export const getSpecificPost = (url: string) => API.get(url);
+export const getSpecificPost = (url: string, slug: string) => API.get(url + slug);
 export const fetchPost = (slug: string) => API.get(`api/v1/blogs/slug/${slug}`);
 
 export const updatePost = (

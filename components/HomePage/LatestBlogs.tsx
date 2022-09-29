@@ -1,5 +1,5 @@
 import React from "react";
-import BlogCard, { BlogProps } from "../Card/BlogCard";
+import BlogCards, {BlogCard, BlogProps}from "../Card/BlogCard";
 import Carousel from "react-multi-carousel";
 import "react-multi-carousel/lib/styles.css";
 
@@ -21,7 +21,8 @@ const responsive = {
   }
 };
 
-const LatestBlogs = ({data}) => {
+const LatestBlogs = ({data}: any) => {
+  console.log(data);
   return (
     // render 10 blog
     <section className="min-h-screen flex flex-col gap-10 justify-center items-center"> 
@@ -44,9 +45,10 @@ const LatestBlogs = ({data}) => {
           removeArrowOnDeviceType={["tablet", "mobile"]}
           // deviceType={this.props.deviceType}
           >
-          {data.map((blog: BlogProps) => (
-            <BlogCard key={blog._id} data={blog} />
-          ))}
+        {data.data.map((blog: BlogProps) => (
+        <BlogCard key={blog._id} blog={blog} />
+      ))}
+      {/* <BlogCards data={data} /> */}
       </Carousel>
     </section>
   );
