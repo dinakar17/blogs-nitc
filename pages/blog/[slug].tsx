@@ -9,6 +9,7 @@ import * as api from "../../api";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
 import { useRouter } from "next/router";
+import { useState } from "react";
 
 type Props = {
   data: AxiosResponse["data"];
@@ -25,7 +26,7 @@ const BlogDetail: NextPage<Props> = (props) => {
     toast(error, { type: "error" });
     return null;
   }
-  console.log(data);
+  // console.log(data);
   return (
     <div className="md:w-[70%] mx-auto p-2 prose max-w-screen-xl prose-indigo md:prose-md prose-img:object-cover prose-img:rounded-lg prose-img:shadow-lg dark:prose-p:text-white">
       <Head>
@@ -55,7 +56,6 @@ const BlogDetail: NextPage<Props> = (props) => {
             </div>
           )}
         </div>
-        <div>Likes</div>
       </div>
       <img
         src={data.data.featuredImage}
@@ -87,84 +87,3 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
 
 export default BlogDetail;
 
-/* 
-
-{status: 'success', data: {…}}
-data
-: 
-branch
-: 
-{value: 'general', label: 'General'}
-content
-: 
-"<h1>Introduction<del>​</del></h1><p>YOLO (you onl
-createdAt
-: 
-"2022-09-29T17:53:37.644Z"
-description
-: 
-"Want to test your video using Yolov7 and Google Colab? Learn how to make real-time object detection using your own videos in this tutorial"
-draft
-: 
-false
-featuredImage
-: 
-"http://localhost:5001/uploads/adijsad_632461d1416122fc5212c05b_1664473604038"
-id
-: 
-"6335dba1545023b79898ddfa"
-likes
-: 
-[]
-reviewed
-: 
-true
-semester
-: 
-{value: '', label: ''}
-slug
-: 
-"real-time-object-detection-using-yolov7-on-google-colab"
-subject
-: 
-{value: '', label: ''}
-tags
-: 
-(3) ['object detection', 'yolov7', 'machine learning']
-title
-: 
-"Real Time Object Detection using YoloV7 on Google Colab"
-updatedAt
-: 
-"2022-09-29T17:53:37.644Z"
-user
-: 
-name
-: 
-"adijsad"
-photo
-: 
-"http://localhost:5001/uploads/wp2638641.jpg"
-_id
-: 
-"632461d1416122fc5212c05b"
-[[Prototype]]
-: 
-Object
-__v
-: 
-0
-_id
-: 
-"6335dba1545023b79898ddfa"
-[[Prototype]]
-: 
-Object
-status
-: 
-"success"
-
-
-Problem: 
-next-dev.js?3515:20 Warning: A component is `contentEditable` and contains `children` managed by React. It is now your responsibility to guarantee that none of those nodes are unexpectedly modified or duplicated. This is probably not intentional.
-*/

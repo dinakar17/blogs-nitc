@@ -17,15 +17,16 @@ import { toast } from "react-toastify";
 const Editor = dynamic(() => import("../../../components/Editor/Editor"));
 
 const fetcher = (url: string, slug: string) =>
-// res.data = {success: true, data: doc}
+  // res.data = {success: true, data: doc}
   api.getSpecificPost(url, slug).then((res: AxiosResponse) => res.data);
 
 const EditBlog: NextPage = () => {
-  const { title, description, featuredImage, content, featuredImageURL } = useSelector(
-    (state: RootState) => state.post
+  const { title, description, featuredImage, content, featuredImageURL } =
+    useSelector((state: RootState) => state.post);
+  const { branch, semester, subject } = useSelector(
+    (state: RootState) => state.filter
   );
-  const {branch, semester, subject} = useSelector((state: RootState) => state.filter);
-  const {token} = useSelector((state: RootState) => state.user);
+  const { token } = useSelector((state: RootState) => state.user);
 
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
@@ -41,7 +42,7 @@ const EditBlog: NextPage = () => {
   // | Step 1: Fetch the blog from the database
   const { data, error } = useSWR(
     // here [slug] means that we're passing the slug as a parameter to fetcher function and it will be available as the second argument in fetcher function
-    slug ? ['/api/v1/blogs/slug/', slug] : null,
+    slug ? ["/api/v1/blogs/slug/", slug] : null,
     // fetcher url is passed as an argument to the fetcher function i.e., url = `api/v1/blogs/slug/${slug}`
     fetcher,
     {
@@ -70,7 +71,29 @@ const EditBlog: NextPage = () => {
   // | Step 3: If the data is not yet available, show the spinner
   if (!data) return <Loader />;
 
+  const imageUpload = async (file: File) => {
+    // console.log(file);
+
+    const formData = new FormData();
+    formData.append("profile-file", file);
+    try {
+      const response: AxiosResponse = await api.uploadImage(formData);
+      console.log(response);
+      // console.log(response.data.data);
+      const url = response.data.result[0].url;
+      const modified_url =
+        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
+      // console.log(modified_url);
+      return modified_url;
+    } catch (error: any) {
+      console.log(error);
+      alert(error);
+    }
+  };
+
   const saveContent = async () => {
+    // @ts-ignore
+    const updatedContent = editor.current?.getContents();
     const config = {
       headers: {
         "Content-Type": "application/json",
@@ -78,23 +101,35 @@ const EditBlog: NextPage = () => {
       },
     };
     // Todo: Check if the featured image is changed or not and then send the request accordingly
-      
+    let photoUrl = "";
+    if (featuredImage) {
+      photoUrl = await imageUpload(featuredImage as File);
+    }
 
-    const toSaveData = {
+    const dataToSend = {
       title,
       description,
-      featuredImage: featuredImageURL,
+      featuredImage: photoUrl ? photoUrl : featuredImageURL,
       branch,
       semester,
       subject,
       tags,
-      content: content,
+      content: updatedContent,
+      draft,
     };
+    console.log(dataToSend);
     try {
       setLoading(true);
-      await api.updatePost(data.data._id, toSaveData, config);
+      await api.updatePost(data.data._id, dataToSend, config);
       setLoading(false);
-      toast.success("Blog updated successfully");
+      if (draft) {
+        toast("Draft saved successfully", {
+          type: "success",
+        });
+      } else {
+        toast.success("Blog updated successfully");
+      }
+      router.push(`/blog/${slug}`);
     } catch (error: any) {
       setLoading(false);
       toast.error(error.response.data.message);
@@ -154,31 +189,6 @@ const EditBlog: NextPage = () => {
         editorContent={content}
         editorForUpdate={true}
       />
-      {/* Delete and Save Buttons */}
-      {/* <Dialog
-        open={dialogOpen}
-        onClose={handleDeleteDialogClose}
-        aria-labelledby="alert-dialog-title"
-        aria-describedby="alert-dialog-description"
-      >
-        <DialogTitle id="alert-dialog-title">
-          {"Do you want to delete this blog?"}
-        </DialogTitle>
-        <DialogContent>
-          <DialogContentText id="alert-dialog-description">
-            Deleting a blog is an irreversible operation. Please perform this
-            action with caution.
-          </DialogContentText>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={handleDeleteDialogClose} color="primary">
-            Cancel
-          </Button>
-          <Button onClick={onDeleteHandler} color="primary">
-            Confirm
-          </Button>
-        </DialogActions>
-      </Dialog> */}
     </>
   );
 };

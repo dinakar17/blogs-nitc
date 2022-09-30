@@ -1,6 +1,5 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { BlogPost, SignInFormData, SignUpFormData } from "../types";
-import qs from "qs";
 
 // axio.create() returns an instance of axios with a custom config
 const API = axios.create({ baseURL: "http://localhost:5000" });

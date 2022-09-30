@@ -141,6 +141,7 @@ const Home: NextPage = () => {
         setDraft={setDraft}
         loading={loading}
         editorContent=""
+        editorForUpdate={false}
       />
       {/* Upload Image to the server */}
       {/* Convert this string html "<p>You faith you ne<span style=\"color: rgb(255, 0, 0);\">ed to prove&nbsp;</span></p>" to normal html*/}

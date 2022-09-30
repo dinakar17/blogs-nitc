@@ -33,6 +33,7 @@ const postSlice = createSlice({
       // action.payload === data.data {object of all post data fields}
       state.title = action.payload.title;
       state.description = action.payload.description;
+      // Note: We aren't using state.featuredImage since it is only for storing the file object
       state.featuredImageURL = action.payload.featuredImage;
       state.content = action.payload.content;
     },

@@ -73,7 +73,7 @@ const FileInput = ({ setImage, image }: Props) => {
           id="dropzone-file"
           type="file"
           className="hidden"
-          required
+          // required
           onChange={(e) => {
             if (e.target.files) {
               // The below code creates a new File [e.target.files[0]] with the same properties as the original File [image] but with a new name [authData?.username + Date.now() + e.target.files[0].name]

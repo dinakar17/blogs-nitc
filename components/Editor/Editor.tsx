@@ -138,6 +138,7 @@ const Editor = (props: EditorProps) => {
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    console.log("Form submitted");
     e.preventDefault();
     saveContent();
   };
@@ -237,7 +238,7 @@ const Editor = (props: EditorProps) => {
       </div>
       <div className="w-[25%] m-4">
         <div className="sticky top-0">
-          <Publish setDraft={setDraft} saveContent={saveContent} editorForUpdate={editorForUpdate} />
+          <Publish setDraft={setDraft} editorForUpdate={editorForUpdate} />
         </div>
       </div>
     </form>
