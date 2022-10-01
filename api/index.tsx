@@ -36,6 +36,8 @@ export const getAllPosts = (query: string) => API.get(`/api/v1/blogs?${query}`);
 
 export const getLatestPosts = (url: string) => API.get(url);
 
+export const getRandomPosts = () => API.get("/api/v1/blogs/random");
+
 export const getFilteredPosts = (url: string) => API.get(url);
 
 //https://stackoverflow.com/questions/9870523/what-are-the-differences-between-application-json-and-application-x-www-form-url
@@ -50,7 +52,8 @@ export const createPost = (newPost: BlogPost, token: string) =>
   });
 
 // Note: In this case url = 'api/v1/blogs/slug/${slug}'
-export const getSpecificPost = (url: string, slug: string) => API.get(url + slug);
+export const getSpecificPost = (url: string, slug: string) =>
+  API.get(url + slug);
 export const fetchPost = (slug: string) => API.get(`api/v1/blogs/slug/${slug}`);
 
 export const updatePost = (
@@ -61,6 +64,10 @@ export const updatePost = (
 
 export const deletePost = (id: string, config: AxiosRequestConfig) =>
   API.delete(`/api/v1/blogs/${id}`, config);
+
+export const likePost = (url: string, config: AxiosRequestConfig) => 
+  API.get(url, config);
+
 
 // ------------------ AUTH ------------------  //
 export const signUp = (formData: SignUpFormData) =>

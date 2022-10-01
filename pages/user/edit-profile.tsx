@@ -16,6 +16,10 @@ import { MdPhotoCamera } from "react-icons/md";
 import { AxiosResponse } from "axios";
 import { updateAuthData } from "../../store/StatesContainer/auth/AuthSlice";
 
+// Todo: @material-tailwind/react is too heavy, find a better alternative
+import Input from "@material-tailwind/react/components/Input";
+import TextArea from "@material-tailwind/react/components/Textarea";
+
 const fetchWithToken = (url: string, token: string) =>
   getEditProfile(url, token).then((res) => res.data);
 
@@ -26,6 +30,8 @@ const Edit = () => {
 
   const [name, setName] = React.useState("");
   const [bio, setBio] = React.useState("");
+  const [email, setEmail] = React.useState("");
+
   // here blob means binary large object similar to File object. It is used to store binary data.
   const [photo, setPhoto] = React.useState<File | null | Blob>(null);
   const [preview, setPreview] = React.useState<string | ArrayBuffer | null>(
@@ -54,6 +60,7 @@ const Edit = () => {
       onSuccess: (data) => {
         setName(data.data.user.name);
         setBio(data.data.user.bio);
+        setEmail(data.data.user.email);
       },
     }
   );
@@ -110,58 +117,81 @@ const Edit = () => {
   //   console.log(data);
 
   return (
-    <div>
-      <h1>Edit Profile</h1>
-      <div>
-        <img
-          src={
-            preview
-              ? preview
-              : data.data.user.photo
-              ? data.data.user.photo
-              : null
-          }
-          alt="profile"
-          className="w-20 h-20 rounded-full object-cover"
-        />
-        <input
-          accept="image/*"
-          className="hidden"
-          id="profile-upload"
-          type="file"
-          onChange={(e) => {if(e.target.files) setPhoto(e.target.files[0])}}
-        />
-        <label htmlFor="profile-upload">
-          <Button
-            variant="contained"
-            color="primary"
-            component="span"
-            startIcon={<MdPhotoCamera />}
-          >
-            Upload Photo
-          </Button>
-        </label>
+    <div className="w-[90%] mx-auto min-h-screen flex flex-col my-10">
+      <h1 className="text-4xl font-bold text-center my-10">Edit Profile</h1>
+      {/* User's Image */}
+      <div className="grid grid-cols-2">
+        <div className="flex flex-col justify-center items-center gap-5">
+          <img
+            src={
+              preview
+                ? preview
+                : data.data.user.photo
+                ? data.data.user.photo
+                : null
+            }
+            alt="profile"
+            className="w-40 h-40 rounded-full object-cover"
+          />
+          <input
+            accept="image/*"
+            className="hidden"
+            id="profile-upload"
+            type="file"
+            onChange={(e) => {
+              if (e.target.files) setPhoto(e.target.files[0]);
+            }}
+          />
+          <label htmlFor="profile-upload">
+            <Button
+              variant="contained"
+              color="primary"
+              component="span"
+              startIcon={<MdPhotoCamera />}
+            >
+              Upload Photo
+            </Button>
+          </label>
+        </div>
+        <form onSubmit={handleSubmit} className="flex flex-col gap-5">
+          <Input
+            label="Username"
+            variant="standard"
+            value={name}
+            style={{ fontFamily: "Inter" }}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <p>{email}</p>
+          <TextArea
+            label="Your Bio"
+            style={{ fontFamily: "Inter" }}
+            value={bio}
+            onChange={(e) => setBio(e.target.value)}
+          />
+          <div className="flex justify-center gap-10">
+            <Button
+              variant="contained"
+              color="primary"
+              style={{ fontFamily: "Inter" }}
+              onClick={() => router.push("/user/my-profile")}
+            >
+              Cancel
+            </Button>
+            <Button
+              variant="contained"
+              color="primary"
+              // set shadow to blue on hover
+              className="hover:shadow-lg"
+              type="submit"
+              disabled={name === "" || loading}
+              // disabled={name === "" || loading}
+            >
+              {" "}
+              {loading ? "Saving changes..." : "Save Changes"}
+            </Button>
+          </div>
+        </form>
       </div>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          value={name}
-          onChange={(e) => setName(e.target.value)}
-        />
-        <p></p>
-        <input
-          type="text"
-          // add elegant css to this input
-          className="w-full h-40"
-          value={bio}
-          onChange={(e) => setBio(e.target.value)}
-        />
-        <button onClick={() => router.push("/user/my-profile")}>Cancel</button>
-        <button disabled={name === ""}>
-          {" "}
-          {loading ? "Saving changes..." : "Save Changes"}
-        </button>
-      </form>
     </div>
   );
 };

@@ -10,12 +10,22 @@ import * as api from "../../api";
 
 import "react-tagsinput/react-tagsinput.css";
 
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
 import { toast } from "react-toastify";
 import { useRouter } from "next/router";
 import { AxiosResponse } from "axios";
 import Head from "next/head";
+import {
+  setDescription,
+  setFeaturedImageURL,
+  setTitle,
+} from "../../store/StatesContainer/post/PostSlice";
+import {
+  setBranch,
+  setSemester,
+  setSubject,
+} from "../../store/StatesContainer/filters/FilterSlice";
 
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
@@ -23,10 +33,22 @@ const Editor = dynamic(() => import("../../components/Editor/Editor"), {
 
 // Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 const Home: NextPage = () => {
-  console.log(
-    "I am create page and helps in creating a blog and I am rendered"
-  );
+  // console.log(
+  //   "I am create page and helps in creating a blog and I am rendered"
+  // );
   const router = useRouter();
+
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Todo: Find an alternative to this
+  useEffect(() => {
+    dispatch(setFeaturedImageURL(""));
+    dispatch(setTitle(""));
+    dispatch(setDescription(""));
+    dispatch(setBranch({ value: "", label: "" }));
+    dispatch(setSemester({ value: "", label: "" }));
+    dispatch(setSubject({ value: "", label: "" }));
+  }, []);
 
   const token = useSelector((state: RootState) => state.user.token);
   const { branch, semester, subject } = useSelector(
@@ -118,16 +140,15 @@ const Home: NextPage = () => {
   return (
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
     <>
-    <Head>
-      <title>Create Blog</title>
+      <Head>
+        <title>Create Blog</title>
 
-      <meta name="description" content="Create a blog" />
-      <link rel="icon" href="/favicon.ico" />
+        <meta name="description" content="Create a blog" />
+        <link rel="icon" href="/favicon.ico" />
 
-      <meta property="og:title" content="Create Blog" />
-      <meta property="og:description" content="Create a blog" />
-      
-    </Head>
+        <meta property="og:title" content="Create Blog" />
+        <meta property="og:description" content="Create a blog" />
+      </Head>
       <Editor
         title={title}
         description={description}
@@ -142,6 +163,7 @@ const Home: NextPage = () => {
         loading={loading}
         editorContent=""
         editorForUpdate={false}
+        userId=""
       />
       {/* Upload Image to the server */}
       {/* Convert this string html "<p>You faith you ne<span style=\"color: rgb(255, 0, 0);\">ed to prove&nbsp;</span></p>" to normal html*/}

@@ -6,7 +6,7 @@ import { RootState } from "../../store/store";
 import Loader from "../../components/UI/Loader/Loader";
 import { getProfile } from "../../api";
 import { toast } from "react-toastify";
-import {BlogCard, BlogProps } from "../../components/Card/BlogCard";
+import { BlogCard, BlogProps } from "../../components/Card/BlogCard";
 import { Pagination } from "@material-ui/lab";
 import { useRouter } from "next/router";
 
@@ -20,21 +20,26 @@ const MyProfile = () => {
 
   const { data, error } = useSWR(
     token ? [`api/v1/users/profile?page=${page}`, token] : null,
-    fetchWithToken
+    fetchWithToken,
+    {
+      revalidateOnFocus: false,
+    }
   );
 
-  if (error) {
-    let errMessage;
-    if (error.response) {
-      errMessage = error.response.data.message;
-    } else errMessage = "Something went wrong, Please try again later";
+  useEffect(() => {
+    if (error) {
+      let errMessage;
+      if (error.response) {
+        errMessage = error.response.data.message;
+      } else errMessage = "Something went wrong, Please try again later";
 
-    toast(errMessage, {
-      type: "error",
-    });
-    return null;
-  }
+      toast(errMessage, {
+        type: "error",
+      });
+    }
+  }, [error]);
 
+  // if (error) return <div>Something went wrong</div>;
   if (!data) return <Loader />;
   // Todo: Deal when there are no blogs
 
@@ -55,33 +60,31 @@ const MyProfile = () => {
         <title>My Profile</title>
         <meta name="description" content="My Profile page for Blog App" />
       </Head>
-      <div className="w-[80%] mx-auto min-h-screen">
-        <h1>My Profile</h1>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="rounded-full overflow-hidden w-32 h-32">
-            <img
-              src={data.data.user.photo}
-              alt="user"
-              className="object-cover w-full"
-            />
+      <div className="w-[90%] mx-auto min-h-screen">
+        {/* <h1>My Profile</h1> */}
+        <div className="grid grid-cols-2 w-[60%] mx-auto rounded-lg shadow-lg gap-10 my-10">
+          {/* Note that you cannot change the height of children inside aspect-w-16 rather you can adjust the aspect ratio height and width my changing width of the parent  */}
+          <div className="aspect-w-16 aspect-h-12">
+            <img src={data.data.user.photo} className="object-cover rounded-l-lg" />
           </div>
-          <div>
-            <p>{data.data.user.name}</p>
-            <p>{data.data.user.email}</p>
-            <p>{data.data.user.bio}</p>
+          <div className="flex flex-col h-full w-full justify-center gap-10">
+            <h1 className="text-3xl font-bold">{data.data.user.name}</h1>
+            <p className="text-xl italic">{data.data.user.email}</p>
+            <p className="text-xl">{data.data.user.bio}</p>
           </div>
         </div>
         <div className="mt-4 flex flex-col gap-4">
-          <h2 className="text-2xl font-semibold text-center">My Blogs</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <h2 className="text-4xl font-semibold text-center mt-10">My Blogs</h2>
+          <hr/>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
             {data.data.blogs.map((blog: BlogProps) => (
               <BlogCard key={blog._id} blog={blog} />
             ))}
           </div>
-          {/* Pagination */}
           <Pagination
-            count={Math.ceil(data.data.totalBlogs / 5)}
+            count={Math.ceil(data.data.totalBlogs / 8)}
             page={Number(page)}
+            style={{alignSelf: "center", marginTop: "1rem"}}
             onChange={paginationHandler}
           />
         </div>

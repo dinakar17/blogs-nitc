@@ -12,7 +12,7 @@ type SubjectProps = {
   semester: string;
 };
 
-console.log("I am not displayed when the component re-renders");
+// console.log("I am not displayed when the component re-renders");
 // Note: || operator won't work in the case statement i.e., case branch || semester won't work
 
 const Subject = ({ branch, semester }: SubjectProps) => {
@@ -231,14 +231,23 @@ const Subject = ({ branch, semester }: SubjectProps) => {
       }
       break;
   }
+
+  const notBranches = ["general", "campus_placements"];
+
   return (
-    <Select
-      options={subjects}
-      placeholder="Select Subject"
-      className="z-[11]"
-      value={subject}
-      onChange={(e) => dispatch(setSubject(e))}
-    />
+    <>
+      {semester && branch && !notBranches.includes(branch) && (
+        <div className="w-[200px]">
+          <Select
+            options={subjects}
+            placeholder="Select Subject"
+            className="z-[11]"
+            value={subject.value === "" ? null : subject}
+            onChange={(e) => dispatch(setSubject(e))}
+          />
+        </div>
+      )}
+    </>
   );
 };
 

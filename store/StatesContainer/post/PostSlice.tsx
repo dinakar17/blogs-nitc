@@ -29,6 +29,9 @@ const postSlice = createSlice({
     setFeaturedImage: (state, action) => {
       state.featuredImage = action.payload;
     },
+    setFeaturedImageURL: (state, action) => {
+      state.featuredImageURL = action.payload;
+    },
     setPost: (state, action) => {
       // action.payload === data.data {object of all post data fields}
       state.title = action.payload.title;
@@ -40,6 +43,6 @@ const postSlice = createSlice({
   },
 });
 
-export const { setTitle, setDescription, setFeaturedImage, setPost } = postSlice.actions;
+export const { setTitle, setDescription, setFeaturedImage, setPost, setFeaturedImageURL } = postSlice.actions;
 
 export default postSlice.reducer;

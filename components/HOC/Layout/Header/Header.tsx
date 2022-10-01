@@ -1,6 +1,6 @@
 // Todo: Add transition between dark and light mode
 
-import React from "react";
+import React, { useEffect } from "react";
 import { useTheme } from "next-themes";
 import Link from "next/link";
 import { useRouter } from "next/router";
@@ -16,6 +16,9 @@ import { IoCreateOutline, IoLogOutOutline } from "react-icons/io5";
 import { AnimatePresence, motion } from "framer-motion";
 import DarkModeToggle from "react-dark-mode-toggle";
 import { MdCollectionsBookmark } from "react-icons/md";
+import Image from "next/image";
+
+import styles from "styles/MobileMenu.module.css";
 
 const ContainerVariants = {
   hidden: { scale: 0 },
@@ -83,6 +86,10 @@ const Header = () => {
     },
   ];
 
+  useEffect(() => {
+    setMounted(false);
+  }, [router]);
+
   const handleLogOut = () => {
     console.log("Log out");
     // clear the presist state
@@ -94,26 +101,41 @@ const Header = () => {
   return (
     // Note: w-[80%] mx-auto is a Tailwind class that sets the width to 80% and centers the element and this is common practice for most websites.
     <motion.header
-      className="flex items-center py-4 font-medium text-gray-900 dark:text-gray-100 mb-10"
+      className="flex items-center py-4 font-medium text-gray-900 dark:text-gray-100"
       variants={variants}
       initial="hidden"
       animate="visible"
     >
       {/* Todo: remove w-[%] with another alternative */}
-      <nav className="w-[80%] mx-auto flex items-center justify-between">
-        <div>
-          <Link href="/"> Blog App </Link>
+      <nav className="w-full md:w-[80%] mx-auto flex items-center justify-between">
+        <div className="cursor-pointer">
+          <Link href="/">
+            <Image
+              src="/static/logo-for-nitc.png"
+              alt="logo"
+              width={100}
+              height={100}
+            />
+          </Link>
         </div>
-        <ul className="md:flex gap-5 items-center hidden justify-center">
+        <ul className="text-gray-600 text-lg md:flex gap-5 items-center hidden justify-center tracking-wide">
           {navLinks.map((link) => (
-            <Link href={link.href} key={link.name}>
-              <a>{link.name}</a>
-            </Link>
+            <li key={link.name}>
+              <Link href={link.href}>
+                <a
+                  className={`p-1 rounded-md transition-all hover:bg-gray-200 dark:hover:bg-gray-800 ${
+                    router.pathname === link.href ? "underline" : ""
+                  }`}
+                >
+                  {link.name}
+                </a>
+              </Link>
+            </li>
           ))}
         </ul>
         <div className="flex gap-5">
           {authData ? (
-            <div className="relative">
+            <div className="invisible md:visible relative group">
               <motion.div
                 className="cursor-pointer"
                 // variants are used to define the start and end states of an animation
@@ -199,7 +221,7 @@ const Header = () => {
               Sign In
             </button>
           )}
-          <div className="flex justify-center items-center">
+          <div className="flex justify-center items-center mr-20 md:mr-0">
             <DarkModeToggle
               onChange={handleClick}
               checked={isDarkMode}
@@ -210,30 +232,33 @@ const Header = () => {
         </div>
       </nav>
       {/* Mobile Menu */}
-      {!openMenu ? (
-        <FiMenu
-          className="md:hidden scale-150 ml-auto z-20 cursor-pointer"
-          onClick={() => setOpenMenu(!openMenu)}
-        />
-      ) : (
-        <GrClose
-          className="md:hidden scale-150 ml-auto z-20 cursor-pointer"
-          onClick={() => setOpenMenu(!openMenu)}
-        />
-      )}
-      {/* JSX element type 'FiMenu' does not have any construct or call signatures. */}
-      <div
-        className={`md:hidden bg-primary p-1  z-10 absolute h-screen w-screen top-0 transition-all ${
-          !openMenu ? "custom-clip-path" : "increase-clip-path"
-        }`}
-      >
-        <ul className="flex flex-col h-full w-full justify-center items-center gap-10">
-          {navLinks.map((link) => (
-            <Link href={link.href} key={link.name}>
-              <a className="text-white text-2xl">{link.name}</a>
-            </Link>
-          ))}
-        </ul>
+      <div className="md:invisible visible">
+        <label
+          htmlFor="active"
+          className={`absolute z-[10000] right-5 top-10 h-12 w-12 text-center leading-[50px] rounded-full text-xl text-white cursor-pointer transition-all ${
+            mounted && "bg-transparent"
+          } flex items-center justify-center`}
+          onClick={() => setMounted((s) => !s)}
+        >
+          <FiMenu />
+        </label>
+        <div
+          className={`${
+            styles.customTransition
+          } z-[9999] absolute top-0 left-0 h-full w-full bg-blue-500/60 ${
+            styles.clipPath
+          } ${mounted && styles.activeClipPath}`}
+        >
+          <ul className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 text-center">
+            {navLinks.map((link) => (
+              <li className="mb-5"  key={link.name}>
+                <Link href={link.href}>
+                  <a>{link.name}</a>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </motion.header>
   );

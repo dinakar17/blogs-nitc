@@ -10,17 +10,24 @@ import Pagination from "@material-ui/lab/Pagination";
 
 import { GetServerSideProps, NextPage } from "next";
 import { getAllPosts, getFilteredPosts } from "../../api";
-import BlogCard, { BlogProps } from "../../components/Card/BlogCard";
 import { toast } from "react-toastify";
 import Branch from "../../helpers/Options/Branch";
 import Semester from "../../helpers/Options/Semester";
 import Select from "react-select";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
 import useSWR from "swr";
-import SkeletonCard from "../../components/UI/Loader/SkeletonCard";
 import SearchInput from "../../components/UI/Search/SearchInput";
 import BlogCards from "../../components/Card/BlogCard";
+import Button from "@material-tailwind/react/components/Button";
+import { MagnifyingGlassLoader } from "../../components/UI/Loader/Loader";
+import Subject from "../../helpers/Options/Subject";
+import NoSearchResults from "../../components/UI/Search/NoSearchResults";
+import {
+  setBranch,
+  setSemester,
+  setSubject,
+} from "../../store/StatesContainer/filters/FilterSlice";
 
 type Props = {
   data: any;
@@ -36,10 +43,20 @@ const sortOptions = [
 const fetcher = (url: string) => getFilteredPosts(url).then((res) => res.data);
 
 const Home: NextPage<Props> = (props) => {
+  const router = useRouter();
+
   const { branch, semester, subject } = useSelector(
     (state: RootState) => state.filter
   );
-  const router = useRouter();
+  const dispatch = useDispatch<AppDispatch>();
+
+  // Todo: Reset the filters router queries are empty
+  useEffect(() => {
+    dispatch(setSemester({ value: "", label: "" }));
+    dispatch(setSubject({ value: "", label: "" }));
+    dispatch(setBranch({ value: "", label: "" }));
+  }, []);
+
   let query: string = "";
 
   // Todo: Fix this issue
@@ -199,9 +216,9 @@ const Home: NextPage<Props> = (props) => {
     fetcher
   );
 
-  if (!res.data && conditionToDisplayFilteredData()) {
-    return <div>Loading...</div>;
-  }
+  // if (!res.data && conditionToDisplayFilteredData()) {
+  //   return <div>Loading...</div>;
+  // }
 
   // if (shouldFetch && !res.data) return <SkeletonCards />;
 
@@ -226,36 +243,57 @@ const Home: NextPage<Props> = (props) => {
 
       {/* Filters here */}
       <div className="w-full flex flex-col md:flex-row items-center my-4 gap-5">
-        <Branch />
-        <Semester />
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          // handle change in branch and semester separately
-          onClick={() => handleSearch("Filter")}
-        >
-          Filter
-        </button>
-        <Select options={sortOptions} onChange={(e: any) => setSort(e)} />
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-md"
-          onClick={() => handleSearch("Sort")}
-        >
-          Sort
-        </button>
+        <div className="flex items-center gap-2">
+          <Branch />
+          <Semester />
+          <Subject branch={branch.value} semester={semester.value} />
+
+          <Button
+            variant="gradient"
+            className="font-medium text-base capitalize py-2"
+            style={{ fontFamily: "Inter" }}
+            // handle change in branch and semester separately
+            onClick={() => handleSearch("Filter")}
+          >
+            Filter
+          </Button>
+        </div>
+        <div className="flex items-center gap-2">
+          <Select options={sortOptions} onChange={(e: any) => setSort(e)} />
+          <Button
+            variant="gradient"
+            className="font-medium text-base capitalize py-2"
+            style={{ fontFamily: "Inter" }}
+            onClick={() => handleSearch("Sort")}
+          >
+            Sort
+          </Button>
+        </div>
       </div>
       <div>
         {/* Todo: Display number of blogs and also the time */}
         {/* <p>Found {dataToDisplay.length} blogs</p> */}
-        <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* Is && data required? */}
-          {!conditionToDisplayFilteredData() && data && (
+        {/* Is && data required? */}
+        {!conditionToDisplayFilteredData() && data && (
+          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
             <BlogCards data={data} />
-          )}
-          {conditionToDisplayFilteredData() && <BlogCards data={res.data} />}
-        </div>
+          </div>
+        )}
+        {conditionToDisplayFilteredData() &&
+          (res.data ? (
+            res.data.data.length === 0 ? (
+              <NoSearchResults />
+            ) : (
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+                <BlogCards data={res.data} />
+              </div>
+            )
+          ) : (
+            <MagnifyingGlassLoader />
+          ))}
         <div style={{ alignSelf: "center", marginTop: "3rem" }}>
           <Pagination
-           className="flex justify-center"
+            className="flex justify-center"
             count={
               res.data
                 ? Math.ceil(res.data.totalBlogs / limit)

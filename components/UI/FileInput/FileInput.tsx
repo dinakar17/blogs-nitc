@@ -18,6 +18,10 @@ const FileInput = ({ setImage, image }: Props) => {
   );
 
   useEffect(() => {
+    setPreview(null);
+  }, []);
+
+  useEffect(() => {
     if (!image) {
       setImage(null);
       return;
@@ -77,9 +81,13 @@ const FileInput = ({ setImage, image }: Props) => {
           onChange={(e) => {
             if (e.target.files) {
               // The below code creates a new File [e.target.files[0]] with the same properties as the original File [image] but with a new name [authData?.username + Date.now() + e.target.files[0].name]
+              // get the extension of the file
+              const extension = e.target.files[0].name.split(".").pop();
               const file = new File(
                 [e.target.files[0]],
-                `${authData.name}_${authData._id}_${Date.now()}`
+                `${authData.name}_${authData._id}_${
+                  Date.now() + "." + extension
+                }`
               );
               dispatch(setImage(file));
             }

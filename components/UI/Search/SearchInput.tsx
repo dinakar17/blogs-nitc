@@ -1,4 +1,5 @@
 import React from "react";
+import { Button } from "@material-tailwind/react";
 
 type Props = {
   handleSearch: (choice: string) => void;
@@ -62,9 +63,11 @@ const SearchInput = ({ handleSearch, setSearch, search }: Props) => {
           </svg>
         </button>
       </div>
-      <button
+      <Button
+        variant="gradient"
         type="submit"
-        className="inline-flex items-center py-2.5 px-3 ml-2 text-sm font-medium text-white bg-blue-700 rounded-lg border border-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800"
+        className="inline-flex items-center mx-4 font-medium text-base capitalize py-2 md:w-auto"
+        style={{fontFamily: "Inter"}}
       >
         <svg
           aria-hidden="true"
@@ -82,7 +85,7 @@ const SearchInput = ({ handleSearch, setSearch, search }: Props) => {
           />
         </svg>
         Search
-      </button>
+      </Button>
     </form>
   );
 };

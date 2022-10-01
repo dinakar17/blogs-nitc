@@ -1,0 +1,12 @@
+.clipPath {
+  clip-path: circle(20px at calc(100% - 43px) 66px);
+}
+
+.activeClipPath {
+  clip-path: circle(75%);
+}
+
+.customTransition{
+    transition: clip-path 0.3s ease-in-out;
+}
+

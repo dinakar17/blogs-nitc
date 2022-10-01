@@ -7,8 +7,8 @@ import { setBranch } from "../../store/StatesContainer/filters/FilterSlice";
 import { AppDispatch, RootState } from "../../store/store";
 
 export const branches = [
-  {value: "general", label: "General"},
-  {value: "campus_placements", label: "Campus Placements"},
+  { value: "general", label: "General" },
+  { value: "campus_placements", label: "Campus Placements" },
   { value: "cse", label: "Computer Science and Engineering" },
   { value: "ece", label: "Electronics and Communication Engineering" },
   { value: "eee", label: "Electrical and Electronics Engineering" },
@@ -30,18 +30,22 @@ type BranchProps = {
 };
 
 const Branch = () => {
-  const {branch} = useSelector((state: RootState) => state.filter);
+  const { branch } = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
-  
+
   return (
-    <Select
-      value={branch}
-      options={branches}
-      onChange={(e: any) => dispatch(setBranch(e))}
-      placeholder="Select Branch"
-      className="z-[10001]"
-    />
+    <div className="">
+      <Select
+        value={ branch.value === "" ? null : branch }
+        options={branches}
+        onChange={(e: any) => dispatch(setBranch(e))}
+        placeholder="Select Branch" 
+        className="z-[10001] w-full"
+      />
+      </div>
   );
 };
 
 export default Branch;
+
+// https://medium.com/@albertogasparin/forcing-state-reset-on-a-react-component-by-using-the-key-prop-14b36cd7448e

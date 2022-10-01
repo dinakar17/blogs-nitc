@@ -2,6 +2,10 @@
 module.exports = {
   reactStrictMode: true,
   devIndicators: {
-    buildActivity: false
-}
-}
+    buildActivity: false,
+  },
+  // allow images from other domains
+  images: {
+    domains: ["localhost", "images.unsplash.com"],
+  },
+};

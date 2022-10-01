@@ -45,6 +45,7 @@ type EditorProps = {
   editor: RefObject<SunEditorCore>;
   editorContent: string;
   editorForUpdate: boolean;
+  userId: string;
   // imageUpload: (file: File) => Promise<void>;
 };
 
@@ -64,6 +65,7 @@ const Editor = (props: EditorProps) => {
     editor,
     editorContent,
     editorForUpdate,
+    userId,
   } = props;
 
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
@@ -176,18 +178,14 @@ const Editor = (props: EditorProps) => {
           <div className="flex flex-col gap-2 z-[1000]">
             <label className="">Select the branch</label>
             <Branch />
-            {isBranch(branch.value) && (
-              <div className="flex flex-col gap-2">
-                <label className="">Select the semester</label>
-                <Semester />
-              </div>
-            )}
-            {semester.value && (
-              <div className="flex flex-col gap-2">
-                <label className="">Select the Subject </label>
-                <Subject branch={branch.value} semester={semester.value} />
-              </div>
-            )}
+            <div className="flex flex-col gap-2">
+              {/* <label className="">Select the semester</label> */}
+              <Semester />
+            </div>
+            <div className="flex flex-col gap-2">
+              {/* <label className="">Select the Subject </label> */}
+              <Subject branch={branch.value} semester={semester.value} />
+            </div>
           </div>
           {/* Tags */}
           <div className="flex flex-col gap-2">
@@ -238,7 +236,11 @@ const Editor = (props: EditorProps) => {
       </div>
       <div className="w-[25%] m-4">
         <div className="sticky top-0">
-          <Publish setDraft={setDraft} editorForUpdate={editorForUpdate} />
+          <Publish
+            setDraft={setDraft}
+            editorForUpdate={editorForUpdate}
+            userId={userId}
+          />
         </div>
       </div>
     </form>

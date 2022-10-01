@@ -52,6 +52,8 @@ const EditBlog: NextPage = () => {
         setTags(data.data.tags);
         dispatch(setFilter(data.data));
       },
+      // Note: If this is true and then useSWR makes request to the backend every time you change the tab in the browser
+      revalidateOnFocus: false,
     }
   );
   // | Step 2: If there is an error, show the error message to the user through toast
@@ -78,7 +80,7 @@ const EditBlog: NextPage = () => {
     formData.append("profile-file", file);
     try {
       const response: AxiosResponse = await api.uploadImage(formData);
-      console.log(response);
+      // console.log(response);
       // console.log(response.data.data);
       const url = response.data.result[0].url;
       const modified_url =
@@ -188,6 +190,7 @@ const EditBlog: NextPage = () => {
         loading={loading}
         editorContent={content}
         editorForUpdate={true}
+        userId={data.data._id}
       />
     </>
   );

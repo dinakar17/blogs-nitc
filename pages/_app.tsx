@@ -16,6 +16,8 @@ import NextProgress from "next-progress";
 import { Provider } from "react-redux";
 import { store } from "../store/store";
 
+import {useEffect} from 'react';
+
 import Head from "next/head";
 import PrivateRoute from "../components/HOC/WithAuth";
 import { Slide, ToastContainer } from "react-toastify";
@@ -30,6 +32,10 @@ export const persistor = persistStore(store);
 
 function MyApp({ Component, pageProps }: AppProps) {
   // const { authData, token } = useSelector((state: RootState) => state.user);
+
+  useEffect(() => {
+    window.addEventListener('online', (e) => { console.log('online'); });
+  }, []);
 
   const protectedRoutes = [
     "/user/edit-profile",
@@ -66,7 +72,7 @@ function MyApp({ Component, pageProps }: AppProps) {
           loading={<Loader />}
           persistor={persistor}
           onBeforeLift={() =>
-            new Promise((resolve) => setTimeout(resolve, 700))
+            new Promise((resolve) => setTimeout(resolve, 300))
           }
         >
           <PrivateRoute protectedRoutes={protectedRoutes}>
