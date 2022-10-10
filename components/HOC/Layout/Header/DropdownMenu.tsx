@@ -2,15 +2,16 @@ import React from "react";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
 import { useRouter } from "next/router";
+
 import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../store/store";
-import { logOut } from "../../store/StatesContainer/auth/AuthSlice";
+import { AppDispatch } from "../../../../store/store";
+import { logOut } from "../../../../store/StatesContainer/auth/AuthSlice";
 
 type Props = {
   children: React.ReactNode;
 };
 
-function SimpleMenu({ children }: Props) {
+function DropdownMenu({ children }: Props) {
   const router = useRouter();
 
   const dispatch = useDispatch<AppDispatch>();
@@ -62,6 +63,7 @@ function SimpleMenu({ children }: Props) {
         aria-haspopup="true"
         onClick={handleClick}
         onMouseOver={handleClick}
+        style={{ cursor: "pointer" }}
       >
         {children}
       </div>
@@ -71,14 +73,10 @@ function SimpleMenu({ children }: Props) {
         open={Boolean(anchorEl)}
         onClose={handleClose}
         MenuListProps={{ onMouseLeave: handleClose }}
-        // add border-radius
         PaperProps={{
           style: {
-            borderRadius: "0.3rem",
-            marginTop: "0.5rem",
-            padding: "0.5rem 0",
-            // height: "20rem",
-            // overflow: "auto",
+            marginTop: "3rem",
+            marginLeft: "-3rem",
           },
         }}
       >
@@ -88,8 +86,10 @@ function SimpleMenu({ children }: Props) {
             onClick={() => {
               if (item.href === "/auth/logout") {
                 dispatch(logOut());
+                router.push("/auth/login");
               } else handleItem(item.href);
             }}
+            className="dark:text-white dark:bg-[#1F2028]"
           >
             <i className={`${item.icon} text-lg pr-3`} />
             {item.name}
@@ -100,4 +100,7 @@ function SimpleMenu({ children }: Props) {
   );
 }
 
-export default SimpleMenu;
+export default DropdownMenu;
+
+// Todo: Add cursor pointer to the menu
+// Todo: Dark mode for material ui components

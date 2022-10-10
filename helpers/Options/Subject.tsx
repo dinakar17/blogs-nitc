@@ -232,11 +232,11 @@ const Subject = ({ branch, semester }: SubjectProps) => {
       break;
   }
 
-  const notBranches = ["general", "campus_placements"];
+  const NotBranches = ["general", "campus_placements", "sports", "arts_and_life", "nitc_clubs"];
 
   return (
     <>
-      {semester && branch && !notBranches.includes(branch) && (
+      {semester && branch && !NotBranches.includes(branch) && (
         <div className="w-[200px]">
           <Select
             options={subjects}

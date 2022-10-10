@@ -2,7 +2,12 @@ import { useRouter } from "next/router";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+// ? https://mui.com/material-ui/guides/minimizing-bundle-size/
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import Icon from "@mui/material/Icon";
 import useSWR from "swr";
+
 import {
   deleteImage,
   getEditProfile,
@@ -11,20 +16,13 @@ import {
 } from "../../api";
 import Loader from "../../components/UI/Loader/Loader";
 import { AppDispatch, RootState } from "../../store/store";
-import Button from "@material-ui/core/Button";
-import { MdPhotoCamera } from "react-icons/md";
-import { AxiosResponse } from "axios";
 import { updateAuthData } from "../../store/StatesContainer/auth/AuthSlice";
-
-// Todo: @material-tailwind/react is too heavy, find a better alternative
-import Input from "@material-tailwind/react/components/Input";
-import TextArea from "@material-tailwind/react/components/Textarea";
 
 const fetchWithToken = (url: string, token: string) =>
   getEditProfile(url, token).then((res) => res.data);
 
 const Edit = () => {
-  const { token } = useSelector((state: RootState) => state.user);
+  const { authData, token } = useSelector((state: RootState) => state.user);
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
 
@@ -62,6 +60,7 @@ const Edit = () => {
         setBio(data.data.user.bio);
         setEmail(data.data.user.email);
       },
+      revalidateOnFocus: false,
     }
   );
   // ? Error: Rendered more hooks than during the previous render. This may be caused by an accidental early return statement.
@@ -75,13 +74,15 @@ const Edit = () => {
       if (photo) {
         const formData = new FormData();
         formData.append("profile-file", photo as Blob);
-        const photoUrl = data.data.user.photo.replace(
-          process.env.NEXT_PUBLIC_IMAGE_API_URL,
-          ""
-        );
-        await deleteImage(`filePath=${photoUrl}`);
-
-        const res: AxiosResponse = await uploadImage(formData);
+        if (data.data.user.photo) {
+          // Delete old image only if user has already uploaded a photo before
+          const photoUrl = data.data.user.photo.replace(
+            process.env.NEXT_PUBLIC_IMAGE_API_URL,
+            ""
+          );
+          await deleteImage(`filePath=${photoUrl}`);
+        }
+        const res: any = await uploadImage(formData);
         const url = res.data.result[0].url;
         modified_url =
           process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
@@ -97,6 +98,8 @@ const Edit = () => {
       const updatedResponse = await updateProfile(dataToUpdate, token);
       // Note: updatedResponse.data is AxiosResponse and remaining is the data from the response
       dispatch(updateAuthData(updatedResponse.data.data.user));
+
+      router.push("/user/my-profile");
 
       setLoading(false);
       toast.success("Profile updated successfully");
@@ -114,13 +117,11 @@ const Edit = () => {
     });
   }
 
-  //   console.log(data);
-
   return (
     <div className="w-[90%] mx-auto min-h-screen flex flex-col my-10">
       <h1 className="text-4xl font-bold text-center my-10">Edit Profile</h1>
       {/* User's Image */}
-      <div className="grid grid-cols-2">
+      <div className="grid lg:grid-cols-2 space-y-10">
         <div className="flex flex-col justify-center items-center gap-5">
           <img
             src={
@@ -139,7 +140,20 @@ const Edit = () => {
             id="profile-upload"
             type="file"
             onChange={(e) => {
-              if (e.target.files) setPhoto(e.target.files[0]);
+              if (e.target.files) {
+                // append author's name and time to the file name
+                const modifiedFileName = `${authData?.name}-${Date.now()}-${
+                  e.target.files[0].name
+                }`;
+                const modifiedFile = new File(
+                  [e.target.files[0]],
+                  modifiedFileName,
+                  {
+                    type: e.target.files[0].type,
+                  }
+                );
+                setPhoto(modifiedFile);
+              }
             }}
           />
           <label htmlFor="profile-upload">
@@ -147,25 +161,28 @@ const Edit = () => {
               variant="contained"
               color="primary"
               component="span"
-              startIcon={<MdPhotoCamera />}
+              startIcon={<Icon className="fas fa-upload" />}
             >
               Upload Photo
             </Button>
           </label>
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-          <Input
-            label="Username"
+          <TextField
+            id="standard-basic"
+            label="User Name"
             variant="standard"
             value={name}
-            style={{ fontFamily: "Inter" }}
             onChange={(e) => setName(e.target.value)}
           />
           <p>{email}</p>
-          <TextArea
+          <TextField
+            id="outlined-multiline-static"
             label="Your Bio"
-            style={{ fontFamily: "Inter" }}
+            multiline
+            rows={2}
             value={bio}
+            className="dark:text-white"
             onChange={(e) => setBio(e.target.value)}
           />
           <div className="flex justify-center gap-10">
@@ -180,11 +197,9 @@ const Edit = () => {
             <Button
               variant="contained"
               color="primary"
-              // set shadow to blue on hover
               className="hover:shadow-lg"
               type="submit"
               disabled={name === "" || loading}
-              // disabled={name === "" || loading}
             >
               {" "}
               {loading ? "Saving changes..." : "Save Changes"}
@@ -197,3 +212,7 @@ const Edit = () => {
 };
 
 export default Edit;
+
+// Todo: Fix dark mode issues
+// Todo: disabled button on loading
+// Todo: Add Material UI Buttons (optional)

@@ -2,6 +2,7 @@ import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React from "react";
 import { useDispatch } from "react-redux";
 import { AppDispatch } from "../../../store/store";
+import CustomizedTooltip from "../HTMLToolTip/HTMLTooltip";
 
 type Props = {
   label: string;
@@ -13,17 +14,19 @@ type Props = {
 const TextArea = ({ label, setState, placeholder, value }: Props) => {
   const dispatch = useDispatch<AppDispatch>();
 
-
   return (
     <>
       <label
         htmlFor="message"
-        className="block text-base font-medium text-gray-900 dark:text-gray-400"
+        className="flex gap-2 items-center text-base font-medium text-gray-900 dark:text-gray-400"
       >
-        {label}
+        <span>{label}</span>
+        <CustomizedTooltip name="description">
+          <i className="fa-regular fa-circle-question"></i>
+        </CustomizedTooltip>
       </label>
       <textarea
-      // difference between value and defaultValue is that value is controlled by react and defaultValue is controlled by the browser
+        // difference between value and defaultValue is that value is controlled by react and defaultValue is controlled by the browser
         value={value}
         required
         id="message"

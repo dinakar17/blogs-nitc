@@ -1,21 +1,29 @@
-// Todo: Remove @headlessui/react if this slows down the app
 import { useRouter } from "next/router";
-import React, { Fragment, useState } from "react";
-import { useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { toast } from "react-toastify";
+import Switch from "@mui/material/Switch";
+
 import * as api from "../../api";
-import { RootState } from "../../store/store";
+import { AppDispatch, RootState } from "../../store/store";
+import SimpleAccordion from "../UI/CustomAccordion/CustomAccordion";
+// Todo: Bundle size is too large, need to optimize
+import { setAnonymous } from "../../store/StatesContainer/post/PostSlice";
+import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
 
 type Props = {
   setDraft: (draft: boolean) => void;
   editorForUpdate: boolean;
-  userId: string;
+  blogId: string;
 };
 
-const Publish = ({ setDraft, editorForUpdate, userId }: Props) => {
+const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
   const router = useRouter();
 
   const { token } = useSelector((state: RootState) => state.user);
+  const { status } = useSelector((state: RootState) => state.post);
+
+  const dispatch = useDispatch<AppDispatch>();
 
   const [loading, setLoading] = useState(false);
   const [showModal, setShowModal] = useState(false);
@@ -30,37 +38,63 @@ const Publish = ({ setDraft, editorForUpdate, userId }: Props) => {
 
     try {
       setLoading(true);
-      // ? What if there is userId
-      await api.deletePost(userId, config);
+      // user verification is taken care of in the backend through the token
+      await api.deletePost(blogId, config);
       setLoading(false);
       setShowModal(false);
-      // handleDeleteDialogClose();
       toast("Blog Deleted", {
         type: "success",
       });
       router.push(`/user/my-profile`);
     } catch (error: any) {
       setLoading(false);
-      // handleDeleteDialogClose();
-      // enqueueSnackbar(`${error.response.data.message}`, { variant: "error" });
+      setShowModal(false);
       toast.error(error.response.data.message);
     }
   };
+
+  let blogStatus = "---",
+    visibility = "---";
+  if (status.draft === false && status.reviewed === false) {
+    blogStatus = "🚀 Under Review";
+    visibility = "Private";
+  } else if (status.draft === false && status.reviewed === true) {
+    blogStatus = "Published ✅";
+    visibility = "Public";
+  } else if (status.draft === true && status.reviewed === false) {
+    blogStatus = "Draft";
+    visibility = "Private";
+  } else if (status.draft === true && status.reviewed === true) {
+    blogStatus = "Published ✅";
+    visibility = "Private";
+  }
 
   return (
     <>
       <div className="flex flex-col gap-5 border-2 border-gray-200 p-5 rounded-md">
         <h2 className="text-2xl font-semibold">Publish</h2>
         <p>
-          <span className="font-bold">Status:</span> Draft
+          <span className="font-bold">Status:</span>{" "}
+          {editorForUpdate ? blogStatus : "---"}
         </p>
         <p>
-          <span className="font-bold">Visibility:</span> Public
+          <span className="font-bold">Visibility:</span>{" "}
+          {editorForUpdate ? visibility : "---"}
         </p>
+        <div className="flex items-center gap-2">
+          <Switch
+            checked={status.anonymous}
+            onChange={() => dispatch(setAnonymous(!status.anonymous))}
+          />
+          <label className="font-medium">Anonymous</label>
+          <CustomizedTooltip name="anonymous">
+            <i className="invisible md:visible cursor-pointer fa-regular fa-circle-question"></i>
+          </CustomizedTooltip>
+        </div>
         <div className="flex justify-between">
           <button
             type="submit"
-            className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+            className="text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 "
             onClick={() => {
               setDraft(true);
             }}
@@ -89,32 +123,33 @@ const Publish = ({ setDraft, editorForUpdate, userId }: Props) => {
             </button>
           )}
           {editorForUpdate && (
-            <button
-              // Note: type button won't submit the form and will only call the function
-              type="button"
-              className="inline-block px-6 py-2.5 bg-blue-600 text-white font-medium text-xs leading-tight uppercase rounded shadow-md hover:bg-blue-700 hover:shadow-lg focus:bg-blue-700 focus:shadow-lg focus:outline-none focus:ring-0 active:bg-blue-800 active:shadow-lg transition duration-150 ease-in-out"
-              data-bs-toggle="modal"
-              data-bs-target="#exampleModalCenter"
-              onClick={() => setShowModal(true)}
-            >
-              Delete
-            </button>
-          )}
-          {showModal && (
-            <Modal setOpenModal={setShowModal} handleDelete={handleDelete} />
+            <>
+              <button
+                // Note: type button won't submit the form and will only call the function
+                type="button"
+                className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+                data-bs-toggle="modal"
+                data-bs-target="#exampleModalCenter"
+                onClick={() => setShowModal(true)}
+              >
+                Delete
+              </button>
+              {showModal && (
+                <Modal
+                  setOpenModal={setShowModal}
+                  handleDelete={handleDelete}
+                />
+              )}
+            </>
           )}
         </div>
       </div>
-      <div className="flex flex-col gap-5 border-2 border-gray-200 p-5 rounded-md min-w-[25%]">
-        <h1>Tips that might help your awesome blog!</h1>
+      <div className="mt-4 flex flex-col gap-5 border-2 border-gray-200 p-5 rounded-md min-w-[25%]">
+        <h1 className="text-lg font-bold">
+          Tips that might help your awesome blog!
+        </h1>
         {/* Accordion here */}
-        <ul>
-          <li>Write a catchy title</li>
-          <li>Use a good image</li>
-          <li>Write a catchy title</li>
-          <li>Use a good image</li>
-          <li>Write a catchy title</li>
-        </ul>
+        <SimpleAccordion />
       </div>
     </>
   );
@@ -153,11 +188,11 @@ const Modal = ({ setOpenModal, handleDelete }: ModalProps) => {
               </div>
               <div className="mt-2 text-center sm:ml-4 sm:text-left">
                 <h4 className="text-lg font-medium text-gray-800">
-                  Delete account ?
+                  Delete Blog ?
                 </h4>
                 <p className="mt-2 text-[15px] leading-relaxed text-gray-500">
-                  Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed
-                  do eiusmod tempor incididunt ut labore et dolore magna aliqua.
+                  Deleting this blog will permanently remove it from the
+                  database. Are you sure you want to delete this blog?
                 </p>
                 <div className="items-center gap-2 mt-3 sm:flex">
                   <button
@@ -185,3 +220,5 @@ const Modal = ({ setOpenModal, handleDelete }: ModalProps) => {
 };
 
 export default Publish;
+
+// Todo: Change router to Link

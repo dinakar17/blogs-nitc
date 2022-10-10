@@ -1,14 +1,15 @@
-import { useContext, useState, useEffect, ChangeEvent } from "react";
+import { useEffect, ChangeEvent } from "react";
+import { useRouter } from "next/router";
 import Head from "next/head";
 import useSWR from "swr";
+import { toast } from "react-toastify";
 import { useSelector } from "react-redux";
+import Pagination from "@mui/material/Pagination";
+
 import { RootState } from "../../store/store";
 import Loader from "../../components/UI/Loader/Loader";
 import { getProfile } from "../../api";
-import { toast } from "react-toastify";
 import { BlogCard, BlogProps } from "../../components/Card/BlogCard";
-import { Pagination } from "@material-ui/lab";
-import { useRouter } from "next/router";
 
 const fetchWithToken = (url: string, token: string) =>
   getProfile(url, token).then((res) => res.data);
@@ -30,7 +31,7 @@ const MyProfile = () => {
     if (error) {
       let errMessage;
       if (error.response) {
-        errMessage = error.response.data.message;
+        errMessage = error.response?.data?.message;
       } else errMessage = "Something went wrong, Please try again later";
 
       toast(errMessage, {
@@ -62,21 +63,33 @@ const MyProfile = () => {
       </Head>
       <div className="w-[90%] mx-auto min-h-screen">
         {/* <h1>My Profile</h1> */}
-        <div className="grid grid-cols-2 w-[60%] mx-auto rounded-lg shadow-lg gap-10 my-10">
+        <div className="grid md:grid-cols-2 lg:w-[60%] mx-auto rounded-lg shadow-lg gap-10 my-10">
           {/* Note that you cannot change the height of children inside aspect-w-16 rather you can adjust the aspect ratio height and width my changing width of the parent  */}
-          <div className="aspect-w-16 aspect-h-12">
-            <img src={data.data.user.photo} className="object-cover rounded-l-lg" />
+          <div className="lg:aspect-w-16 lg:aspect-h-12 md:aspect-w-1 md:aspect-h-1 aspect-w-16 aspect-h-9">
+            <img
+              src={data.data.user.photo}
+              className="object-cover rounded-l-lg"
+            />
           </div>
-          <div className="flex flex-col h-full w-full justify-center gap-10">
-            <h1 className="text-3xl font-bold">{data.data.user.name}</h1>
-            <p className="text-xl italic">{data.data.user.email}</p>
-            <p className="text-xl">{data.data.user.bio}</p>
+          <div className="flex flex-col h-full w-full justify-center gap-3 px-5 md:px-0 py-4">
+            <div className="flex flex-col gap-1">
+              <h1 className="text-lg font-semibold">Username</h1>
+            <h1 className="text-lg font-logo">{data.data.user.name}</h1>
+            </div>
+            <div className="flex flex-col gap-1">
+              <h2 className="text-xl font-semibold">Email</h2>
+              <p className="text-base break-words">{data.data.user.email}</p>
+            </div>
+            <div className="flex flex-col gap-1">
+              <p className="text-lg font-bold">About Me</p>
+              <p className="text-sm">{data.data.user.bio}</p>
+            </div>
           </div>
         </div>
         <div className="mt-4 flex flex-col gap-4">
           <h2 className="text-4xl font-semibold text-center mt-10">My Blogs</h2>
-          <hr/>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <hr />
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 justify-items-center">
             {data.data.blogs.map((blog: BlogProps) => (
               <BlogCard key={blog._id} blog={blog} />
             ))}
@@ -84,7 +97,7 @@ const MyProfile = () => {
           <Pagination
             count={Math.ceil(data.data.totalBlogs / 8)}
             page={Number(page)}
-            style={{alignSelf: "center", marginTop: "1rem"}}
+            style={{ alignSelf: "center", marginTop: "1rem" }}
             onChange={paginationHandler}
           />
         </div>
@@ -102,3 +115,6 @@ export default MyProfile;
 // const getServersideProps: GetServerSideProps = async (context) => {
 //   // get token from cookie
 //   const token = getCookie('token', context.req);
+
+// Todo: During screen size of 1280px, there is no gap between blogCards
+// Todo: Uploading less dimensioned image adds "px" to the image and content

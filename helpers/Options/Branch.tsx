@@ -9,6 +9,9 @@ import { AppDispatch, RootState } from "../../store/store";
 export const branches = [
   { value: "general", label: "General" },
   { value: "campus_placements", label: "Campus Placements" },
+  { value: "sports", label: "Sports" },
+  { value: "arts_and_life", label: "Arts and Life" },
+  { value: "nitc_clubs", label: "NITC Clubs" },
   { value: "cse", label: "Computer Science and Engineering" },
   { value: "ece", label: "Electronics and Communication Engineering" },
   { value: "eee", label: "Electrical and Electronics Engineering" },
@@ -20,32 +23,24 @@ export const branches = [
   { value: "ep", label: "Engineering Physics" },
 ];
 
-interface BranchValue {
-  value: string;
-  label: string;
-}
-
-type BranchProps = {
-  setBranch: (branch: BranchValue) => void;
-};
-
 const Branch = () => {
   const { branch } = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
 
   return (
-    <div className="">
+    <div className="text-black dark:text-white">
       <Select
-        value={ branch.value === "" ? null : branch }
+        value={branch.value === "" ? null : branch}
         options={branches}
         onChange={(e: any) => dispatch(setBranch(e))}
-        placeholder="Select Branch" 
+        placeholder="Select Branch"
         className="z-[10001] w-full"
       />
-      </div>
+    </div>
   );
 };
 
 export default Branch;
 
 // https://medium.com/@albertogasparin/forcing-state-reset-on-a-react-component-by-using-the-key-prop-14b36cd7448e
+// Todo: Add custom styles to the select component

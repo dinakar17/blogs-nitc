@@ -28,5 +28,6 @@ export type BlogPost = {
   },
   tags: string[];
   content: string | undefined;
-  draft ?: boolean;
+  draft : boolean;
+  anonymous: boolean;
 };

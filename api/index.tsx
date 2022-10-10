@@ -65,9 +65,11 @@ export const updatePost = (
 export const deletePost = (id: string, config: AxiosRequestConfig) =>
   API.delete(`/api/v1/blogs/${id}`, config);
 
-export const likePost = (url: string, config: AxiosRequestConfig) => 
-  API.get(url, config);
+export const likePost = (id: string, config: AxiosRequestConfig) =>
+  API.patch(`/api/v1/blogs/like/${id}`, {}, config);
 
+export const fetchLikes = (url: string, config: AxiosRequestConfig) =>
+  API.get(url, config);
 
 // ------------------ AUTH ------------------  //
 export const signUp = (formData: SignUpFormData) =>

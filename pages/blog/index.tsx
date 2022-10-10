@@ -1,33 +1,35 @@
-// Todo: Search and Filter the blogs
+// Todo: Only show the necessary field in the query while filtering through branch, semester, subject
+// Todo: Search by description and tags
+// Todo: Add popular option as another sorting option
 // https://stackoverflow.com/questions/42217121/how-to-start-search-only-when-user-stops-typing
-// Todo: Pagination
-// Todo: Fetch the blogs from the database
 
 import React, { ChangeEvent, useEffect } from "react";
 import Head from "next/head";
 import { useRouter } from "next/router";
-import Pagination from "@material-ui/lab/Pagination";
-
+import Pagination from "@mui/material/Pagination";
 import { GetServerSideProps, NextPage } from "next";
-import { getAllPosts, getFilteredPosts } from "../../api";
 import { toast } from "react-toastify";
-import Branch from "../../helpers/Options/Branch";
-import Semester from "../../helpers/Options/Semester";
 import Select from "react-select";
+import useSWR from "swr";
+
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
-import useSWR from "swr";
+
+import { getAllPosts, getFilteredPosts } from "../../api";
+import Branch from "../../helpers/Options/Branch";
+import Semester from "../../helpers/Options/Semester";
 import SearchInput from "../../components/UI/Search/SearchInput";
 import BlogCards from "../../components/Card/BlogCard";
-import Button from "@material-tailwind/react/components/Button";
 import { MagnifyingGlassLoader } from "../../components/UI/Loader/Loader";
 import Subject from "../../helpers/Options/Subject";
 import NoSearchResults from "../../components/UI/Search/NoSearchResults";
 import {
+  resetFilters,
   setBranch,
   setSemester,
   setSubject,
 } from "../../store/StatesContainer/filters/FilterSlice";
+import SkeletonCard from "../../components/UI/Loader/SkeletonCard";
 
 type Props = {
   data: any;
@@ -37,7 +39,7 @@ type Props = {
 const sortOptions = [
   { value: "newest", label: "Newest" },
   { value: "oldest", label: "Oldest" },
-  { value: "popular", label: "Popular" },
+  // { value: "popular", label: "Popular" }, Todo: Add popular filter
 ];
 
 const fetcher = (url: string) => getFilteredPosts(url).then((res) => res.data);
@@ -50,40 +52,17 @@ const Home: NextPage<Props> = (props) => {
   );
   const dispatch = useDispatch<AppDispatch>();
 
-  // Todo: Reset the filters router queries are empty
   useEffect(() => {
-    dispatch(setSemester({ value: "", label: "" }));
-    dispatch(setSubject({ value: "", label: "" }));
-    dispatch(setBranch({ value: "", label: "" }));
+    dispatch(resetFilters());
   }, []);
 
   let query: string = "";
-
-  // Todo: Fix this issue
-  // useEffect(() => {
-  //   // clear all query names in the url
-  //   // shallow means
-  //   router.replace("/blog", undefined, { shallow: true });
-  // }, []);
 
   const { data, error } = props;
 
   const [search, setSearch] = React.useState("");
   const [sort, setSort] = React.useState({ value: "", label: "" });
-  const [shouldFetch, setShouldFetch] = React.useState(false);
-
-  if (error) {
-    let errMessage;
-    if (error.response) {
-      errMessage = error.response.data.message;
-    } else errMessage = "Something went wrong, Please reload to view content";
-
-    toast(errMessage, {
-      type: "error",
-    });
-
-    return null;
-  }
+  const [showLoader, setShowLoader] = React.useState(false);
 
   const page = router.query.page || 1;
   const limit = 20;
@@ -120,30 +99,22 @@ const Home: NextPage<Props> = (props) => {
     }
 
     if (choice === "Filter") {
-      // if branch is not empty then add it to the query
-      if (branch.value && router.query.branch !== branch.value) {
+      if (branch.value || semester.value || subject.value) {
+        // Todo: Add the filter query
         router.push({
           pathname: router.pathname,
-          query: { ...router.query, branch: branch.value },
+          query: {
+            ...router.query,
+            branch: branch.value,
+            semester: semester.value,
+            subject: subject.value,
+          },
         });
-      } else if (!branch.value && router.query.branch) {
-        // if branch is empty and there is a branch query in the url then remove it
+      } else {
         const currentQuery = router.query;
         delete currentQuery.branch;
-        router.push({
-          pathname: router.pathname,
-          query: currentQuery,
-        });
-      }
-      if (semester.value && router.query.semester !== semester.value) {
-        router.push({
-          pathname: router.pathname,
-          query: { ...router.query, semester: semester.value },
-        });
-      } else if (!semester.value && router.query.semester) {
-        // if semester is empty and there is a semester query in the url then remove it
-        const currentQuery = router.query;
         delete currentQuery.semester;
+        delete currentQuery.subject;
         router.push({
           pathname: router.pathname,
           query: currentQuery,
@@ -168,25 +139,6 @@ const Home: NextPage<Props> = (props) => {
         });
       }
     }
-
-    // // if subject is not empty then add it to the query
-    // if (subject.value) {
-    //   router.push({
-    //     pathname: router.pathname,
-    //     query: { ...router.query, subject: subject.value },
-    //   });
-    // } else if (!subject.value && router.query.subject) {
-    //   // if subject is empty and there is a subject query in the url then remove it
-    //   const currentQuery = router.query;
-    //   delete currentQuery.subject;
-    //   router.push({
-    //     pathname: router.pathname,
-    //     query: currentQuery,
-    //   });
-    // }
-
-    // setShouldFetch(true);
-    setShouldFetch(true);
   };
 
   // https://swr.vercel.app/docs/conditional-fetching
@@ -195,7 +147,7 @@ const Home: NextPage<Props> = (props) => {
     router.query.branch ? `&branch=${router.query.branch}` : ""
   }${router.query.semester ? `&semester=${router.query.semester}` : ""}${
     router.query.sort ? `&sort=${router.query.sort}` : ""
-  }`;
+  }${router.query.subject ? `&subject=${router.query.subject}` : ""}`;
   query = query.startsWith("&") ? query.slice(1) : query;
 
   const conditionToDisplayFilteredData = () => {
@@ -216,17 +168,57 @@ const Home: NextPage<Props> = (props) => {
     fetcher
   );
 
-  // if (!res.data && conditionToDisplayFilteredData()) {
-  //   return <div>Loading...</div>;
-  // }
+  const handleReset = () => {
+    setSearch("");
+    setSort({ value: "", label: "" });
+    dispatch(setBranch({ value: "", label: "" }));
+    dispatch(setSemester({ value: "", label: "" }));
+    dispatch(setSubject({ value: "", label: "" }));
+    const currentQuery = router.query;
+    delete currentQuery.sort;
+    delete currentQuery.branch;
+    delete currentQuery.semester;
+    delete currentQuery.subject;
 
-  // if (shouldFetch && !res.data) return <SkeletonCards />;
+    router.push({
+      pathname: router.pathname,
+      query: currentQuery,
+    });
+  };
 
-  // const dataToDisplay = res.data ? res.data : data;
-  // console.log(res.data);
+  // Error handling
+  if (error || res.error) {
+    toast(
+      "Some went wrong while displaying the blogs. Please try again later or try refreshing the page.",
+      {
+        type: "error",
+        autoClose: false,
+        position: "bottom-right",
+        toastId: "blogs",
+      }
+    );
+    return (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 w-[90%] mx-auto">
+        {Array(12)
+          .fill(0)
+          .map((_, i) => (
+            <SkeletonCard key={i} />
+          ))}
+      </div>
+    );
+  }
+
+  useEffect(() => {
+    // https://stackoverflow.com/questions/52754121/how-to-return-jsx-after-settimeout
+    if (!res.data) {
+      setTimeout(() => {
+        setShowLoader(true);
+      }, 1000);
+    }
+  }, [res.isValidating]);
 
   return (
-    <div className="w-[90%] mx-auto">
+    <div className="min-h-screen w-[90%] mx-auto">
       <Head>
         <title>Blog App</title>
         <meta
@@ -243,53 +235,59 @@ const Home: NextPage<Props> = (props) => {
 
       {/* Filters here */}
       <div className="w-full flex flex-col md:flex-row items-center my-4 gap-5">
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Branch />
           <Semester />
           <Subject branch={branch.value} semester={semester.value} />
 
-          <Button
-            variant="gradient"
-            className="font-medium text-base capitalize py-2"
-            style={{ fontFamily: "Inter" }}
+          <button
+            className="bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue/40 active:opacity-[0.85] font-medium text-base capitalize py-2 px-4 rounded-md"
             // handle change in branch and semester separately
             onClick={() => handleSearch("Filter")}
           >
             Filter
-          </Button>
+          </button>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Select options={sortOptions} onChange={(e: any) => setSort(e)} />
-          <Button
-            variant="gradient"
-            className="font-medium text-base capitalize py-2"
-            style={{ fontFamily: "Inter" }}
+          <button
+            className="bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue/40 active:opacity-[0.85] font-medium text-base capitalize py-2 px-4 rounded-md"
             onClick={() => handleSearch("Sort")}
           >
             Sort
-          </Button>
+          </button>
+          <button
+            onClick={handleReset}
+            className="bg-gradient-to-r from-red-600 to-red-400 text-white font-medium text-base capitalize py-2 px-4 rounded-md"
+          >
+            Reset Filters
+          </button>
         </div>
       </div>
       <div>
         {/* Todo: Display number of blogs and also the time */}
         {/* <p>Found {dataToDisplay.length} blogs</p> */}
         {/* Is && data required? */}
-        {!conditionToDisplayFilteredData() && data && (
-          <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
-            <BlogCards data={data} />
-          </div>
-        )}
+        {!conditionToDisplayFilteredData() &&
+          data &&
+          (data.data.length === 0 ? (
+            <NoSearchResults />
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 place-items-center">
+              <BlogCards data={data} />
+            </div>
+          ))}
         {conditionToDisplayFilteredData() &&
           (res.data ? (
             res.data.data.length === 0 ? (
               <NoSearchResults />
             ) : (
-              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 ">
+              <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 place-items-center">
                 <BlogCards data={res.data} />
               </div>
             )
           ) : (
-            <MagnifyingGlassLoader />
+            showLoader && <MagnifyingGlassLoader />
           ))}
         <div style={{ alignSelf: "center", marginTop: "3rem" }}>
           <Pagination
@@ -313,7 +311,16 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
   const query = `page=${page}`;
   try {
     const res = await getAllPosts(query);
-    // console.log(res);
+    /*
+    res.data === {
+      data: blogs,
+      currentPage: Number(page),
+      numberOfPages: Math.ceil(total / LIMIT),
+      totalBlogs: total,
+      currentBlogsCount,
+    }
+    Same format for search results
+    */
     return {
       props: {
         data: res.data,
@@ -330,3 +337,13 @@ export const getServerSideProps: GetServerSideProps = async (context) => {
 };
 
 export default Home;
+
+// Todo: Carousel for tags (performance issue?)
+// Todo: No blogs found UI design
+// Todo: BlogCards are not responsive in tablet view (max-width: 768px)
+// Todo: Add Input, Filter, Sort UI in error handling (optional)
+// Todo: Set red color for heart only if it is liked by the user
+// Todo: Add random colors to the tags
+// Todo: BlurDataUrl for images
+// Todo: Found "number" results in "time" logic
+// https://stackoverflow.com/questions/9040161/mongo-order-by-length-of-array

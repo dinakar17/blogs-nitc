@@ -9,7 +9,7 @@ import * as api from "../../../api";
 
 import { GetServerSideProps } from "next";
 import type { NextPage } from "next";
-import { ToastContainer, toast } from "react-toastify";
+import { toast } from "react-toastify";
 
 type Props = {
   error: string;
@@ -21,22 +21,23 @@ const ConfirmSignup: NextPage<Props> = (props) => {
 
   useEffect(() => {
     if (props.error) {
+      router.push("/auth/login");
       toast.error(props.error, {
         position: "top-center",
-        autoClose: 2000,
+        autoClose: false,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
         draggable: true,
         progress: undefined,
       });
-      router.push("/auth/login");
     } else if (props.success) {
+      router.push("/auth/login");
       toast.success(
         "Hurray! Email Confirmation Successful 😊. Please Login to continue",
         {
           position: "top-center",
-          autoClose: 2000,
+          autoClose: false,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
@@ -44,7 +45,6 @@ const ConfirmSignup: NextPage<Props> = (props) => {
           progress: undefined,
         }
       );
-      router.push("/auth/login");
     }
   }, [props.error, props.success, router]);
 

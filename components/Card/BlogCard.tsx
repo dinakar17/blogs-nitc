@@ -1,8 +1,12 @@
+import Tooltip from "@mui/material/Tooltip";
 import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import { MagnifyingGlassLoader } from "../UI/Loader/Loader";
-import NoSearchResults from "../UI/Search/NoSearchResults";
+
+import dayjs from "dayjs";
+import relativeTime from "dayjs/plugin/relativeTime";
+import { useSelector } from "react-redux";
+import { RootState } from "../../store/store";
 
 export type BlogProps = {
   _id: string;
@@ -28,27 +32,38 @@ export type BlogProps = {
     name: string;
     photo: string;
   };
+  likes: Array<string>;
   createdAt: string;
 };
 interface Props {
   blog: BlogProps;
 }
 
-// Todo: change "any" to response type
 export const BlogCard = ({ blog }: Props) => {
-  // data === res.data || props.data
-  // blogdata is the array of posts
-  // console.log(blogtags);
+  const { authData } = useSelector((state: RootState) => state.user);
+
+  let dateToDisplay: string = "";
+
+  if (dayjs().diff(dayjs(blog.createdAt), "day") < 10) {
+    dayjs.extend(relativeTime);
+    dateToDisplay = dayjs(blog.createdAt).fromNow();
+  } else {
+    dateToDisplay = dayjs(blog.createdAt).format("DD MMM YYYY");
+  }
+
   return (
-    <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800 max-w-sm lg:w-[300px] shadow-lg">
+    <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800 max-w-[300px] lg:w-[300px] shadow-lg">
       {/* Design and display a blog card */}
-      <div className="relative flex flex-col min-h-[380px] max-w-sm rounded-t-lg overflow-hidden">
+      <div className="relative flex flex-col min-h-[380px] rounded-t-lg overflow-hidden">
         {/* Card Image */}
         <div className="relative w-full h-[180px] bg-gray-300">
           <Image
             src={blog.featuredImage}
             alt="blog image"
             layout="fill"
+            // ? Don't know whether it is a good idea to use blurDataURL same as src or not
+            // placeholder="blur"
+            // blurDataURL={blog.featuredImage}
             className="w-full h-full object-cover rounded-t-lg"
           />
         </div>
@@ -57,7 +72,6 @@ export const BlogCard = ({ blog }: Props) => {
           {/* Card tags */}
           <div className="flex flex-wrap gap-2 text-xs">
             {/* Display the first two tags */}
-
             {blog.tags.slice(0, 2).map((tag: string) => (
               <div
                 key={tag}
@@ -70,7 +84,7 @@ export const BlogCard = ({ blog }: Props) => {
           {/* Card Title */}
 
           <Link href={`/blog/${blog.slug}`}>
-            <h1 className="line-clamp-2 my-[0.1rem] leading-5 font-semibold cursor-pointer">
+            <h1 className="line-clamp-2 my-[0.1rem] leading-5 font-semibold cursor-pointer hover:text-blue-500 transition-colors duration-300 ease-in-out">
               {blog.title}
             </h1>
           </Link>
@@ -91,23 +105,33 @@ export const BlogCard = ({ blog }: Props) => {
               {/* Author name */}
 
               <h1 className="text-sm font-semibold">{blog.user.name}</h1>
-              <p className="text-xs">
-                {new Date(blog.createdAt)
-                  .toDateString()
-                  .split(" ")
-                  .slice(1)
-                  .join(" ")}
-              </p>
+              <p className="text-xs">{dateToDisplay}</p>
             </div>
           </div>
+          {/* Likes */}
+          {blog.likes.length > 0 && (
+            <Tooltip
+              title={`${blog.likes.length} ${
+                blog.likes.length > 1 ? "people" : "person"
+              } found this helpful`}
+            >
+              <div className="cursor-pointer absolute bottom-2 right-2 flex items-center gap-1">
+                <i
+                  className={`fa-sharp text-lg fa-solid fa-heart ${
+                    blog.likes.includes(authData?._id)
+                      ? "text-red-900"
+                      : "text-red-500"
+                  }`}
+                ></i>
+                <p className="text-sm">
+                  {(new Intl.NumberFormat().format(blog.likes.length) as any) +
+                    " "}
+                </p>
+              </div>
+            </Tooltip>
+          )}
         </div>
       </div>
-      {/* Liked by others */}
-      {/* <div className="flex flex-col gap-2 bg-white dark:bg-gray-800 text-sm p-2 border border-gray-300 rounded-b-md w-[300px]">
-        <p className="text-gray-500 text-center">
-          10 people found this exciting
-        </p>
-      </div> */}
     </div>
   );
 };

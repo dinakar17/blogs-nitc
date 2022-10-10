@@ -1,5 +1,9 @@
 /** @type {import('next').NextConfig} */
-module.exports = {
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
+
+module.exports = withBundleAnalyzer({
   reactStrictMode: true,
   devIndicators: {
     buildActivity: false,
@@ -8,4 +12,6 @@ module.exports = {
   images: {
     domains: ["localhost", "images.unsplash.com"],
   },
-};
+});
+
+// Installed Depcheck

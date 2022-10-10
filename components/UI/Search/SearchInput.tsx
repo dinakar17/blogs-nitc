@@ -1,17 +1,16 @@
 import React from "react";
-import { Button } from "@material-tailwind/react";
 
 type Props = {
-  handleSearch: (choice: string) => void;
+  handleSearch : (choice: string) => void;
   // setSearch is state setter function
-  setSearch: React.Dispatch<React.SetStateAction<string>>;
-  search: string;
+  setSearch : React.Dispatch<React.SetStateAction<string>>;
+  search : string;
 };
 
 const SearchInput = ({ handleSearch, setSearch, search }: Props) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    handleSearch("Search");
+    handleSearch("Search") as void;
   };
 
   return (
@@ -40,11 +39,11 @@ const SearchInput = ({ handleSearch, setSearch, search }: Props) => {
           type="text"
           id="voice-search"
           className="bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 block w-full pl-10 p-2.5  dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
-          placeholder="Search Mockups, Logos, Design Templates..."
+          placeholder="Search for Campus placements, Academics, Subjects..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
         />
-        <button
+        {/* <button
           type="button"
           className="flex absolute inset-y-0 right-0 items-center pr-3"
         >
@@ -61,17 +60,15 @@ const SearchInput = ({ handleSearch, setSearch, search }: Props) => {
               clipRule="evenodd"
             />
           </svg>
-        </button>
+        </button> */}
       </div>
-      <Button
-        variant="gradient"
+      <button
         type="submit"
-        className="inline-flex items-center mx-4 font-medium text-base capitalize py-2 md:w-auto"
-        style={{fontFamily: "Inter"}}
+        className="flex items-center mx-1 bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue/40 active:opacity-[0.85] font-medium text-base capitalize py-[0.6rem] px-4 rounded-md"
       >
         <svg
           aria-hidden="true"
-          className="mr-2 -ml-1 w-5 h-5"
+          className="lg:mr-2 -ml-1 w-5 h-5"
           fill="none"
           stroke="currentColor"
           viewBox="0 0 24 24"
@@ -84,8 +81,8 @@ const SearchInput = ({ handleSearch, setSearch, search }: Props) => {
             d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
           />
         </svg>
-        Search
-      </Button>
+        <span className="hidden lg:inline">Search</span>
+      </button>
     </form>
   );
 };

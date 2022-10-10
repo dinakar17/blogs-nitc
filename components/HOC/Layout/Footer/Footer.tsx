@@ -1,12 +1,13 @@
+import Link from "next/link";
 import React from "react";
 
 const Footer = () => {
   return (
     <footer className="p-4 bg-white rounded-lg shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-800">
-      <span className="text-sm text-gray-500 sm:text-center dark:text-gray-400">
+      <span className="block text-sm text-gray-500 text-center dark:text-gray-400">
         © 2022{" "}
         <a href="https://flowbite.com/" className="hover:underline">
-          Flowbite™
+          NITC™
         </a>
         . All Rights Reserved.
       </span>
@@ -22,9 +23,11 @@ const Footer = () => {
           </a>
         </li>
         <li>
-          <a href="#" className="mr-4 hover:underline md:mr-6">
-            Terms&Conditions
-          </a>
+          <Link href="/terms-and-conditions">
+            <a href="#" className="mr-4 hover:underline md:mr-6">
+              Terms&Conditions
+            </a>
+          </Link>
         </li>
         <li>
           <a href="#" className="mr-4 hover:underline md:mr-6">

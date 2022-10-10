@@ -1,5 +1,5 @@
 import React from "react";
-import { Dna, MagnifyingGlass } from "react-loader-spinner";
+import { Dna, MagnifyingGlass, ThreeDots } from "react-loader-spinner";
 // import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 // https://mhnpd.github.io/react-loader-spinner/docs/components/
 
@@ -32,8 +32,25 @@ export const MagnifyingGlassLoader = () => {
         glassColor="#c0efff"
         color="#e15b64"
       />
-      <div className="text-2xl text-gray-500 font-bold animate-pulse">Searching...</div>
+      <div className="text-2xl text-gray-500 font-bold animate-pulse">
+        Searching...
+      </div>
     </div>
+  );
+};
+
+export const ThreeDotsLoader = () => {
+  return (
+    <ThreeDots
+      height="50"
+      width="50"
+      radius="9"
+      color="#e15b64"
+      ariaLabel="three-dots-loading"
+      wrapperStyle={{}}
+      wrapperClass=""
+      visible={true}
+    />
   );
 };
 

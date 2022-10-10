@@ -1,141 +1,55 @@
-import type { NextPage } from "next";
-import dynamic from "next/dynamic";
-import SunEditorCore from "suneditor/src/lib/core";
-import { useEffect, useRef, useState } from "react";
-
-/* 
-next-dev.js?3515:20 Warning: A component is `contentEditable` and contains `children` managed by React. It is now your responsibility to guarantee that none of those nodes are unexpectedly modified or duplicated. This is probably not intentional.
-*/
-import * as api from "../../api";
-
+// Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 import "react-tagsinput/react-tagsinput.css";
 
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../store/store";
-import { toast } from "react-toastify";
-import { useRouter } from "next/router";
-import { AxiosResponse } from "axios";
 import Head from "next/head";
-import {
-  setDescription,
-  setFeaturedImageURL,
-  setTitle,
-} from "../../store/StatesContainer/post/PostSlice";
-import {
-  setBranch,
-  setSemester,
-  setSubject,
-} from "../../store/StatesContainer/filters/FilterSlice";
+import type { NextPage } from "next";
+import dynamic from "next/dynamic";
+// Todo: The bundle size of the editor is too large. Find a way to reduce it.
+import { useEffect } from "react";
+import { toast } from "react-toastify";
+import { useDispatch } from "react-redux";
+
+import { AppDispatch } from "../../store/store";
+import { resetPost, setPost} from "../../store/StatesContainer/post/PostSlice";
+import { resetFilters, setFilter} from "../../store/StatesContainer/filters/FilterSlice";
 
 const Editor = dynamic(() => import("../../components/Editor/Editor"), {
   ssr: false,
 });
 
-// Note: Change in redux state will trigger only the component which is using that state and not the whole component tree like in class based components
 const Home: NextPage = () => {
-  // console.log(
-  //   "I am create page and helps in creating a blog and I am rendered"
-  // );
-  const router = useRouter();
-
   const dispatch = useDispatch<AppDispatch>();
-
-  // Todo: Find an alternative to this
-  useEffect(() => {
-    dispatch(setFeaturedImageURL(""));
-    dispatch(setTitle(""));
-    dispatch(setDescription(""));
-    dispatch(setBranch({ value: "", label: "" }));
-    dispatch(setSemester({ value: "", label: "" }));
-    dispatch(setSubject({ value: "", label: "" }));
-  }, []);
-
-  const token = useSelector((state: RootState) => state.user.token);
-  const { branch, semester, subject } = useSelector(
-    (state: RootState) => state.filter
-  );
-  const { title, description, featuredImage } = useSelector(
-    (state: RootState) => state.post
-  );
-
-  const editor = useRef<SunEditorCore>(null);
-
-  const [tags, setTags] = useState<string[]>([]);
-  const [draft, setDraft] = useState(false);
-
-  const [loading, setLoading] = useState(false);
 
   useEffect(() => {
     // It is not possible to create "custom message" with "beforeUnload" event
     window.addEventListener("beforeunload", (e) => {
       e.preventDefault();
-      alert("Are you sure you want to leave?");
+      alert(
+        "Are you sure you want to leave? Changes you made may not be saved."
+      );
       // e.returnValue = "";
     });
   });
 
-  const imageUpload = async (file: File) => {
-    // console.log(file);
 
-    const formData = new FormData();
-    formData.append("profile-file", file);
-    try {
-      const response: AxiosResponse = await api.uploadImage(formData);
-      console.log(response);
-      // console.log(response.data.data);
-      const url = response.data.result[0].url;
-      const modified_url =
-        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
-      // console.log(modified_url);
-      return modified_url;
-    } catch (error: any) {
-      console.log(error);
-      alert(error);
+  useEffect(() => {
+    if (localStorage.getItem("post")) {
+      const post = JSON.parse(localStorage.getItem("post")!);
+      dispatch(setPost(post));
+      dispatch(setFilter(post));
+      toast("Looks like you have an unsaved post. We have loaded it for you.", {
+        type: "info",
+        position: "bottom-right",
+        autoClose: 5000,
+        toastId: "draft",
+        hideProgressBar: true,
+      });
+    } else {
+      dispatch(resetPost());
+      dispatch(resetFilters());
     }
-  };
+  }, []);
 
-  const saveContent = async () => {
-    // @ts-ignore
-    const content = editor.current?.getContents();
-
-    try {
-      setLoading(true);
-      // if the below code returns error, then it will be caught by the catch block since it is an async function and it will be handled by the catch block
-      let photoUrl = "";
-      if (featuredImage) {
-        photoUrl = await imageUpload(featuredImage as File);
-      }
-      const dataToSend = {
-        title,
-        description,
-        featuredImage: photoUrl,
-        branch,
-        semester,
-        subject,
-        tags,
-        content,
-        draft,
-      };
-      console.log(dataToSend);
-      // // response - {data: {status: "success", data: doc}, status: 201, statusText: "Created", headers: {…}, config: {…}, …}
-      const response = await api.createPost(dataToSend, token);
-      setLoading(false);
-      console.log(response);
-      toast.success("Blog created successfully");
-      router.push("/blog/success");
-      // setBlogData(response.data.data);
-      // setLoading(false);
-      // // enqueueSnackbar(`Blog Created`, { variant: 'success' });
-      // // router.push(`/blog/edit/${response.data.data.slug}`);
-    } catch (error: any) {
-      setLoading(false);
-      let errMessage;
-      if (error.response) {
-        errMessage = error.response.data.message;
-      } else errMessage = "Something went wrong, Please try again later";
-      toast.error(errMessage);
-    }
-  };
 
   return (
     // https://stackoverflow.com/questions/64019051/how-do-i-display-data-created-by-suneditor-in-a-reactjs-app
@@ -150,25 +64,20 @@ const Home: NextPage = () => {
         <meta property="og:description" content="Create a blog" />
       </Head>
       <Editor
-        title={title}
-        description={description}
-        featuredImage={featuredImage}
-        branch={branch}
-        semester={semester}
-        tags={tags}
-        setTags={setTags}
-        saveContent={saveContent}
-        editor={editor}
-        setDraft={setDraft}
-        loading={loading}
-        editorContent=""
         editorForUpdate={false}
-        userId=""
+        blogId={""}
       />
-      {/* Upload Image to the server */}
-      {/* Convert this string html "<p>You faith you ne<span style=\"color: rgb(255, 0, 0);\">ed to prove&nbsp;</span></p>" to normal html*/}
     </>
   );
 };
 
 export default Home;
+
+// Todo: File preview or featuredImageURL is still remained after creating the blog. Fix this issue
+// Todo: Enable editing for mobile devices
+// Todo: Restrict images uploaded only to specific formats
+
+
+/* 
+next-dev.js?3515:20 Warning: A component is `contentEditable` and contains `children` managed by React. It is now your responsibility to guarantee that none of those nodes are unexpectedly modified or duplicated. This is probably not intentional.
+*/

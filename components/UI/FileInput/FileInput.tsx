@@ -2,6 +2,7 @@ import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../../store/store";
+import * as api from '../../../api';
 
 type Props = {
   setImage: ActionCreatorWithPayload<any, string>;
@@ -30,10 +31,55 @@ const FileInput = ({ setImage, image }: Props) => {
     const objectUrl = URL.createObjectURL(image);
     setPreview(objectUrl);
 
+    // free memory when ever this component is unmounted
     return () => URL.revokeObjectURL(objectUrl);
   }, [image]);
+
+const handleUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // delete the previous image from the server
+  if (featuredImageURL) {
+    api.deleteImage(featuredImageURL);
+  }
+
+  if (e.target.files) {
+    const modifiedFileName = `${authData?.username}-${new Date().toLocaleDateString( "en-US", {
+      day: "numeric",
+      month: "short",
+      year: "numeric",
+    }).replace(/ /g, "-")}-${e.target.files[0].name}`;
+    
+    const newFile = new File([e.target.files[0]], modifiedFileName, {
+      type: e.target.files[0].type,
+    });
+
+    dispatch(setImage(newFile));
+  }
+};
+
   return (
-    <div className="flex justify-center items-center w-full">
+    <div
+      className="flex justify-center items-center w-full"
+      draggable
+      onDragOver={(e) => {
+        e.preventDefault();
+      }}
+      onDragStart={(e) => {
+        e.preventDefault();
+      }}
+      onDrop={(e) => {
+        e.preventDefault();
+        if (e.dataTransfer.files) {
+          // The below code creates a new File [e.target.files[0]] with the same properties as the original File [image] but with a new name [authData?.username + Date.now() + e.target.files[0].name]
+          // get the extension of the file
+          const extension = e.dataTransfer.files[0].name.split(".").pop();
+          const file = new File(
+            [e.dataTransfer.files[0]],
+            `${authData?.name}_${authData?._id}_${Date.now() + "." + extension}`
+          );
+          dispatch(setImage(file));
+        }
+      }}
+    >
       <label
         htmlFor="dropzone-file"
         className="flex flex-col justify-center items-center w-full h-64 bg-gray-50 rounded-lg border-2 border-gray-300 border-dashed cursor-pointer dark:hover:bg-bray-800 dark:bg-gray-700 hover:bg-gray-100 dark:border-gray-600 dark:hover:border-gray-500 dark:hover:bg-gray-600"
@@ -85,7 +131,7 @@ const FileInput = ({ setImage, image }: Props) => {
               const extension = e.target.files[0].name.split(".").pop();
               const file = new File(
                 [e.target.files[0]],
-                `${authData.name}_${authData._id}_${
+                `${authData?.name}_${authData?._id}_${
                   Date.now() + "." + extension
                 }`
               );
@@ -97,6 +143,5 @@ const FileInput = ({ setImage, image }: Props) => {
     </div>
   );
 };
-// draggble is used to make the input element draggable and dropable
 
 export default FileInput;

@@ -86,6 +86,9 @@ const authSlice = createSlice({
     updateAuthData: (state, action) => {
       state.authData = action.payload;
     },
+    resetError: (state) => {
+      state.error = "";
+    },
   },
   // extraReducers - allows us to handle actions that are not created by createSlice or createAsyncThunk (e.g. signIn)
   extraReducers: (builder) => {
@@ -132,14 +135,14 @@ const authSlice = createSlice({
     });
     builder.addCase(signUp.fulfilled, (state, action) => {
       state.loading = false;
-      state.authData = action.payload;
+      // action.payload === {status: "success", message: "Email sent successfully"}
       state.signUpSuccess = true;
       state.error = "";
     });
     builder.addCase(signUp.rejected, (state, action) => {
       state.loading = false;
       state.authData = null;
-      console.log(action);
+      // console.log(action);
       // @ts-ignore
       state.error = action.payload.message as string;
       console.log(state.error);
@@ -154,7 +157,7 @@ const authSlice = createSlice({
 //* Step 5: Default Export the reducer
 export default authSlice.reducer;
 
-export const { logOut, updateAuthData } = authSlice.actions;
+export const { logOut, updateAuthData, resetError } = authSlice.actions;
 //* Step 6: pass the reducer (which triggers state mutation) to the configureStore
 
 //* Step 7: Export the store and feed to it to the React component tree

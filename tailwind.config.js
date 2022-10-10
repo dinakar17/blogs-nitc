@@ -1,8 +1,6 @@
 /** @type {import('tailwindcss').Config} */
 
-const withMT = require("@material-tailwind/react/utils/withMT");
-
-module.exports = withMT({
+module.exports = {
   // This configuration implies that a class called dark will be added to the <html> tag.
   // Once this class is active, your dark:{class} classes will become active.
   darkMode: "class",
@@ -26,6 +24,7 @@ module.exports = withMT({
   variants: {
     extend: {
       lineClamp: ["responsive", "hover", "focus"],
+      typography: ["dark"],
     },
   },
   plugins: [
@@ -33,7 +32,7 @@ module.exports = withMT({
     require("@tailwindcss/line-clamp"),
     require("@tailwindcss/aspect-ratio"),
   ],
-});
+};
 
 // warning: LF will be replaced by CRLF in tailwind.config.js.
 // The file will have its original line endings in your working directory

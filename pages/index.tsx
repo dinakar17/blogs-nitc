@@ -9,11 +9,11 @@ type Props = {
   data: {
     data: any[];
     success: string;
-  },
+  };
   error: string;
-}
+};
 
-const Home: NextPage<Props> = ({data, error}) => {
+const Home: NextPage<Props> = ({ data, error }) => {
   // console.log(data); // Here data === res.data
 
   // if (error) return <div>Something went wrong</div>;
@@ -26,7 +26,6 @@ const Home: NextPage<Props> = ({data, error}) => {
     </div>
   );
 };
-
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
@@ -41,7 +40,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
     console.log(err);
     return {
       props: {
-        data: null,
+        error: "Unable to display posts at the moment. Please try again later",
       },
     };
   }

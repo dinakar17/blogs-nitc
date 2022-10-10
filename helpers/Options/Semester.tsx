@@ -20,20 +20,12 @@ export const semesterOptions = [
   { value: "8", label: "8th Semester" },
 ];
 
-interface SemesterValue {
-  value: string;
-  label: string;
-}
-
-type SemesterProps = {
-  setSemester: (semester: SemesterValue) => void;
-};
 
 const Semester = () => {
   const { branch, semester } = useSelector((state: RootState) => state.filter);
   const dispatch = useDispatch<AppDispatch>();
 
-  const NotBranches = ["general", "campus_placements"];
+  const NotBranches = ["general", "campus_placements", "sports", "arts_and_life", "nitc_clubs"];
 
   useEffect(() => {
     if (NotBranches.includes(branch.value)) {

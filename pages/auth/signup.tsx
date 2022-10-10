@@ -1,15 +1,16 @@
 import React, { useEffect } from "react";
-import * as api from "../../api";
-import { AppDispatch, RootState } from "../../store/store";
+import { AppDispatch,  RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { signUp } from "../../store/StatesContainer/auth/AuthSlice";
+import { resetError, signUp } from "../../store/StatesContainer/auth/AuthSlice";
 import {
   ConfirmPasswordValidator,
   PasswordValidator,
 } from "../../helpers/Validators/PasswordValidator";
 import { EmailValidator } from "../../helpers/Validators/EmailValidator";
-import { Slide, toast, ToastContainer } from "react-toastify";
+import { toast} from "react-toastify";
 import SignupSuccess from "../../helpers/SignupSuccess";
+import Loader from "../../components/UI/Loader/Loader";
+import Image from "next/image";
 
 const signup = () => {
   const dispatch = useDispatch<AppDispatch>();
@@ -65,7 +66,6 @@ const signup = () => {
       passwordError === "" &&
       confirmPasswordError === ""
     ) {
-      // send a post request to the backend to create a new user
       dispatch(
         signUp({
           name: userName,
@@ -74,11 +74,12 @@ const signup = () => {
           passwordConfirm: confirmPassword,
         })
       );
+      // send a post request to the backend to create a new user
     } else {
       // display the error message using toasitfy
-      toast.error("Enter valid details", {
+      toast.error("Please enter valid details", {
         position: "top-center",
-        autoClose: 5000,
+        autoClose: 2000,
         hideProgressBar: false,
         closeOnClick: true,
         pauseOnHover: true,
@@ -99,21 +100,22 @@ const signup = () => {
         draggable: true,
         progress: undefined,
       });
+      dispatch(resetError());
     }
   }, [error]);
 
-  console.log(error);
-
   return (
-    // create a register form
     <>
       {signUpSuccess ? (
         <SignupSuccess />
       ) : loading ? (
-        <div>Loading</div>
+        <Loader />
       ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen">
-          <div className="flex flex-col justify-center gap-5 md:w-[60%] mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 min-h-screen m-0">
+          <div className="hidden md:block relative w-full h-full">
+            <Image src="/static/signup.jpg" layout="fill" objectFit="cover" />
+          </div>
+          <div className="flex flex-col justify-center gap-5 w-[80%] md:w-[60%] mx-auto">
             <h1 className="text-4xl font-bold text-gray-800 dark:text-gray-50">
               Create account
             </h1>
@@ -132,6 +134,8 @@ const signup = () => {
                 <label>Username</label>
                 <input
                   type="text"
+                  // length of the username should be at least 3 characters long
+                  minLength={4}
                   required
                   value={userName}
                   placeholder="Enter your name"
@@ -143,6 +147,7 @@ const signup = () => {
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Email</label>
                 <input
+                  required
                   type="email"
                   placeholder="Enter your email"
                   value={email}
@@ -154,6 +159,7 @@ const signup = () => {
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Password</label>
                 <input
+                  required
                   type="password"
                   placeholder="Enter your password"
                   value={password}
@@ -165,6 +171,7 @@ const signup = () => {
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Confirm Password</label>
                 <input
+                  required
                   type="password"
                   placeholder="Confirm your password"
                   value={confirmPassword}
@@ -173,7 +180,7 @@ const signup = () => {
                 />
                 <p className="text-red-500 text-sm">{confirmPasswordError}</p>
               </div>
-              <button className="bg-blue-500 text-white p-2 rounded-md">
+              <button type="submit" className="bg-blue-500 text-white p-2 rounded-md">
                 Register
               </button>
               <div>
@@ -184,21 +191,8 @@ const signup = () => {
               </div>
             </form>
           </div>
-          <div></div>
         </div>
       )}
-      <ToastContainer
-        position="top-center"
-        transition={Slide}
-        autoClose={1000}
-        hideProgressBar={false}
-        newestOnTop={false}
-        closeOnClick
-        rtl={false}
-        pauseOnFocusLoss
-        draggable
-        pauseOnHover
-      />
     </>
   );
 };

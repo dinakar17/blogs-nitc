@@ -1,11 +1,14 @@
 import Image from "next/image";
-import React from "react";
-import { useSelector } from "react-redux";
-import { RootState } from "../../store/store";
-import { useTypewriter, Cursor } from "react-simple-typewriter";
-import TextTransition, { presets } from "react-text-transition";
 import Link from "next/link";
+import React from "react";
 import Carousel from "react-multi-carousel";
+import { useTypewriter } from "react-simple-typewriter";
+import { useSelector } from "react-redux";
+import TextTransition, { presets } from "react-text-transition";
+import { toast } from "react-toastify";
+// Todo: replace react-text-transition with normal css animation
+
+import { RootState } from "../../store/store";
 
 const TEXTS = ["Share", "Grow"];
 
@@ -36,12 +39,22 @@ type Props = {
 };
 
 const Intro = ({ data, error }: Props) => {
+  React.useEffect(() => {
+    if (error) {
+      toast(error, {
+        type: "error",
+        autoClose: false,
+        position: "bottom-right",
+        toastId: "intro",
+      });
+    }
+  }, [error]);
   const { authData } = useSelector((state: RootState) => state.user);
 
   const [index, setIndex] = React.useState(0);
 
   const [text] = useTypewriter({
-    words: ["Experience", "Knowledge", "Wisdom 😉"],
+    words: ["Experience", "Knowledge", "Passion"],
     delaySpeed: 1000,
     loop: 0,
     onLoopDone: () => console.log(`loop completed after 3 runs.`),
@@ -60,8 +73,8 @@ const Intro = ({ data, error }: Props) => {
       {/* Todo: replace mt-24 mb-20*/}
       <div className="grid grid-cols-1 lg:grid-cols-2 lg:mt-20 mb-20">
         <div className="flex flex-col gap-5 text-center lg:text-left">
-          <p className="text-sm md:text-xl font-bold uppercase text-gray-800">
-            Welcome {authData ? authData.name : <span>to NITC world</span>},
+          <p className="text-sm md:text-xl font-bold uppercase text-gray-800 dark:text-gray-200">
+            Welcome {authData ? authData?.name : <span>to NITC world</span>},
             here you can
           </p>
           <h1 className="text-5xl md:text-8xl font-bold">
@@ -157,10 +170,14 @@ export const CardLayout = ({ post }: CardProps) => {
   return (
     <div className="relative">
       <div className="aspect-w-10 aspect-h-9 lg:aspect-w-16 lg:aspect-h-9">
-        <img
+        <Image
           src={post.featuredImage}
           className="object-cover shadow-lg rounded-lg"
-          alt=""
+          alt={post.title}
+          layout="fill"
+          // placeholder="blur"
+          // // ? should we use blurDataURL same as src?
+          // blurDataURL={post.featuredImage}
         />
       </div>
       <div className="absolute bottom-0 p-4 flex flex-col gap-2">
@@ -170,12 +187,11 @@ export const CardLayout = ({ post }: CardProps) => {
           </h2>
         </Link>
         <div className="flex items-center gap-2">
-          <div>
+          <div className="w-10 h-10 relative">
             <Image
               src={post.user[0].photo}
-              width={30}
-              height={30}
-              className="rounded-full"
+              layout="fill"
+              className="rounded-full object-cover"
             />
           </div>
           <div className="text-white">

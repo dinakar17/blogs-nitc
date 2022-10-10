@@ -8,19 +8,19 @@ import { toast } from "react-toastify";
 import * as api from "../../api";
 import Loader from "../../components/UI/Loader/Loader";
 import { EmailValidator } from "../../helpers/Validators/EmailValidator";
-import { signIn } from "../../store/StatesContainer/auth/AuthSlice";
-import { AppDispatch, RootState } from "../../store/store";
+import { resetError, signIn } from "../../store/StatesContainer/auth/AuthSlice";
+import { AppDispatch, persistor, RootState } from "../../store/store";
 
 const login = () => {
   const router = useRouter();
   const dispatch = useDispatch<AppDispatch>();
-  const userInfo = useSelector((state: RootState) => state.user);
-  const { authData, loading, error } = userInfo;
+  const { authData, token, loading, error } = useSelector(
+    (state: RootState) => state.user
+  );
 
   const [email, setEmail] = React.useState("");
   const [emailError, setEmailError] = React.useState("");
   const [password, setPassword] = React.useState("");
-  const [passwordError, setPasswordError] = React.useState("");
 
   const handleEmail = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -41,7 +41,7 @@ const login = () => {
     // verify whether the email and password are valid or not
     // if valid, then redirect to the home page
     // if invalid, then show the error message
-    if (emailError === "" && passwordError === "") {
+    if (emailError === "") {
       // redirect to the home page
       // Todo: google auto filling causing login successful
       const signInDetails = { email, password };
@@ -49,10 +49,11 @@ const login = () => {
       try {
         dispatch(signIn(signInDetails));
       } catch (error: any) {
+        // This catch block will never be executed because the error is handled in the createAsyncThunk
         toast.error(error.message);
       }
     } else {
-      // show the error message
+      // Frontend validation failed
       toast.error("email or password is invalid 😓", {
         position: "top-center",
         autoClose: 2000,
@@ -72,11 +73,15 @@ const login = () => {
   // }, [authData, loading, router]);
 
   useEffect(() => {
-    // Todo: Clear the persist:root state in the local storage since that is storing error message
-    if (authData) {
+    if (token && authData?.photo) {
       router.push("/");
+    } else if (token && !authData?.photo) {
+      router.push("/user/edit-profile");
     }
-    if (!loading && error) {
+  }, [token, loading, router]);
+
+  useEffect(() => {
+    if (error) {
       toast.error(error, {
         position: "top-center",
         autoClose: 2000,
@@ -86,8 +91,9 @@ const login = () => {
         draggable: true,
         progress: undefined,
       });
+      dispatch(resetError());
     }
-  }, [error, loading]);
+  }, [error]);
 
   return (
     // create two columns using grid and make them responsive as well
@@ -128,9 +134,6 @@ const login = () => {
                   className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   onChange={handlePassword}
                 />
-                <p className="text-red-500 text-sm">
-                  {passwordError && passwordError}
-                </p>
               </div>
               <div className="flex justify-between items-center">
                 <div className="flex">

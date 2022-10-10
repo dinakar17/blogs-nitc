@@ -1,11 +1,12 @@
+import "react-tagsinput/react-tagsinput.css";
+
+import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
+import { useRef, useState } from "react";
 import SunEditorCore from "suneditor/src/lib/core";
 import "suneditor/dist/css/suneditor.min.css"; // Import Sun Editor's CSS File
 import TagsInput from "react-tagsinput";
 
-import "react-tagsinput/react-tagsinput.css";
-
-import { RefObject } from "react";
 import { uploadImage } from "../../api";
 import { setOptions } from "./EditorOptions";
 import Branch from "../../helpers/Options/Branch";
@@ -15,58 +16,39 @@ import FileInput from "../UI/FileInput/FileInput";
 import InputField from "../UI/InputField/InputField";
 import TextArea from "../UI/TextArea/TextArea";
 
-import {
-  setDescription,
-  setFeaturedImage,
-  setTitle,
-} from "../../store/StatesContainer/post/PostSlice";
+import { setDescription, setDraft, setFeaturedImage, setTags, setTitle} from "../../store/StatesContainer/post/PostSlice";
+import * as api from "../../api";
 import Publish from "./Publish";
+import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../store/store";
+// Todo: Remove this later
+import { AxiosResponse } from "axios";
+import { BlogPost } from "../../types";
+import { toast } from "react-toastify";
 
 const SunEditor = dynamic(() => import("suneditor-react"), {
   ssr: false,
 });
 
-type BranchProps = {
-  value: string;
-  label: string;
-};
-
 type EditorProps = {
-  title: string;
-  description: string;
-  featuredImage: File | null | Blob;
-  branch: BranchProps;
-  semester: BranchProps;
-  tags: string[];
-  setTags: (tags: string[]) => void;
-  saveContent: () => void;
-  setDraft: (draft: boolean) => void;
-  loading: boolean;
-  editor: RefObject<SunEditorCore>;
-  editorContent: string;
   editorForUpdate: boolean;
-  userId: string;
-  // imageUpload: (file: File) => Promise<void>;
+  blogId: string;
 };
 
 const Editor = (props: EditorProps) => {
-  console.log("I am editor component just for editor and I am rendered");
-  const {
-    title,
-    description,
-    featuredImage,
-    branch,
-    semester,
-    tags,
-    setTags,
-    saveContent,
-    setDraft,
-    loading,
-    editor,
-    editorContent,
-    editorForUpdate,
-    userId,
-  } = props;
+  const editor = useRef<SunEditorCore>(null);
+
+  const router = useRouter();
+
+  const dispatch = useDispatch<AppDispatch>();
+  const { title, description, featuredImage, featuredImageURL, content, status, tags } = useSelector((state: RootState) => state.post);
+  const { branch, semester, subject } = useSelector((state: RootState) => state.filter);
+  const token = useSelector((state: RootState) => state.user.token);
+
+  const [loading, setLoading] = useState(false);
+
+  const { editorForUpdate, blogId } = props;
 
   const getSunEditorInstance = (sunEditor: SunEditorCore) => {
     // @ts-ignore
@@ -74,8 +56,8 @@ const Editor = (props: EditorProps) => {
   };
 
   // Todo: Add custom keyboard shortcuts
-
   // https://github.com/mkhstar/suneditor-react/issues/128
+  // Sending uploaded images in the server to the backend
   const onImageUploadBefore = (
     files: FileList,
     info: { imageUploadUrl: string; imageUploadHeader: string },
@@ -83,7 +65,6 @@ const Editor = (props: EditorProps) => {
   ) => {
     const formData = new FormData();
     formData.append("profile-file", files[0]);
-    // console.log(info, uploadHandler, files);
 
     uploadImage(formData)
       .then((res) => {
@@ -97,60 +78,118 @@ const Editor = (props: EditorProps) => {
         console.log(err);
         alert("Image upload failed");
       });
-    // const response = {
-    //   // The response must have a "result" array.
-    //   result: [
-    //     {
-    //       url: "https://imagev2api.linoxcloud.com/uploads/aquaman%20playdate.jpg",
-    //       name: "image name",
-    //       size: "561276",
-    //     },
-    //   ],
-    // };
-    // uploadHandler(response);
   };
 
-  // const onImageUpload = (
-  //   targetImgElement: HTMLImageElement,
-  //   index: number,
-  //   state: string,
-  //   imageInfo: {
-  //     name: string;
-  //     size: number;
-  //     type: string;
-  //     width: number;
-  //     height: number;
-  //     alt: string;
-  //     link: string;
-  //   },
-  //   remainingFilesCount: number
-  // ) => {
-  //   console.log(targetImgElement, index, state, imageInfo, remainingFilesCount);
-  //   // targetImgElement.src = "https://picsum.photos/200/300";
-  // };
-
-  const isBranch = (value: string) => {
-    if (value === "general" || value === "campus_placements" || value === "") {
-      // in order to prevent showing select subject option
-      // The below line of code freezes the app for some reason
-      // setSemester({ value: "", label: "Select Semester" });
-      return false;
+  // Image upload to server
+  const imageUpload = async (file: File) => {
+    const formData = new FormData();
+    formData.append("profile-file", file);
+    try {
+      const response: AxiosResponse = await api.uploadImage(formData);
+      const url = response.data.result[0].url;
+      const modified_url =
+        process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
+      return modified_url;
+    } catch (error: any) {
+      console.log(error);
+      alert(error);
     }
-    return true;
+  };
+
+  const saveContent = async () => {
+    // @ts-ignore
+    const editorContent = editor.current?.getContents();
+    const config = {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    };
+
+    let dataToSend: BlogPost;
+
+    try {
+      setLoading(true);
+      let photoUrl = "";
+      if (featuredImage) {
+        photoUrl = await imageUpload(featuredImage as File);
+      }
+      dataToSend = {
+        title,
+        description,
+        featuredImage: editorForUpdate ? (photoUrl  ? photoUrl : featuredImageURL): photoUrl,
+        branch,
+        semester,
+        subject,
+        tags,
+        content: editorContent,
+        draft: status.draft,
+        anonymous: status.anonymous,
+      };
+      // * When editor is in update mode 
+      // // response - {data: {status: "success", data: doc}, status: 200, statusText: "Created", headers: {…}, config: {…}, …}
+      if (editorForUpdate) {
+        const response = await api.updatePost(blogId, dataToSend, config);
+        setLoading(false);
+        router.push(`/blog/${response.data.data.slug}`);
+        if (response.data.data.draft) {
+          toast("Draft saved successfully", {
+            type: "success",
+          });
+        } else {toast.success("Blog updated successfully");}
+      } 
+      // * When editor is in create mode 
+      // // response - {data: {status: "success", data: doc}, status: 201, statusText: "Created", headers: {…}, config: {…}, …}
+      else {
+        const response = await api.createPost(dataToSend, token);
+        localStorage.removeItem("post");
+
+        setLoading(false);
+        if (!response.data.data.draft) {
+          toast.success(
+            "Blog created successfully. We'll notify you through email once it is published on the website."
+          );
+        } else {
+          toast.info("Blog saved as draft");
+        }
+        router.push(`/blog/${response.data.data.slug}`);
+      }
+    }
+    // * If any thing goes wrong during update or create mode or image upload it will be catched here 
+    catch (error: any) {
+      setLoading(false);
+      let errMessage;
+      if (error.response) {
+        errMessage = error.response.data.message;
+      } else errMessage = "Something went wrong, Please try again later";
+
+      // to prevent the data from being lost when an error occurs save the data in local storage
+      // Note: dataToSend! prevents the error "Object is possibly 'undefined'"
+      localStorage.setItem("post", JSON.stringify(dataToSend!));
+      toast(
+        `${errMessage}. Don't worry, we have saved your post. It will be available next time you visit this page.`,
+        {
+          type: "error",
+          position: "bottom-center",
+          autoClose: false,
+          toastId: "postError",
+          style: { fontSize: "0.8rem" },
+        }
+      );
+    }
   };
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    console.log("Form submitted");
     e.preventDefault();
     saveContent();
   };
 
   return (
     <form
-      className="flex justify-center gap-10 mx-auto"
+      className="min-h-screen flex justify-center gap-10 mx-auto"
       onSubmit={handleSubmit}
     >
-      <div className="flex flex-col gap-4 w-[60%]">
+      <div className="flex flex-col gap-4 w-[90%] md:w-[60%]">
         {/* Title for the blog */}
         <InputField
           value={title}
@@ -167,33 +206,43 @@ const Editor = (props: EditorProps) => {
         />
         {/* Featured Image */}
         <div className="flex flex-col gap-2">
-          {/* Todo: Hover effect */}
-          <label className="block mb-2 text-base font-medium text-gray-900 dark:text-gray-400">
-            Featured Image
+          <label className="flex gap-2 items-center mb-2 text-base font-medium text-gray-900 dark:text-gray-400">
+            <span>Featured Image</span>
+            <CustomizedTooltip name="featuredImage">
+              <i className="invisible md:visible cursor-pointer fa-regular fa-circle-question"></i>
+            </CustomizedTooltip>
           </label>
           <FileInput setImage={setFeaturedImage} image={featuredImage} />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
           {/* Select the branch */}
           <div className="flex flex-col gap-2 z-[1000]">
-            <label className="">Select the branch</label>
+            <label className="flex gap-2 items-center">
+              <span>Select the branch</span>
+              <CustomizedTooltip name="branch">
+                <i className="invisible md:visible cursor-pointer fa-regular fa-circle-question"></i>
+              </CustomizedTooltip>
+            </label>
             <Branch />
             <div className="flex flex-col gap-2">
-              {/* <label className="">Select the semester</label> */}
               <Semester />
             </div>
             <div className="flex flex-col gap-2">
-              {/* <label className="">Select the Subject </label> */}
               <Subject branch={branch.value} semester={semester.value} />
             </div>
           </div>
           {/* Tags */}
           <div className="flex flex-col gap-2">
-            <label>Tags</label>
+            <label className="flex items-center gap-2">
+              <span>Tags</span>
+              <CustomizedTooltip name="tags">
+                <i className="fa-regular fa-circle-question"></i>
+              </CustomizedTooltip>
+            </label>
             <TagsInput
               required
               value={tags}
-              onChange={(tags: any) => setTags(tags)}
+              onChange={(tags: any) => dispatch(setTags(tags))}
             />
           </div>
         </div>
@@ -206,40 +255,23 @@ const Editor = (props: EditorProps) => {
             setDefaultStyle="font-family: 'Inter', sans-serif; font-size: 1rem;"
             // @ts-ignore
             onImageUploadBefore={onImageUploadBefore}
-            defaultValue={editorContent}
-            // onImageUpload={onImageUpload}
+            defaultValue={content}
           />
         </div>
-        {/* <fo className="flex justify-center gap-10">
-          <button
-            onClick={saveContent}
-            className="bg-green-500 text-white p-2 rounded-md"
-          >
-            {loading ? "Saving..." : "Save"}
-          </button>
+        {/* 
           {/* Todo: Future Feature if required 
         <Link href="/blog/preview"> 
           <a className="bg-blue-500 text-white p-2 rounded-md" target="_blank">
             Preview
           </a>
         </Link> */}
-        {/* <button
-            className="bg-red-500 text-white p-2 rounded-md"
-            onClick={() => {
-              setDraft(true);
-              saveContent();
-            }}
-          >
-            Save as Draft
-          </button> */}
-        {/* </div> */}
       </div>
-      <div className="w-[25%] m-4">
+      <div className="hidden md:block w-[25%] m-4">
         <div className="sticky top-0">
           <Publish
             setDraft={setDraft}
             editorForUpdate={editorForUpdate}
-            userId={userId}
+            blogId={blogId}
           />
         </div>
       </div>
@@ -248,3 +280,35 @@ const Editor = (props: EditorProps) => {
 };
 
 export default Editor;
+
+// Todo: Dark mode for SunEditor, Select and TagsInput
+
+// const response = {
+//   // The response must have a "result" array.
+//   result: [
+//     {
+//       url: "https://imagev2api.linoxcloud.com/uploads/aquaman%20playdate.jpg",
+//       name: "image name",
+//       size: "561276",
+//     },
+//   ],
+// };
+// uploadHandler(response);
+// const onImageUpload = (
+//   targetImgElement: HTMLImageElement,
+//   index: number,
+//   state: string,
+//   imageInfo: {
+//     name: string;
+//     size: number;
+//     type: string;
+//     width: number;
+//     height: number;
+//     alt: string;
+//     link: string;
+//   },
+//   remainingFilesCount: number
+// ) => {
+//   console.log(targetImgElement, index, state, imageInfo, remainingFilesCount);
+//   // targetImgElement.src = "https://picsum.photos/200/300";
+// };

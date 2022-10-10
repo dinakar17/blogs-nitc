@@ -1,44 +1,54 @@
 import { useRouter } from "next/router";
-import React from "react";
+import React, { useEffect } from "react";
 import Footer from "./Footer/Footer";
 import Header from "./Header/Header";
-import { AnimatePresence, motion } from "framer-motion";
+import { toast } from "react-toastify";
+import Fade from "@mui/material/Fade";
 
-// Type of children
 type Props = {
   children: React.ReactNode;
   noLayoutRoutes: string[];
 };
 
-const variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1 },
-  collapsed: { opacity: 0 },
-};
-
 const Layout = ({ children, noLayoutRoutes }: Props) => {
   const router = useRouter();
-  const noLayout = noLayoutRoutes.indexOf(router.pathname) !== -1;
+  useEffect(() => {
+    localStorage.setItem("createPost", "/blog/create");
+  }, []);
 
-  if (noLayout) {
-    return <div className="font-default">{children}</div>;
-  }
+  useEffect(() => {
+    if (localStorage.getItem("createPost") === router.pathname) {
+      localStorage.removeItem("createPost");
+      toast(
+        "Please wait till the editor is loaded. If it takes too long then refresh the page.",
+        {
+          type: "info",
+          autoClose: 3000,
+          position: "bottom-left",
+          toastId: "editor",
+          hideProgressBar: true,
+        }
+      );
+    }
+  }, [router.pathname]);
+
+  const noLayout = noLayoutRoutes.indexOf(router.pathname) !== -1;
 
   return (
     <>
-      <AnimatePresence>
-        <motion.div
-          className="font-default dark:bg-[#1F2028] dark:text-gray-100"
-          variants={variants}
-          initial="hidden"
-          animate="visible"
-          exit="collapsed"
-        >
-          <Header />
-          <div>{children}</div>
-          <Footer />
-        </motion.div>
-      </AnimatePresence>
+      <Fade appear={true} in={true} timeout={1000}>
+        <div className="font-default dark:bg-[#1F2028] dark:text-gray-100">
+          {noLayout ? (
+            <div>{children}</div>
+          ) : (
+            <>
+              <Header />
+              <div>{children}</div>
+              <Footer />
+            </>
+          )}
+        </div>
+      </Fade>
     </>
   );
 };

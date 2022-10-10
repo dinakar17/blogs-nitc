@@ -2,7 +2,7 @@ import { configureStore } from "@reduxjs/toolkit";
 // configuring redux persist with redux toolkit
 // ? redux-persist failed to create sync storage. falling back to noop storage.
 // | Step 1: Import storage, persistReducer
-import storage from 'redux-persist/lib/storage'
+import storage from "redux-persist/lib/storage";
 // https://github.com/rt2zz/redux-persist/issues/988
 // import postsSliceReducer from "./StatesContainer/posts/postsSlice";
 import userSliceReducer from "./StatesContainer/auth/AuthSlice";
@@ -21,12 +21,12 @@ import {
   PERSIST,
   PURGE,
   REGISTER,
-} from 'redux-persist'
+} from "redux-persist";
 
 // | Step 3: Configure persistConfig. Here key is the name of the state to be persisted
 const persistConfig = {
-  key: 'root',
-  storage
+  key: "root",
+  storage,
 };
 
 // | Step 4: create a persisted reducer
@@ -39,7 +39,7 @@ export const store = configureStore({
     // | Step 5: use the persisted reducer instead of the original reducer. Now head over to _app.tsx for the next step
     user: persistedReducer,
     filter: filtersSliceReducer,
-    post : postSliceReducer,
+    post: postSliceReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
@@ -51,6 +51,8 @@ export const store = configureStore({
   // middleware: [thunk],
 });
 
+// | Step 6: Import persistStore to persist the store
+export const persistor = persistStore(store);
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
 export type RootState = ReturnType<typeof store.getState>;
