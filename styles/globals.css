@@ -6,6 +6,21 @@
 @tailwind components;
 @tailwind utilities;
 
+/* 
+define aspect video class using tailwind
+*/
+/* .aspect-video {
+  aspect-ratio: 1 / 1;
+  border-radius: 0.5rem;
+}
+
+@layer utilities {
+	.prose :where(iframe):not(:where([class~="not-prose"] *)) {
+		@apply aspect-video w-full
+	}
+} */
+
+
 /* https://stackoverflow.com/questions/4712242/wait-for-fonts-to-load-before-rendering-web-page */
 
 body {

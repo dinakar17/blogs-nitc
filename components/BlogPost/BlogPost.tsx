@@ -13,6 +13,7 @@ import Image from "next/image";
 import * as api from "../../api";
 import { ThreeDotsLoader } from "../UI/Loader/Loader";
 import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
+import siteMetadata from "../../data/siteMetadata";
 
 type BlogPostProps = {
   data: {
@@ -43,12 +44,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
     if (!res.data) {
       setTimeout(() => {
         setShowLoader(true);
-      }, 1000);
+      }, 2000);
     }
   }, [res.isValidating]);
 
   return (
-    <div className="w-[90%] lg:w-[70%] mx-auto p-2 prose prose-sm max-w-screen-xl prose-indigo md:prose-base dark:prose-invert">
+    <div className="w-[90%] lg:w-[70%] mx-auto p-2 prose prose-sm max-w-screen-xl prose-indigo md:prose-base dark:prose-invert overflow-auto">
       <div className="text-center">
         <h4 className="text-3xl lg:text-5xl font-extrabold">
           {data.data.title}
@@ -60,21 +61,31 @@ const BlogPost = ({ data }: BlogPostProps) => {
         <div className="flex items-center gap-5">
           <div className="flex items-center gap-2">
             <div className="relative w-10 h-10 rounded-full overflow-hidden">
-              <CustomizedTooltip
-                name="author"
-                photo={data.data.user.photo}
-                bio={data.data.user.bio}
-              >
+              {data.data.anonymous ? (
                 <Image
-                  src={data.data.user.photo}
-                  alt={data.data.user.name}
+                  src="/static/about/1.jpg"
+                  alt="anonymous"
                   layout="fill"
                   objectFit="cover"
                 />
-              </CustomizedTooltip>
+              ) : (
+                <CustomizedTooltip
+                  name="author"
+                  photo={data.data.user.photo}
+                  bio={data.data.user.bio}
+                >
+                  <Image
+                    src={data.data.user.photo}
+                    alt={data.data.user.name}
+                    layout="fill"
+                    objectFit="cover"
+                  />
+                </CustomizedTooltip>
+              )}
             </div>
             <p className="flex flex-col justify-center">
-              {data.data.user.name} <br />
+              {data.data.anonymous ? "Anonymous" : data.data.user.name}
+              <br />
               <span className="text-xs text-gray-500">
                 Published on{" "}
                 <span className="font-bold">
@@ -104,7 +115,7 @@ const BlogPost = ({ data }: BlogPostProps) => {
             </Link>
           )}
         </div>
-        <div className="flex items-center">
+        <div className="flex items-center scale-75 md:scale-100">
           {res.data ? (
             <>
               <LikeUI
@@ -113,11 +124,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
                 mutate={res.mutate}
                 likes={res.data.likes}
               />
-              <p className="text-base lg:text-lg font-bold">
-                {(new Intl.NumberFormat().format(
-                  res.data.likes.length
-                ) as any) + " "}{" "}
-                {res.data.likes.length > 1 ? "likes" : "like"}
+              <p className="text-lg font-bold">
+                {new Intl.NumberFormat().format(res.data.likes.length) as any}{" "}
+                {/* display "likes" text only if the user in larger screens */}
+                <span className="hidden lg:inline">
+                  {res.data.likes.length > 1 ? "likes" : "like"}
+                </span>
               </p>
             </>
           ) : (
@@ -127,7 +139,11 @@ const BlogPost = ({ data }: BlogPostProps) => {
       </div>
       <div className="aspect-w-16 aspect-h-9">
         <Image
-          src={data.data.featuredImage}
+          src={
+            data.data.featuredImage
+              ? data.data.featuredImage
+              : "/static/no_image.png"
+          }
           alt={data.data.description}
           className="shadow-lg rounded-md object-cover"
           layout="fill"
@@ -136,17 +152,18 @@ const BlogPost = ({ data }: BlogPostProps) => {
 
       <div className="mt-4">{parse(data.data.content)}</div>
       {/* Share on Twitter, FaceBook, instagram */}
-      <div className="not-prose flex flex-wrap gap-2 items-center">
+      <div className="not-prose flex flex-wrap gap-2 items-center my-12">
         <button
           className="bg-blue-500 text-white px-4 py-2 rounded-md"
           type="button"
         >
           <a
-            href={`https://twitter.com/intent/tweet?text=${data.data.title}&url=${data.data.slug}&via=devsajib`}
+            href={`https://twitter.com/intent/tweet?text=${data.data.title}&url=${siteMetadata.siteUrl}/blog/${data.data.slug}&via=nitc`}
             target="_blank"
             rel="noreferrer"
           >
             <i className="fa-brands fa-twitter" />
+            <span className="pl-2">Share</span>
           </a>
         </button>
         <button
@@ -154,11 +171,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
           type="button"
         >
           <a
-            href={`https://www.facebook.com/sharer/sharer.php?u=${data.data.slug}`}
+            href={`https://www.facebook.com/sharer/sharer.php?u=${siteMetadata.siteUrl}/blog/${data.data.slug}`}
             target="_blank"
             rel="noreferrer"
           >
             <i className="fa-brands fa-facebook" />
+            <span className="pl-2">Share</span>
           </a>
         </button>
         <button
@@ -166,11 +184,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
           type="button"
         >
           <a
-            href={`https://www.linkedin.com/sharing/share-offsite/?url=${data.data.slug}`}
+            href={`https://www.linkedin.com/sharing/share-offsite/?url=${siteMetadata.siteUrl}/blog/${data.data.slug}`}
             target="_blank"
             rel="nofollow noreferrer"
           >
             <i className="fa-brands fa-linkedin" />
+            <span className="pl-2">Share</span>
           </a>
         </button>
         <button
@@ -179,11 +198,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
         >
           {/* https://www.coderstool.com/share-social-link-generator */}
           <a
-            href="https://reddit.com/submit?url=https://dinakar.co.in/blog/computer-vision/real-time-object-detection-using-yolov7-on-google-colab&title="
+            href={`https://reddit.com/submit?url=${siteMetadata.siteUrl}/blog/${data.data.slug}&title=${data.data.title}&selftext=true`}
             target="_blank"
             rel="nofollow noopener"
           >
             <i className="fa-brands fa-reddit" />
+            <span className="pl-2">Share</span>
           </a>
         </button>
         <button
@@ -191,11 +211,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
           type="button"
         >
           <a
-            href={`https://news.ycombinator.com/submitlink?u=${data.data.slug}&amp;t=${data.data.title}`}
+            href={`https://news.ycombinator.com/submitlink?u=${siteMetadata.siteUrl}/blog/${data.data.slug}&t=${data.data.title}`}
             target="_blank"
             rel="nofollow noreferrer"
           >
             <i className="fa-brands fa-y-combinator" />
+            <span className="pl-2">Share</span>
           </a>
         </button>
       </div>
@@ -211,3 +232,6 @@ next-dev.js?3515:20 Warning: A component is `contentEditable` and contains `chil
 It is now your responsibility to guarantee that none of those nodes are unexpectedly modified or duplicated. 
 This is probably not intentional.
 */
+
+// Todo: Fix loader delay issues
+// Todo: Fix share on twitter, facebook, instagram

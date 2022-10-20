@@ -13,14 +13,18 @@ const Footer = () => {
       </span>
       <ul className="flex flex-wrap items-center mt-3 text-sm text-gray-500 dark:text-gray-400 sm:mt-0">
         <li>
-          <a href="#" className="mr-4 hover:underline md:mr-6 ">
-            About
-          </a>
+          <Link href="/about">
+            <a href="#" className="mr-4 hover:underline md:mr-6 ">
+              About
+            </a>
+          </Link>
         </li>
         <li>
-          <a href="#" className="mr-4 hover:underline md:mr-6">
-            Privacy Policy
-          </a>
+          <Link href="privacy-policy">
+            <a href="#" className="mr-4 hover:underline md:mr-6">
+              Privacy Policy
+            </a>
+          </Link>
         </li>
         <li>
           <Link href="/terms-and-conditions">
@@ -30,15 +34,20 @@ const Footer = () => {
           </Link>
         </li>
         <li>
-          <a href="#" className="mr-4 hover:underline md:mr-6">
-            Licensing
+          <a
+            href="https://discord.gg/5cXWmKGsSF"
+            target="_blank"
+            rel="noreferrer"
+            className="mr-4 hover:underline md:mr-6"
+          >
+            Join Discord
           </a>
         </li>
-        <li>
+        {/* <li>
           <a href="#" className="hover:underline">
             Contact
           </a>
-        </li>
+        </li> */}
       </ul>
     </footer>
   );

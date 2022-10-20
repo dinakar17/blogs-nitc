@@ -1,7 +1,7 @@
 import type { GetServerSideProps, NextPage } from "next";
-import useSWR from "swr";
 import * as api from "../api/index";
 import { Intro, LatestBlogs } from "../components";
+import { PageSEO } from "../components/SEO/SEO";
 
 // Note: res.data === {data: [array of posts], currentBlogsCount: number}
 
@@ -15,29 +15,33 @@ type Props = {
 
 const Home: NextPage<Props> = ({ data, error }) => {
   // console.log(data); // Here data === res.data
-
-  // if (error) return <div>Something went wrong</div>;
-  // if (!data) return <div>Loading...</div>;
+  const metaData = {
+    title: "Blog Website for NITC",
+    description: "This is a blog website for NITC people",
+  }
   return (
-    // TOdo: w-[80%] mx-auto repetitive code
+    <>
+    <PageSEO {...metaData} />
+    {/* // Todo: w-[80%] mx-auto repetitive code */}
     <div className="w-[90%] mx-auto">
       <Intro data={data} error={error} />
       <LatestBlogs />
     </div>
+    </>
   );
 };
 
 export const getServerSideProps: GetServerSideProps = async () => {
   try {
     const res = await api.getRandomPosts();
-    console.log(res.data);
+    // console.log(res.data);
     return {
       props: {
         data: res.data,
       },
     };
   } catch (err) {
-    console.log(err);
+    // console.log(err);
     return {
       props: {
         error: "Unable to display posts at the moment. Please try again later",

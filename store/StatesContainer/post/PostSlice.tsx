@@ -56,6 +56,7 @@ const postSlice = createSlice({
       state.description = action.payload.description;
       // Note: We aren't using state.featuredImage since it is only for storing the file object
       state.featuredImageURL = action.payload.featuredImage;
+      state.featuredImage = null;
       state.tags = action.payload.tags;
       state.content = action.payload.content;
       state.status.reviewed = action.payload.reviewed;

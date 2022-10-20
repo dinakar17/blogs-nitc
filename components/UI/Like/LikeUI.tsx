@@ -67,3 +67,5 @@ const LikeUI = ({ blogId, token, likes, mutate }: LikeProps) => {
 };
 
 export default LikeUI;
+
+// Todo: Add a loader if like is taking time to update

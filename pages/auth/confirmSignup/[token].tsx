@@ -37,12 +37,12 @@ const ConfirmSignup: NextPage<Props> = (props) => {
         "Hurray! Email Confirmation Successful 😊. Please Login to continue",
         {
           position: "top-center",
-          autoClose: false,
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
+          toastId: "emailConfirmationSuccess",
         }
       );
     }
@@ -57,7 +57,6 @@ const ConfirmSignup: NextPage<Props> = (props) => {
 // Diff between getServerSideProps and getStaticProps: https://www.ohmycrawl.com/getstaticprops-vs-getserversideprops/
 export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   const { token } = query;
-  console.log(token);
 
   try {
     if (!token) {

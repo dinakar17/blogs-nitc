@@ -8,6 +8,8 @@ import TextField from "@mui/material/TextField";
 import Icon from "@mui/material/Icon";
 import useSWR from "swr";
 
+import dayjs from "dayjs";
+
 import {
   deleteImage,
   getEditProfile,
@@ -36,6 +38,15 @@ const Edit = () => {
     null
   );
   const [loading, setLoading] = React.useState(false);
+
+  useEffect(() => {
+    if (token && !authData?.photo) {
+      toast("Please update your profile", {
+        type: "info",
+        toastId: "updatePhoto",
+      });
+    }
+  }, [token, authData]);
 
   useEffect(() => {
     if (!photo) {
@@ -74,13 +85,10 @@ const Edit = () => {
       if (photo) {
         const formData = new FormData();
         formData.append("profile-file", photo as Blob);
+        // Delete old image only if user has already uploaded a photo before
         if (data.data.user.photo) {
-          // Delete old image only if user has already uploaded a photo before
-          const photoUrl = data.data.user.photo.replace(
-            process.env.NEXT_PUBLIC_IMAGE_API_URL,
-            ""
-          );
-          await deleteImage(`filePath=${photoUrl}`);
+          const photoUrl = data.data.user.photo.split("/").pop();
+          await deleteImage(photoUrl);
         }
         const res: any = await uploadImage(formData);
         const url = res.data.result[0].url;
@@ -105,17 +113,44 @@ const Edit = () => {
       toast.success("Profile updated successfully");
     } catch (err: any) {
       setLoading(false);
-      toast.error(err.message);
-      console.log(err);
+      let errMessage = "Something went wrong, Please try again later";
+      if (error) {
+        if (error.response.data) {
+          errMessage = error.response.data.message;
+        }
+      }
+      toast.error(errMessage);
     }
   };
 
+  useEffect(() => {
+    let errMessage;
+    if (error) {
+      if (error.response.data) {
+        errMessage = error.response.data.message;
+      } else errMessage = "Something went wrong, Please try again later";
+    }
+    toast.error(errMessage);
+  }, [error]);
+
+  // Todo: Change return type to skeleton loader
+  if (error) return null;
   if (!data) return <Loader />;
-  if (error) {
-    toast("Something went wrong, Please try again later", {
-      type: "error",
-    });
-  }
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      const modifiedFileName = `${authData?._id}-${dayjs().format(
+        "DD-MM-YYYY-HH-mm-ss"
+      )}-${file.name}`;
+
+      const modifiedFile = new File([file], modifiedFileName, {
+        type: file.type,
+      });
+
+      setPhoto(modifiedFile);
+    }
+  };
 
   return (
     <div className="w-[90%] mx-auto min-h-screen flex flex-col my-10">
@@ -139,22 +174,7 @@ const Edit = () => {
             className="hidden"
             id="profile-upload"
             type="file"
-            onChange={(e) => {
-              if (e.target.files) {
-                // append author's name and time to the file name
-                const modifiedFileName = `${authData?.name}-${Date.now()}-${
-                  e.target.files[0].name
-                }`;
-                const modifiedFile = new File(
-                  [e.target.files[0]],
-                  modifiedFileName,
-                  {
-                    type: e.target.files[0].type,
-                  }
-                );
-                setPhoto(modifiedFile);
-              }
-            }}
+            onChange={handleImageChange}
           />
           <label htmlFor="profile-upload">
             <Button
@@ -169,6 +189,7 @@ const Edit = () => {
         </div>
         <form onSubmit={handleSubmit} className="flex flex-col gap-5">
           <TextField
+            required
             id="standard-basic"
             label="User Name"
             variant="standard"

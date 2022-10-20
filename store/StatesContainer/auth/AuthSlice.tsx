@@ -86,6 +86,9 @@ const authSlice = createSlice({
     updateAuthData: (state, action) => {
       state.authData = action.payload;
     },
+    resetSignUpSuccess: (state) => {
+      state.signUpSuccess = false;
+    },
     resetError: (state) => {
       state.error = "";
     },
@@ -105,16 +108,6 @@ const authSlice = createSlice({
       state.signUpSuccess = false;
       state.error = "";
       // Note: useRouter doesn't work in the slice file. So, we have to use window.location.href to redirect the user to the home page
-      // const router = useRouter();
-      // router.push("/");
-      // As soon as we logged in we add the profile to localStorage
-      // localStorage.setItem("loginToken", JSON.stringify(action.payload.token));
-      // localStorage.setItem("userInfo", JSON.stringify(action.payload.data.user));
-
-      // state.authData = JSON.parse(localStorage.getItem("userInfo") as string);
-      // state.token = JSON.parse(localStorage.getItem("loginToken") as string);
-      // console.log(`AuthData: action.payload`);
-      // console.log(`LocalStore: localStorage.getItem("profile")`);
     });
     builder.addCase(signIn.rejected, (state, action) => {
       state.loading = false;
@@ -145,7 +138,7 @@ const authSlice = createSlice({
       // console.log(action);
       // @ts-ignore
       state.error = action.payload.message as string;
-      console.log(state.error);
+      // console.log(state.error);
     });
 
     // builder.addCase(PURGE, (state) => {
@@ -157,7 +150,7 @@ const authSlice = createSlice({
 //* Step 5: Default Export the reducer
 export default authSlice.reducer;
 
-export const { logOut, updateAuthData, resetError } = authSlice.actions;
+export const { logOut, updateAuthData, resetError, resetSignUpSuccess } = authSlice.actions;
 //* Step 6: pass the reducer (which triggers state mutation) to the configureStore
 
 //* Step 7: Export the store and feed to it to the React component tree

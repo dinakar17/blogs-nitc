@@ -1,18 +1,23 @@
+import Link from "next/link";
 import React from "react";
+import siteMetadata from "../data/siteMetadata";
 // https://tailwindcss.com/blog/tailwindcss-typography-v0-5
 
 const TermsAndConditions = () => {
   return (
-    <div className="prose prose-base w-[90%] mx-auto md:w-[60%] dark:prose-invert">
+    <div className="prose prose-indigo prose-base w-[90%] mx-auto md:w-[60%] dark:prose-invert">
       <h1>Terms and Conditions</h1>
       <p>
         These terms and conditions outline the rules and regulations for the use
-        of CodingNepal’s Website, located at https://www.codingnepalweb.com.
+        of NITC’s Website, located at{" "}
+        <Link href={siteMetadata.siteUrl as string}>
+          <a>{siteMetadata.siteUrl} </a>
+        </Link>
       </p>
       <p>
         By accessing this website we assume you accept these terms and
-        conditions. Do not continue to use CodingNepal if you do not agree to
-        take all of the terms and conditions stated on this page.
+        conditions. Do not continue to use NITC if you do not agree to take all
+        of the terms and conditions stated on this page.
       </p>
       <p>
         The following terminology applies to these Terms and Conditions, Privacy
@@ -35,8 +40,8 @@ const TermsAndConditions = () => {
       </p>
       <h2>Cookies</h2>
       <p>
-        We employ the use of cookies. By accessing CodingNepal, you agreed to
-        use cookies in agreement with CodingNepal’s Privacy Policy.
+        We employ the use of cookies. By accessing NITC, you agreed to use
+        cookies in agreement with NITC’s Privacy Policy.
       </p>
       <p>
         Most interactive websites use cookies to let us retrieve the user’s
@@ -48,40 +53,34 @@ const TermsAndConditions = () => {
 
       <h2>License</h2>
       <p>
-        Unless otherwise stated, CodingNepal and/or its licensors own the
-        intellectual property rights for all material on CodingNepal. All
-        intellectual property rights are reserved. You may access this from
-        CodingNepal for your own personal use subject to restrictions set in
-        these terms and conditions.
+        Unless otherwise stated, NITC and/or its licensors own the intellectual
+        property rights for all material on NITC. All intellectual property
+        rights are reserved. You may access this from NITC for your own personal
+        use subject to restrictions set in these terms and conditions.
       </p>
 
       <em>You must not:</em>
       <ul>
-        <li>Republish material from CodingNepal</li>
-        <li>Sell, rent or sub-license material from CodingNepal</li>
-        <li>Reproduce, duplicate or copy material from CodingNepal</li>
-        <li>Redistribute content from CodingNepal</li>
+        <li>Republish material from NITC</li>
+        <li>Sell, rent or sub-license material from NITC</li>
+        <li>Reproduce, duplicate or copy material from NITC</li>
+        <li>Redistribute content from NITC</li>
+        <li> This Agreement shall begin on the date hereof.</li>
       </ul>
-
-      <em>
-        This Agreement shall begin on the date hereof. Our Terms and Conditions
-        were created with the help of the Terms And Conditions Generator and the
-        Privacy Policy Generator.
-      </em>
       <p>
         Parts of this website offer an opportunity for users to post and
-        exchange opinions and information in certain areas of the website.
-        CodingNepal does not filter, edit, publish or review Comments prior to
-        their presence on the website. Comments do not reflect the views and
-        opinions of CodingNepal, its agents and/or affiliates. Comments reflect
-        the views and opinions of the person who post their views and opinions.
-        To the extent permitted by applicable laws, CodingNepal shall not be
-        liable for the Comments or for any liability, damages or expenses caused
-        and/or suffered as a result of any use of and/or posting of and/or
-        appearance of the Comments on this website.
+        exchange opinions and information in certain areas of the website. NITC
+        does not filter, edit, publish or review Comments prior to their
+        presence on the website. Comments do not reflect the views and opinions
+        of NITC, its agents and/or affiliates. Comments reflect the views and
+        opinions of the person who post their views and opinions. To the extent
+        permitted by applicable laws, NITC shall not be liable for the Comments
+        or for any liability, damages or expenses caused and/or suffered as a
+        result of any use of and/or posting of and/or appearance of the Comments
+        on this website.
       </p>
       <p>
-        CodingNepal reserves the right to monitor all Comments and to remove any
+        NITC reserves the right to monitor all Comments and to remove any
         Comments which can be considered inappropriate, offensive or causes
         breach of these Terms and Conditions.
       </p>
@@ -106,9 +105,9 @@ const TermsAndConditions = () => {
         </li>
       </ul>
       <p>
-        You hereby grant CodingNepal a non-exclusive license to use, reproduce,
-        edit and authorize others to use, reproduce and edit any of your
-        Comments in any and all forms, formats or media.
+        You hereby grant NITC a non-exclusive license to use, reproduce, edit
+        and authorize others to use, reproduce and edit any of your Comments in
+        any and all forms, formats or media.
       </p>
       <h2>Hyperlinking to our Content</h2>
       <p>
@@ -119,15 +118,14 @@ const TermsAndConditions = () => {
         <li>Government agencies;</li>
         <li>Search engines;</li>
         <li>News organizations;</li>
-        <li>
-          Contributors may link to our Website in the same manner as they
-          hyperlink to the Websites of other listed businesses and Systemwide
-          Accredited Businesses except for soliciting non-profit organizations,
-          charity shopping malls, and charity fundraising groups that may not
-          hyperlink to our Web site.
-        </li>
       </ul>
-
+      <p>
+        Online directory distributors may link to our Website in the same manner
+        as they hyperlink to the Websites of other listed businesses and
+        Systemwide Accredited Businesses except for soliciting non-profit
+        organizations, charity shopping malls, and charity fundraising groups
+        that may not hyperlink to our Web site.
+      </p>
       <p>
         These organizations may link to our home page, to publications, or to
         other Website information so long as the link: (a) is not in any way
@@ -146,8 +144,10 @@ const TermsAndConditions = () => {
         <li>associations or other groups representing charities;</li>
         <li>online directory distributors;</li>
         <li>internet portals;</li>
-        <li>accounting, law and consulting firms; and</li>
-        <li>educational institutions and trade associations.</li>
+        <li>
+          accounting, law and consulting firms; and educational institutions and
+          trade associations.
+        </li>
       </ul>
 
       <p>
@@ -158,9 +158,9 @@ const TermsAndConditions = () => {
         opportunities, shall not be allowed to link); (b)the organization does
         not have an unsatisfactory record with us; (c) the benefit to us from
         the visibility associated with the hyperlink outweighs the absence of
-        CodingNepal; and (d) where the link is in the context of general
-        resource information or is otherwise consistent with editorial content
-        in a newsletter or similar product furthering the mission of the
+        NITC; and (d) where the link is in the context of general resource
+        information or is otherwise consistent with editorial content in a
+        newsletter or similar product furthering the mission of the
         organization.
       </p>
 
@@ -175,7 +175,7 @@ const TermsAndConditions = () => {
       <p>
         If you are one of the organizations listed in paragraph 2 above and are
         interested in linking to our website, you must inform us by sending an
-        e-mail to CodingNepal. Please include your name, your organization name,
+        e-mail to NITC. Please include your name, your organization name,
         contact information (such as a phone number and/or e-mail address) as
         well as the URL of your site, a list of any URLs from which you intend
         to link to our Website, and a list of the URL(s) on our site to which
@@ -197,8 +197,8 @@ const TermsAndConditions = () => {
       </ul>
 
       <p>
-        No use of CodingNepal’s logo or other artwork will be allowed for
-        linking absent a trademark license agreement.
+        No use of NITC’s logo or other artwork will be allowed for linking
+        absent a trademark license agreement.
       </p>
       <h2>iFrames</h2>
       <p>
@@ -216,7 +216,12 @@ const TermsAndConditions = () => {
         any third party rights.
       </p>
       <h2>Your Privacy</h2>
-      <p>Please read Privacy Policy</p>
+      <p>
+        Please read {" "}
+        <Link href="/privacy-policy">
+          <a>Privacy Policy</a>
+        </Link>
+      </p>
       <h2>Reservation of Rights</h2>
       <p>
         We reserve the right to request that you remove all links or any

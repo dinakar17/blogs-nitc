@@ -57,7 +57,7 @@ const Intro = ({ data, error }: Props) => {
     words: ["Experience", "Knowledge", "Passion"],
     delaySpeed: 1000,
     loop: 0,
-    onLoopDone: () => console.log(`loop completed after 3 runs.`),
+    // onLoopDone: () => console.log(`loop completed after 3 runs.`),
   });
 
   React.useEffect(() => {
@@ -163,6 +163,7 @@ type CardProps = {
       name: string;
       photo: string;
     }>;
+    anonymous: boolean;
   };
 };
 
@@ -189,13 +190,13 @@ export const CardLayout = ({ post }: CardProps) => {
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 relative">
             <Image
-              src={post.user[0].photo}
+              src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo}
               layout="fill"
               className="rounded-full object-cover"
             />
           </div>
           <div className="text-white">
-            <p>{post.user[0].name}</p>
+            <p>{post.anonymous ? "Anonymous" : post.user[0].name}</p>
           </div>
         </div>
       </div>

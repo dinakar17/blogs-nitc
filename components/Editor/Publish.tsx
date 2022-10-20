@@ -8,16 +8,25 @@ import * as api from "../../api";
 import { AppDispatch, RootState } from "../../store/store";
 import SimpleAccordion from "../UI/CustomAccordion/CustomAccordion";
 // Todo: Bundle size is too large, need to optimize
-import { setAnonymous } from "../../store/StatesContainer/post/PostSlice";
+import {
+  setAnonymous,
+  setDraft,
+} from "../../store/StatesContainer/post/PostSlice";
 import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
 
 type Props = {
-  setDraft: (draft: boolean) => void;
   editorForUpdate: boolean;
   blogId: string;
+  blogImgURL: string;
+  publishing: boolean;
 };
 
-const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
+const Publish = ({
+  editorForUpdate,
+  blogId,
+  blogImgURL,
+  publishing,
+}: Props) => {
   const router = useRouter();
 
   const { token } = useSelector((state: RootState) => state.user);
@@ -38,7 +47,10 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
 
     try {
       setLoading(true);
-      // user verification is taken care of in the backend through the token
+      if (blogImgURL) {
+        const fileName = blogImgURL.split("/").pop();
+        await api.deleteImage(fileName as string);
+      }
       await api.deletePost(blogId, config);
       setLoading(false);
       setShowModal(false);
@@ -49,7 +61,11 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
     } catch (error: any) {
       setLoading(false);
       setShowModal(false);
-      toast.error(error.response.data.message);
+      let errMessage = "Something went wrong, Please try again later";
+      if (error.response.data.message) {
+        errMessage = error.response.data.message;
+      }
+      toast.error(errMessage);
     }
   };
 
@@ -91,12 +107,12 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
             <i className="invisible md:visible cursor-pointer fa-regular fa-circle-question"></i>
           </CustomizedTooltip>
         </div>
-        <div className="flex justify-between">
+        <div className="flex flex-wrap justify-between">
           <button
             type="submit"
             className="text-white bg-gradient-to-r from-blue-500 to-blue-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-blue-300 dark:focus:ring-blue-800 shadow-lg shadow-blue-500/50 dark:shadow-lg dark:shadow-blue-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 "
             onClick={() => {
-              setDraft(true);
+              dispatch(setDraft(true));
             }}
           >
             Save as Draft
@@ -104,20 +120,30 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
           {editorForUpdate ? (
             <button
               type="submit"
-              className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+              className={`text-white hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ${
+                publishing
+                  ? "bg-gray-400"
+                  : "bg-gradient-to-r from-green-400 via-green-500 to-green-600"
+              }`}
               onClick={() => {
-                setDraft(false);
+                dispatch(setDraft(false));
               }}
+              disabled={publishing}
             >
               Update
             </button>
           ) : (
             <button
               type="submit"
-              className="text-white bg-gradient-to-r from-green-400 via-green-500 to-green-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+              className={`text-white hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ${
+                publishing
+                  ? "bg-gray-400"
+                  : "bg-gradient-to-r from-green-400 via-green-500 to-green-600"
+              }`}
               onClick={() => {
-                setDraft(false);
+                dispatch(setDraft(false));
               }}
+              disabled={publishing}
             >
               Publish
             </button>
@@ -127,10 +153,15 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
               <button
                 // Note: type button won't submit the form and will only call the function
                 type="button"
-                className="text-white bg-gradient-to-r from-red-400 via-red-500 to-red-600 hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2"
+                className={`text-white hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ${
+                  loading
+                    ? "bg-gray-400"
+                    : "bg-gradient-to-r from-red-400 via-red-500 to-red-600"
+                }`}
                 data-bs-toggle="modal"
                 data-bs-target="#exampleModalCenter"
                 onClick={() => setShowModal(true)}
+                disabled={loading}
               >
                 Delete
               </button>
@@ -138,6 +169,7 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
                 <Modal
                   setOpenModal={setShowModal}
                   handleDelete={handleDelete}
+                  loading={loading}
                 />
               )}
             </>
@@ -158,9 +190,10 @@ const Publish = ({ setDraft, editorForUpdate, blogId }: Props) => {
 type ModalProps = {
   handleDelete: () => void;
   setOpenModal: (open: boolean) => void;
+  loading: boolean;
 };
 
-const Modal = ({ setOpenModal, handleDelete }: ModalProps) => {
+const Modal = ({ setOpenModal, handleDelete, loading }: ModalProps) => {
   return (
     // Todo: Play with z-index for content editor, branch and this modal
     <>
@@ -199,6 +232,7 @@ const Modal = ({ setOpenModal, handleDelete }: ModalProps) => {
                     type="button"
                     className="w-full mt-2 p-2.5 flex-1 text-white bg-red-600 rounded-md outline-none ring-offset-2 ring-red-600 focus:ring-2"
                     onClick={handleDelete}
+                    disabled={loading}
                   >
                     Delete
                   </button>

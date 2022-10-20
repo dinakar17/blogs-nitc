@@ -23,12 +23,7 @@ import BlogCards from "../../components/Card/BlogCard";
 import { MagnifyingGlassLoader } from "../../components/UI/Loader/Loader";
 import Subject from "../../helpers/Options/Subject";
 import NoSearchResults from "../../components/UI/Search/NoSearchResults";
-import {
-  resetFilters,
-  setBranch,
-  setSemester,
-  setSubject,
-} from "../../store/StatesContainer/filters/FilterSlice";
+import { resetFilters } from "../../store/StatesContainer/filters/FilterSlice";
 import SkeletonCard from "../../components/UI/Loader/SkeletonCard";
 
 type Props = {
@@ -65,7 +60,8 @@ const Home: NextPage<Props> = (props) => {
   const [showLoader, setShowLoader] = React.useState(false);
 
   const page = router.query.page || 1;
-  const limit = 20;
+  // Todo: don't mention limit on the frontend
+  const limit = 16;
 
   const paginationHandler = (event: ChangeEvent<unknown>, page: number) => {
     const currentPath = router.pathname;
@@ -78,7 +74,6 @@ const Home: NextPage<Props> = (props) => {
     });
   };
 
-  // console.log(data);
   const handleSearch = (choice: string) => {
     // if search is not empty then add it to the query
     if (choice === "Search") {
@@ -165,15 +160,17 @@ const Home: NextPage<Props> = (props) => {
     conditionToDisplayFilteredData() && query
       ? `api/v1/blogs/search?${query}`
       : null,
-    fetcher
+    fetcher,
+    {
+      revalidateOnFocus: false,
+    }
   );
 
   const handleReset = () => {
     setSearch("");
+    delete router.query.search;
     setSort({ value: "", label: "" });
-    dispatch(setBranch({ value: "", label: "" }));
-    dispatch(setSemester({ value: "", label: "" }));
-    dispatch(setSubject({ value: "", label: "" }));
+    dispatch(resetFilters());
     const currentQuery = router.query;
     delete currentQuery.sort;
     delete currentQuery.branch;
@@ -186,17 +183,22 @@ const Home: NextPage<Props> = (props) => {
     });
   };
 
+  useEffect(() => {
+    if (error || res.error) {
+      toast(
+        "Some went wrong while displaying the blogs. Please try again later or try refreshing the page.",
+        {
+          type: "error",
+          autoClose: false,
+          position: "bottom-right",
+          toastId: "blogs",
+        }
+      );
+    }
+  }, [error, res.error]);
+
   // Error handling
   if (error || res.error) {
-    toast(
-      "Some went wrong while displaying the blogs. Please try again later or try refreshing the page.",
-      {
-        type: "error",
-        autoClose: false,
-        position: "bottom-right",
-        toastId: "blogs",
-      }
-    );
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 w-[90%] mx-auto">
         {Array(12)
@@ -210,6 +212,7 @@ const Home: NextPage<Props> = (props) => {
 
   useEffect(() => {
     // https://stackoverflow.com/questions/52754121/how-to-return-jsx-after-settimeout
+    // Todo: Loader is not getting delayed. Fix it
     if (!res.data) {
       setTimeout(() => {
         setShowLoader(true);
@@ -249,7 +252,12 @@ const Home: NextPage<Props> = (props) => {
           </button>
         </div>
         <div className="flex flex-wrap items-center gap-2">
-          <Select options={sortOptions} onChange={(e: any) => setSort(e)} />
+          <Select
+            className=""
+            value={sort}
+            options={sortOptions}
+            onChange={(e: any) => setSort(e)}
+          />
           <button
             className="bg-gradient-to-tr from-blue-600 to-blue-400 text-white shadow-md shadow-blue-500/20 hover:shadow-lg hover:shadow-blue/40 active:opacity-[0.85] font-medium text-base capitalize py-2 px-4 rounded-md"
             onClick={() => handleSearch("Sort")}
@@ -271,7 +279,11 @@ const Home: NextPage<Props> = (props) => {
         {!conditionToDisplayFilteredData() &&
           data &&
           (data.data.length === 0 ? (
-            <NoSearchResults />
+            <div className="flex justify-center min-h-screen items-center">
+              <p className="text-2xl font-medium text-gray-500">
+                Oops, No blogs are found to display!
+              </p>
+            </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 place-items-center">
               <BlogCards data={data} />

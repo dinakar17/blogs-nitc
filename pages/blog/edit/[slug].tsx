@@ -28,7 +28,8 @@ const EditBlog: NextPage = () => {
     toast("Reload the page if you are facing any issues", {
       type: "info",
       toastId: "editBlog",
-      autoClose: 2000,
+      autoClose: 1000,
+      hideProgressBar: true,
       position: "bottom-left",
     });
   }, []);
@@ -61,6 +62,7 @@ const EditBlog: NextPage = () => {
     }
   }, [error]);
 
+  if(error) return null;
   if (!data) return <Loader />;
 
   return (
@@ -75,6 +77,7 @@ const EditBlog: NextPage = () => {
       <Editor
         editorForUpdate={true}
         blogId={data.data._id}
+        blogImgURL={data.data.featuredImage}
       />
     </>
   );

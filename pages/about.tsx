@@ -1,19 +1,20 @@
 import React from "react";
 import Image from "next/image";
+import Link from "next/link";
 
 const about = () => {
   return (
-    <section className="prose max-w-none lg:prose-lg min-h-screen lg:w-[70%] mx-auto m-2 flex flex-col gap-10 dark:prose-invert">
+    <section className="prose prose-indigo max-w-none prose-sm md:prose-md lg:prose-lg min-h-screen lg:w-[70%] mx-auto w-[90%] flex flex-col gap-10 dark:prose-invert">
       <div>
-        <h2>
+        <h2 className="lg:text-left text-center">
           This website is a content-sharing platform where you can share/create
           things you're really passionate/curious about.
         </h2>
         <p>Read on to know more...</p>
       </div>
       {/* 1 */}
-      <div className="grid grid-rows-reverse lg:grid-cols-2 gap-10">
-        <div>
+      <div className="grid lg:grid-cols-2 lg:gap-10">
+        <div className="lg:order-none order-last">
           <h2 className="text-center">
             Make a Difference in Other People’s Lives
           </h2>
@@ -50,8 +51,8 @@ const about = () => {
         </div>
       </div>
       {/* 2 */}
-      <div className="grid lg:grid-cols-2 gap-10">
-        <div className="relative w-full h-full">
+      <div className="grid lg:grid-cols-2 lg:gap-10">
+        <div className="aspect-w-16 aspect-h-9">
           <Image
             src="/static/about/2.jfif"
             layout="fill"
@@ -68,8 +69,8 @@ const about = () => {
               in your thinking.
             </li>
             <li>
-              With every article, you’ll learn something new, get new ideas, and
-              find better ways to express yourself.
+              <b>With every article, you’ll learn something new, get new ideas, and
+              find better ways to express yourself.</b>
             </li>
             <li>
               Also, writing is a great way to learn about yourself and express
@@ -85,8 +86,8 @@ const about = () => {
         </div>
       </div>
       {/* 3 */}
-      <div className="grid lg:grid-cols-2 gap-10">
-        <div>
+      <div className="grid lg:grid-cols-2 lg:gap-10">
+        <div className="lg:order-none order-last">
           <h2 className="text-center">Become a more organized thinker</h2>
           <ul>
             <li>
@@ -95,9 +96,9 @@ const about = () => {
             </li>
             <li>
               Although you might think that your blog’s potential won’t live to
-              “change the world”, even for one person you may have been the
+              “change the world”, <b>even for one person you may have been the
               catalyst for a life-changing event, making all the difference in
-              his or her world!
+              his or her world!</b>
             </li>
             <li>
               Since, no matter what you discuss or how unique your situation is,
@@ -115,7 +116,7 @@ const about = () => {
           />
         </div>
       </div>
-      <div className="grid lg:grid-cols-2 gap-10">
+      <div className="grid lg:grid-cols-2 lg:gap-10">
         <div className="aspect-w-16 aspect-h-9">
           <Image
             src="/static/about/4.jpg"
@@ -132,12 +133,13 @@ const about = () => {
               a good start.
             </li>
             <li>
-              Give yourself the time to write a blog on a topic you're
-              passionate about, as experience speaks louder than words.
+              Because now is the time for you to give yourself the time to write
+              a blog on a topic you're passionate about, as experience speaks
+              louder than words.
             </li>
             <li>
               On your first attempt, it might feel a bit frustrating and
-              challenging, but don't forget you exceed your limits through hard
+              challenging, but don't forget you <b>exceed your limits</b> through hard
               work.
             </li>
             <li>
@@ -147,6 +149,17 @@ const about = () => {
           </ul>
         </div>
       </div>
+      <h3 className="lg:text-left text-center">
+        So, What are you waiting for?{" "}
+        <Link href="/auth/signup">
+          <a>Create your account </a>
+        </Link>
+        and starting{" "}
+        <Link href="/blog/create">
+          <a>creating and sharing</a>
+        </Link>{" "}
+        something unique!
+      </h3>
     </section>
   );
 };

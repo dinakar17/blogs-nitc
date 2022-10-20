@@ -11,9 +11,9 @@ const fetcher = (url: string) => getLatestPosts(url).then((res) => res.data);
 
 const LatestBlogs = () => {
   // make the api call only when the component is in the viewport
-
-  // console.log(data);
-  const { data, error } = useSWR("api/v1/blogs/latest", fetcher);
+  const { data, error } = useSWR("api/v1/blogs/latest", fetcher, {
+    revalidateOnFocus: false,
+  });
 
   // useEffect(() => {
   //   if (error) {
@@ -57,66 +57,69 @@ const LatestBlogs = () => {
               ))}
           </div>
         ) : (
-          <Carousel
-            additionalTransfrom={0}
-            arrows
-            autoPlaySpeed={3000}
-            centerMode={false}
-            className=""
-            containerClass="container"
-            dotListClass=""
-            draggable
-            focusOnSelect={false}
-            // infinite
-            keyBoardControl
-            minimumTouchDrag={80}
-            partialVisible
-            pauseOnHover
-            renderArrowsWhenDisabled={false}
-            renderButtonGroupOutside={false}
-            renderDotsOutside={false}
-            responsive={{
-              desktop: {
-                breakpoint: {
-                  max: 3000,
-                  min: 1024,
+          data.data.length > 0 && (
+            <Carousel
+              additionalTransfrom={0}
+              arrows
+              autoPlaySpeed={3000}
+              centerMode={false}
+              className=""
+              containerClass="container"
+              dotListClass=""
+              draggable
+              focusOnSelect={false}
+              // infinite
+              keyBoardControl
+              minimumTouchDrag={80}
+              partialVisible
+              pauseOnHover
+              renderArrowsWhenDisabled={false}
+              renderButtonGroupOutside={false}
+              renderDotsOutside={false}
+              responsive={{
+                desktop: {
+                  breakpoint: {
+                    max: 3000,
+                    min: 1024,
+                  },
+                  items: 4,
+                  partialVisibilityGutter: 15,
                 },
-                items: 4,
-                partialVisibilityGutter: 15,
-              },
-              mobile: {
-                breakpoint: {
-                  max: 464,
-                  min: 0,
+                mobile: {
+                  breakpoint: {
+                    max: 464,
+                    min: 0,
+                  },
+                  items: 1,
+                  partialVisibilityGutter: 40,
                 },
-                items: 1,
-                partialVisibilityGutter: 40,
-              },
-              tablet: {
-                breakpoint: {
-                  max: 1024,
-                  min: 464,
+                tablet: {
+                  breakpoint: {
+                    max: 1024,
+                    min: 464,
+                  },
+                  items: 2,
+                  partialVisibilityGutter: 30,
                 },
-                items: 2,
-                partialVisibilityGutter: 30,
-              },
-            }}
-            rewind={false}
-            rewindWithAnimation={false}
-            rtl={false}
-            shouldResetAutoplay
-            showDots={false}
-            sliderClass=""
-            slidesToSlide={1}
-            swipeable
-            removeArrowOnDeviceType={["tablet", "mobile"]}
-            itemClass="first-carousel-item py-5"
-          >
-            {data.data.map((blog: BlogProps) => (
-              <BlogCard key={blog._id} blog={blog} />
-            ))}
-            {/* <BlogCards data={data} /> */}
-          </Carousel>
+              }}
+              rewind={false}
+              rewindWithAnimation={false}
+              rtl={false}
+              shouldResetAutoplay
+              showDots={false}
+              sliderClass=""
+              slidesToSlide={1}
+              swipeable
+              removeArrowOnDeviceType={["tablet", "mobile"]}
+              itemClass="first-carousel-item py-5"
+            >
+              {data.data.map((blog: BlogProps) => (
+                <BlogCard key={blog._id} blog={blog} />
+              ))}
+
+              {/* <BlogCards data={data} /> */}
+            </Carousel>
+          )
         )}
       </section>
     </>

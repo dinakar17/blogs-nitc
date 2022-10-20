@@ -1,8 +1,12 @@
 import { ActionCreatorWithPayload } from "@reduxjs/toolkit";
 import React, { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import dayjs from "dayjs";
+
 import { AppDispatch, RootState } from "../../../store/store";
-import * as api from '../../../api';
+import { setFeaturedImageURL } from "../../../store/StatesContainer/post/PostSlice";
+import { toast } from "react-toastify";
+import sanitize from "sanitize-filename";
 
 type Props = {
   setImage: ActionCreatorWithPayload<any, string>;
@@ -27,7 +31,6 @@ const FileInput = ({ setImage, image }: Props) => {
       setImage(null);
       return;
     }
-
     const objectUrl = URL.createObjectURL(image);
     setPreview(objectUrl);
 
@@ -35,26 +38,54 @@ const FileInput = ({ setImage, image }: Props) => {
     return () => URL.revokeObjectURL(objectUrl);
   }, [image]);
 
-const handleUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
-  // delete the previous image from the server
-  if (featuredImageURL) {
-    api.deleteImage(featuredImageURL);
-  }
+  const deletePrev = async () => {
+    if (featuredImageURL) {
+      dispatch(setFeaturedImageURL(""));
+    }
+  };
 
-  if (e.target.files) {
-    const modifiedFileName = `${authData?.username}-${new Date().toLocaleDateString( "en-US", {
-      day: "numeric",
-      month: "short",
-      year: "numeric",
-    }).replace(/ /g, "-")}-${e.target.files[0].name}`;
-    
-    const newFile = new File([e.target.files[0]], modifiedFileName, {
-      type: e.target.files[0].type,
-    });
+  const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    try {
+      if (e.target.files) {
+        const modifiedFileName = sanitize(`${authData?._id}-${dayjs(new Date())
+          .format("DD-MM-YYYY-HH-mm-ss")
+          .toString()
+          .replace(/ /g, "-")}-${e.target.files[0].name}`);
 
-    dispatch(setImage(newFile));
-  }
-};
+        const newFile = new File([e.target.files[0]], modifiedFileName, {
+          type: e.target.files[0].type,
+        });
+
+        dispatch(setImage(newFile));
+        // delete the previous image from the server
+        deletePrev();
+      }
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
+
+  const handleDropUpload = (e: React.DragEvent<HTMLDivElement>) => {
+    try {
+      e.preventDefault();
+      if (e.dataTransfer.files) {
+        const modifiedFileName = sanitize(`${authData?._id}-${dayjs(new Date())
+          .format("DD-MM-YYYY-HH-mm-ss")
+          .toString()
+          .replace(/ /g, "-")}-${e.dataTransfer.files[0].name}`);
+
+        const newFile = new File([e.dataTransfer.files[0]], modifiedFileName, {
+          type: e.dataTransfer.files[0].type,
+        });
+
+        dispatch(setImage(newFile));
+        // delete the previous image from the server
+        deletePrev();
+      }
+    } catch (err: any) {
+      toast.error(err.message);
+    }
+  };
 
   return (
     <div
@@ -66,19 +97,7 @@ const handleUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
       onDragStart={(e) => {
         e.preventDefault();
       }}
-      onDrop={(e) => {
-        e.preventDefault();
-        if (e.dataTransfer.files) {
-          // The below code creates a new File [e.target.files[0]] with the same properties as the original File [image] but with a new name [authData?.username + Date.now() + e.target.files[0].name]
-          // get the extension of the file
-          const extension = e.dataTransfer.files[0].name.split(".").pop();
-          const file = new File(
-            [e.dataTransfer.files[0]],
-            `${authData?.name}_${authData?._id}_${Date.now() + "." + extension}`
-          );
-          dispatch(setImage(file));
-        }
-      }}
+      onDrop={handleDropUpload}
     >
       <label
         htmlFor="dropzone-file"
@@ -124,20 +143,7 @@ const handleUpdate = (e: React.ChangeEvent<HTMLInputElement>) => {
           type="file"
           className="hidden"
           // required
-          onChange={(e) => {
-            if (e.target.files) {
-              // The below code creates a new File [e.target.files[0]] with the same properties as the original File [image] but with a new name [authData?.username + Date.now() + e.target.files[0].name]
-              // get the extension of the file
-              const extension = e.target.files[0].name.split(".").pop();
-              const file = new File(
-                [e.target.files[0]],
-                `${authData?.name}_${authData?._id}_${
-                  Date.now() + "." + extension
-                }`
-              );
-              dispatch(setImage(file));
-            }
-          }}
+          onChange={handleUpload}
         />
       </label>
     </div>

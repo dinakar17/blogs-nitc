@@ -30,6 +30,7 @@ const Header = () => {
 
   const { theme, setTheme } = useTheme();
   const [isDarkMode, setIsDarkMode] = React.useState(false);
+
   const handleClick = () => {
     setIsDarkMode((s) => !s);
     setTheme(theme === "dark" ? "light" : "dark");
@@ -54,14 +55,6 @@ const Header = () => {
     setMounted(false);
   }, [router]);
 
-  const handleLogOut = () => {
-    console.log("Log out");
-    // clear the presist state
-    // persistor.purge();
-    dispatch(logOut());
-    // dispatch(logOut());
-    router.push("/auth/login");
-  };
   return (
     // Note: w-[80%] mx-auto is a Tailwind class that sets the width to 80% and centers the element and this is common practice for most websites.
     <header className="flex items-center py-4 font-medium text-gray-900 dark:text-gray-100">
@@ -69,13 +62,15 @@ const Header = () => {
       <nav className="w-full md:w-[80%] mx-auto flex items-center justify-between">
         <div className="cursor-pointer">
           <Link href="/">
-            <Image
-              src="/static/logo-for-nitc.png"
-              alt="logo"
-              width={100}
-              height={100}
-              objectFit="cover"
-            />
+            <a className="relative">
+              <Image
+                src="/static/logo-for-nitc.png"
+                alt="logo"
+                width={100}
+                height={100}
+                objectFit="cover"
+              />
+            </a>
           </Link>
         </div>
         <ul className="text-gray-600 text-base md:flex gap-5 items-center hidden justify-center tracking-wide">
@@ -100,46 +95,14 @@ const Header = () => {
                 <div className="w-10 h-10 relative cursor-pointer">
                   <DropdownMenu>
                     <Image
-                    // Note: authData?.user is optional chaining, it means if authData is null then it will not throw an error
-                      src={authData?.photo}
+                      // Note: authData?.user is optional chaining, it means if authData is null then it will not throw an error
+                      src={authData.photo ? authData.photo : "/static/default-avatar.png"}
                       alt="profile"
                       layout="fill"
                       className="rounded-full object-cover cursor-pointer block m-auto"
                     />
                   </DropdownMenu>
                 </div>
-                {/* <ul className="invisible group-hover:visible flex absolute -right-16 bg-white shadow-lg rounded-lg p-4 w-44  flex-col gap-5">
-                  <li className="cursor-pointer">
-                    <Link href="/blog/create">
-                      <div className="hover:text-blue-500 flex items-center gap-2">
-                        <i className="fa-regular fa-pen-to-square scale-110"></i>
-                        <a>Write a Blog</a>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="cursor-pointer">
-                    <Link href="/user/my-profile">
-                      <div className="hover:text-blue-500 flex items-center gap-2">
-                        <i className="fa-solid fa-book-bookmark scale-110"></i>
-                        <a>My Blogs</a>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="cursor-pointer">
-                    <Link href="/user/edit-profile">
-                      <div className="hover:text-blue-500 flex items-center gap-2">
-                        <i className="fa-regular fa-address-card scale-110"></i>
-                        <a>Edit Profile</a>
-                      </div>
-                    </Link>
-                  </li>
-                  <li className="cursor-pointer">
-                    <div className="hover:text-blue-500 flex items-center gap-2">
-                      <i className="fa-sharp fa-solid fa-arrow-right-from-bracket"></i>
-                      <button onClick={handleLogOut}>Log Out</button>
-                    </div>
-                  </li>
-                </ul> */}
               </div>
             </div>
           ) : (

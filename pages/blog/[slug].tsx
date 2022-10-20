@@ -1,11 +1,13 @@
 import { GetServerSideProps, NextPage } from "next";
-import Head from "next/head";
 import { toast } from "react-toastify";
 
 import * as api from "../../api";
 import { useEffect, useState } from "react";
 import BlogPost from "../../components/BlogPost/BlogPost";
 import RelatedPosts from "../../components/BlogPost/RelatedPosts";
+import { BlogSEO } from "../../components/SEO/SEO";
+import siteMetadata from "../../data/siteMetadata";
+
 
 export type RelatedBlog = {
   _id: string;
@@ -15,6 +17,7 @@ export type RelatedBlog = {
   featuredImage: string;
   slug: string;
   id: string;
+  anonymous: boolean;
 };
 
 export type BlogPostDetails = {
@@ -37,6 +40,7 @@ export type BlogPostDetails = {
   likes: Array<{ user: string }>;
   draft: boolean;
   reviewed: boolean;
+  anonymous: boolean;
   createdAt: string;
   updatedAt: string;
   slug: string;
@@ -72,12 +76,19 @@ const BlogDetail: NextPage<Props> = (props) => {
     return null;
   }
 
+  const metaData = {
+    title: data.data.title,
+    summary: data.data.description,
+    images: [data.data.featuredImage],
+    url : `${siteMetadata.siteUrl}blog/${data.data.slug}`,
+    canonicalUrl: `${siteMetadata.siteUrl}/blog/${data.data.slug}`,
+    date: data.data.createdAt,
+    lastmod: data.data.updatedAt,
+    authorDetails: [data.data.user],
+  }
   return (
     <>
-      <Head>
-        <title>{data.data.title}</title>
-        <meta name="description" content={data.data.description} />
-      </Head>
+      <BlogSEO {...metaData} />
       {/* https://css-tricks.com/equal-columns-with-flexbox-its-more-complicated-than-you-might-think/ */}
       <div className="grid grid-cols-1 lg:grid-flow-col justify-evenly">
         {/* Grid Block 1 */}

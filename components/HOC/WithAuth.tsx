@@ -1,13 +1,14 @@
-import { useRouter } from 'next/router';
-import React, {useEffect, FC} from 'react'
-import { useSelector } from 'react-redux';
-import { RootState } from '../../store/store';
-import Loader from '../UI/Loader/Loader';
+import { useRouter } from "next/router";
+import React, { useEffect, FC } from "react";
+import { useSelector } from "react-redux";
+import { toast } from "react-toastify";
+import { RootState } from "../../store/store";
+import Loader from "../UI/Loader/Loader";
 
 type Props = {
-    children: React.ReactNode;
-    protectedRoutes: string[];
-}
+  children: React.ReactNode;
+  protectedRoutes: string[];
+};
 
 const PrivateRoute: FC<Props> = (props) => {
   const { children, protectedRoutes } = props;
@@ -18,7 +19,11 @@ const PrivateRoute: FC<Props> = (props) => {
 
   useEffect(() => {
     if (!token && pathIsProtected) {
-      router.push('/auth/login');
+      toast("You need to be logged in to access this page", {
+        type: "error",
+        toastId: "authError",
+      });
+      router.push("/auth/login");
     }
   }, [token, pathIsProtected]);
 
@@ -26,11 +31,9 @@ const PrivateRoute: FC<Props> = (props) => {
     return <Loader />;
   }
 
-  return (
-    <>
-      {children}
-    </>
-  )
-}
+  return <>{children}</>;
+};
 
 export default PrivateRoute;
+
+// Todo: One can access any auth page except login even after logged in. So try to fix this issue

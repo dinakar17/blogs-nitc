@@ -1,11 +1,11 @@
 import React from "react";
-import { Dna, MagnifyingGlass, ThreeDots } from "react-loader-spinner";
+import { Dna, MagnifyingGlass, Oval, ThreeDots } from "react-loader-spinner";
 // import "react-loader-spinner/dist/loader/css/react-spinner-loader.css";
 // https://mhnpd.github.io/react-loader-spinner/docs/components/
 
 const Loader = () => {
   return (
-    <div className="flex flex-col justify-center items-center h-screen">
+    <div className="flex flex-col justify-center items-center h-screen scale-75 md:scale-100">
       <Dna
         visible={true}
         height="300"
@@ -51,6 +51,25 @@ export const ThreeDotsLoader = () => {
       wrapperClass=""
       visible={true}
     />
+  );
+};
+
+export const OvalLoader = () => {
+  return (
+    <div className="flex items-center justify-center">
+      <Oval
+        height={80}
+        width={80}
+        color="#1840c4"
+        wrapperStyle={{}}
+        wrapperClass=""
+        visible={true}
+        ariaLabel="oval-loading"
+        secondaryColor="#2c3bc2"
+        strokeWidth={2}
+        strokeWidthSecondary={2}
+      />
+    </div>
   );
 };
 

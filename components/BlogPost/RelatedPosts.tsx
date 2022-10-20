@@ -12,17 +12,19 @@ type RelatedPostsProps = {
 };
 
 const RelatedPosts = ({ data }: RelatedPostsProps) => {
-  console.log(data);
+  // console.log(data);
   return (
     <div className="block  lg:w-[400px] lg:mt-32 lg:mr-24">
       <div className="lg:shadow-xl p-5 rounded-md w-[90%] mx-auto flex flex-col gap-5">
         <div>
-          <h4 className="lg:text-left text-center text-2xl font-extrabold">Related Posts</h4>
+          <h4 className="lg:text-left text-center text-2xl font-extrabold">
+            Related Posts
+          </h4>
           <hr className="border-4 border-blue-500 cursor-pointer hover:border-blue-500 duration-500" />
         </div>
         <div className="flex flex-col gap-4">
           {data.relatedBlogs.map((blog: RelatedBlog) => (
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-2 gap-2" key={blog._id}>
               <div className="relative w-full">
                 <Image
                   src={blog.featuredImage}
@@ -38,8 +40,9 @@ const RelatedPosts = ({ data }: RelatedPostsProps) => {
                 </Link>
                 <div className="flex flex-col">
                   <p className="text-xs text-gray-500">
-                    {/* @ts-ignore Todo: Fix this issue */}
-                    {blog.user.name ? blog.user.name : blog.user[0].name}
+                    {blog.anonymous ? "Anonymous" : 
+                    // @ts-ignore Todo: Fix this issue 
+                    blog.user.name ? blog.user.name : blog.user[0].name}
                   </p>
                   <p className="text-xs text-gray-500">
                     {new Date(blog.createdAt).toDateString().slice(4)}

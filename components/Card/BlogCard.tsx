@@ -34,6 +34,7 @@ export type BlogProps = {
   };
   likes: Array<string>;
   createdAt: string;
+  anonymous: boolean;
 };
 interface Props {
   blog: BlogProps;
@@ -54,13 +55,16 @@ export const BlogCard = ({ blog }: Props) => {
   return (
     <div className="flex flex-col justify-center items-center bg-white dark:bg-gray-800 max-w-[300px] lg:w-[300px] shadow-lg">
       {/* Design and display a blog card */}
-      <div className="relative flex flex-col min-h-[380px] rounded-t-lg overflow-hidden">
+      <div className="relative flex flex-col min-h-[380px] rounded-t-lg overflow-hidden w-full">
         {/* Card Image */}
         <div className="relative w-full h-[180px] bg-gray-300">
           <Image
-            src={blog.featuredImage}
+            src={
+              blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
+            }
             alt="blog image"
             layout="fill"
+            objectFit="cover"
             // ? Don't know whether it is a good idea to use blurDataURL same as src or not
             // placeholder="blur"
             // blurDataURL={blog.featuredImage}
@@ -96,7 +100,7 @@ export const BlogCard = ({ blog }: Props) => {
             {/* Rounded author image */}
             <div className="h-7 w-7 rounded-full bg-gray-300">
               <img
-                src={blog.user.photo}
+                src={blog.anonymous ? "/static/about/1.jpg" : blog.user.photo}
                 alt="author image"
                 className="rounded-full object-cover w-full h-full"
               />
@@ -104,12 +108,14 @@ export const BlogCard = ({ blog }: Props) => {
             <div className="flex flex-col gap-1">
               {/* Author name */}
 
-              <h1 className="text-sm font-semibold">{blog.user.name}</h1>
+              <h1 className="text-sm font-semibold">
+                {blog.anonymous ? "Anonymous" : blog.user.name}
+              </h1>
               <p className="text-xs">{dateToDisplay}</p>
             </div>
           </div>
           {/* Likes */}
-          {blog.likes.length > 0 && (
+          {blog.likes && blog.likes.length > 0 && (
             <Tooltip
               title={`${blog.likes.length} ${
                 blog.likes.length > 1 ? "people" : "person"
@@ -152,3 +158,4 @@ const BlogCards = ({ data }: any) => {
 export default BlogCards;
 
 // https://stackoverflow.com/questions/72845518/make-text-overflow-visible-on-hover-using-react-css
+// Todo: Design sophisticated BlogCard UI 

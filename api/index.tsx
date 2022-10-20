@@ -1,17 +1,18 @@
 import axios, { AxiosRequestConfig } from "axios";
 import { BlogPost, SignInFormData, SignUpFormData } from "../types";
 
-// axio.create() returns an instance of axios with a custom config
-const API = axios.create({ baseURL: "http://localhost:5000" });
-// change the content type of the request to application/x-www-form-urlencoded
-API.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+const API = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_URL });
+// API.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 
-// create another instance of axios with a custom config
+// --------------- IMAGE UPLOAD API --------------- //
 const API2 = axios.create({ baseURL: process.env.NEXT_PUBLIC_IMAGE_API_URL });
-// set API2 content type to multipart/form-data
 API2.defaults.headers.post["Content-Type"] = "multipart/form-data";
-// add 'access-control-allow-origin' header to API2
 API2.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+
+API2.interceptors.request.use((req: AxiosRequestConfig) => {
+  req.headers!.Authorization = `Bearer ${process.env.NEXT_PUBLIC_IMAGE_SERVER_KEY}`;
+  return req;
+});
 
 /*
 Access to XMLHttpRequest at 'Server' from origin 'Client' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
@@ -27,11 +28,6 @@ Access to XMLHttpRequest at 'Server' from origin 'Client' has been blocked by CO
 //   return req;
 // });
 
-// export const fetchPosts = () => API.get('/posts');
-// export const createPost = (newPost) => API.post('/posts', newPost);
-// export const likePost = (id) => API.patch(`/posts/${id}/likePost`);
-// export const updatePost = (id, updatedPost) => API.patch(`/posts/${id}`, updatedPost);
-// export const deletePost = (id) => API.delete(`/posts/${id}`);
 export const getAllPosts = (query: string) => API.get(`/api/v1/blogs?${query}`);
 
 export const getLatestPosts = (url: string) => API.get(url);
@@ -81,7 +77,11 @@ export const signIn = (formData: SignInFormData) =>
   API.post("/api/v1/users/login", formData);
 
 export const forgotPassword = (email: string) =>
-  API.post("/api/v1/users/forgotPassword", email);
+  API.post("/api/v1/users/forgotPassword", {email});
+
+export const resendSignUpToken = (email: string) => 
+  API.post("/api/v1/users/resendSignupToken", {email})
+
 
 export const resetPassword = (
   token: string,
@@ -105,9 +105,16 @@ export const updateProfile = (updatedProfile: any, token: string) =>
     headers: { Authorization: `Bearer ${token}` },
   });
 
+// -------------------- ADMIN --------------------- //
+export const getUnReviewedBlogs = (url: string, token: string) =>
+  API.get(url, { headers: { Authorization: `Bearer ${token}` } });
+
+export const getUnReviewedBlog = (url: string, token: string) =>
+  API.get(url, { headers: { Authorization: `Bearer ${token}` } });
+
 // ------------------ IMAGE ------------------  //
 export const uploadImage = (formData: FormData) =>
   API2.post("/imagev2api/profile-upload-single", formData);
 
 export const deleteImage = (query: string) =>
-  API2.delete(`/delete-file?${query}`);
+  API2.delete(`/delete-file?filePath=${query}`);
