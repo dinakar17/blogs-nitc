@@ -9,7 +9,6 @@ import { toast } from "react-toastify";
 // Todo: replace react-text-transition with normal css animation
 
 import { RootState } from "../../store/store";
-import { contentfulLoader } from "../../helpers/ImageURL/contentFulLoader";
 
 const TEXTS = ["Share", "Grow"];
 
@@ -174,7 +173,6 @@ export const CardLayout = ({ post }: CardProps) => {
       <div className="aspect-w-10 aspect-h-9 lg:aspect-w-16 lg:aspect-h-9">
         <Image
           src={post.featuredImage}
-          loader={contentfulLoader}
           className="object-cover shadow-lg rounded-lg"
           alt={post.title}
           layout="fill"
@@ -193,7 +191,6 @@ export const CardLayout = ({ post }: CardProps) => {
           <div className="w-10 h-10 relative">
             <Image
               src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo}
-              loader={contentfulLoader}
               layout="fill"
               className="rounded-full object-cover"
             />
