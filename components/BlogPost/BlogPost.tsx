@@ -14,6 +14,7 @@ import * as api from "../../api";
 import { ThreeDotsLoader } from "../UI/Loader/Loader";
 import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
 import siteMetadata from "../../data/siteMetadata";
+import { contentfulLoader } from "../../helpers/ImageURL/contentFulLoader";
 
 type BlogPostProps = {
   data: {
@@ -76,6 +77,7 @@ const BlogPost = ({ data }: BlogPostProps) => {
                 >
                   <Image
                     src={data.data.user.photo}
+                    loader={contentfulLoader}
                     alt={data.data.user.name}
                     layout="fill"
                     objectFit="cover"
@@ -144,6 +146,7 @@ const BlogPost = ({ data }: BlogPostProps) => {
               ? data.data.featuredImage
               : "/static/no_image.png"
           }
+          loader={contentfulLoader}
           alt={data.data.description}
           className="shadow-lg rounded-md object-cover"
           layout="fill"

@@ -19,6 +19,7 @@ import styles from "styles/MobileMenu.module.css";
 import dynamic from "next/dynamic";
 import MobileMenu from "./MobileMenu";
 import DropdownMenu from "./DropdownMenu";
+import { contentfulLoader } from "../../../../helpers/ImageURL/contentFulLoader";
 
 const Header = () => {
   const [mounted, setMounted] = React.useState(false);
@@ -97,6 +98,7 @@ const Header = () => {
                     <Image
                       // Note: authData?.user is optional chaining, it means if authData is null then it will not throw an error
                       src={authData.photo ? authData.photo : "/static/default-avatar.png"}
+                      loader={contentfulLoader}
                       alt="profile"
                       layout="fill"
                       className="rounded-full object-cover cursor-pointer block m-auto"

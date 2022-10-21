@@ -11,6 +11,7 @@ import Loader from "../../components/UI/Loader/Loader";
 import { getProfile } from "../../api";
 import { BlogCard, BlogProps } from "../../components/Card/BlogCard";
 import Image from "next/image";
+import { contentfulLoader } from "../../helpers/ImageURL/contentFulLoader";
 
 const fetchWithToken = (url: string, token: string) =>
   getProfile(url, token).then((res) => res.data);
@@ -72,6 +73,7 @@ const MyProfile = () => {
                   ? data.data.user.photo
                   : "/static/default-avatar.png"
               }
+              loader={contentfulLoader}
               layout="fill"
               objectFit="cover"
               alt={data.data.user.name}
