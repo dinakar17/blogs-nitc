@@ -66,7 +66,7 @@ const MyProfile = () => {
         <div className="grid md:grid-cols-2 lg:w-[60%] mx-auto rounded-lg shadow-lg gap-10 my-10 overflow-hidden">
           {/* Note that you cannot change the height of children inside aspect-w-16 rather you can adjust the aspect ratio height and width my changing width of the parent  */}
           <div className="lg:aspect-w-16 lg:aspect-h-12 md:aspect-w-1 md:aspect-h-1 aspect-w-1 aspect-h-1 ">
-            <Image
+            {/* <Image
               src={
                 data.data.user.photo
                   ? data.data.user.photo
@@ -75,6 +75,15 @@ const MyProfile = () => {
               layout="fill"
               objectFit="cover"
               alt={data.data.user.name}
+            /> */}
+            <img
+              src={
+                data.data.user.photo
+                  ? data.data.user.photo
+                  : "/static/default-avatar.png"
+              }
+              alt={data.data.user.name}
+              className="w-full h-full object-cover"
             />
           </div>
           <div className="flex flex-col h-full w-full justify-center gap-3 px-5 md:px-0 py-4">

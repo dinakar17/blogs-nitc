@@ -94,13 +94,14 @@ const Header = () => {
               <div className="cursor-pointer">
                 <div className="w-10 h-10 relative cursor-pointer">
                   <DropdownMenu>
-                    <Image
+                    {/* <Image
                       // Note: authData?.user is optional chaining, it means if authData is null then it will not throw an error
                       src={authData.photo ? authData.photo : "/static/default-avatar.png"}
                       alt="profile"
                       layout="fill"
                       className="rounded-full object-cover cursor-pointer block m-auto"
-                    />
+                    /> */}
+                    <img src={authData.photo ? authData.photo : "/static/default-avatar.png"} alt={authData?.name} className="w-full h-full rounded-full object-cover cursor-pointer block m-auto" />
                   </DropdownMenu>
                 </div>
               </div>

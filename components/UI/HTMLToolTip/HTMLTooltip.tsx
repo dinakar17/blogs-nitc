@@ -77,12 +77,13 @@ const CustomizedTooltip = ({ children, name, photo, bio }: Props) => {
       content = (
         <>
           <div className="relative w-48 h-48 ">
-            <Image
+            {/* <Image
               src={photo!}
               alt="author image"
               layout="fill"
               objectFit="cover"
-            />
+            /> */}
+            <img src={photo!} alt="author image" className="w-full h-full object-cover" />
           </div>
           <p className="pt-1 text-sm">{bio!}</p>
         </>

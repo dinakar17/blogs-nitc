@@ -58,7 +58,7 @@ export const BlogCard = ({ blog }: Props) => {
       <div className="relative flex flex-col min-h-[380px] rounded-t-lg overflow-hidden w-full">
         {/* Card Image */}
         <div className="relative w-full h-[180px] bg-gray-300">
-          <Image
+          {/* <Image
             src={
               blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
             }
@@ -68,6 +68,13 @@ export const BlogCard = ({ blog }: Props) => {
             // ? Don't know whether it is a good idea to use blurDataURL same as src or not
             // placeholder="blur"
             // blurDataURL={blog.featuredImage}
+            className="w-full h-full object-cover rounded-t-lg"
+          /> */}
+          <img
+            src={
+              blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
+            }
+            alt={blog.title}
             className="w-full h-full object-cover rounded-t-lg"
           />
         </div>
@@ -158,4 +165,4 @@ const BlogCards = ({ data }: any) => {
 export default BlogCards;
 
 // https://stackoverflow.com/questions/72845518/make-text-overflow-visible-on-hover-using-react-css
-// Todo: Design sophisticated BlogCard UI 
+// Todo: Design sophisticated BlogCard UI

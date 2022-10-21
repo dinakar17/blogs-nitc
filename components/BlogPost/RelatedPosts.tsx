@@ -26,11 +26,12 @@ const RelatedPosts = ({ data }: RelatedPostsProps) => {
           {data.relatedBlogs.map((blog: RelatedBlog) => (
             <div className="grid grid-cols-2 gap-2" key={blog._id}>
               <div className="relative w-full">
-                <Image
+                {/* <Image
                   src={blog.featuredImage}
                   layout="fill"
                   objectFit="cover"
-                />
+                /> */}
+                <img src={blog.featuredImage} alt={blog.title} className="w-full h-full object-cover" />
               </div>
               <div key={blog._id} className="flex flex-col gap-2">
                 <Link href={`/blog/${blog.slug}`}>
