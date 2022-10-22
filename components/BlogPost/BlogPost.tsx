@@ -74,17 +74,17 @@ const BlogPost = ({ data }: BlogPostProps) => {
                   photo={data.data.user.photo}
                   bio={data.data.user.bio}
                 >
-                  {/* <Image
+                  <Image
                     src={data.data.user.photo}
                     alt={data.data.user.name}
                     layout="fill"
                     objectFit="cover"
-                  /> */}
-                  <img
+                  />
+                  {/* <img
                     src={data.data.user.photo}
                     alt={data.data.user.name}
                     className="w-full h-full object-cover"
-                  />
+                  /> */}
                 </CustomizedTooltip>
               )}
             </div>
@@ -143,7 +143,7 @@ const BlogPost = ({ data }: BlogPostProps) => {
         </div>
       </div>
       <div className="aspect-w-16 aspect-h-9">
-        {/* <Image
+        <Image
           src={
             data.data.featuredImage
               ? data.data.featuredImage
@@ -152,12 +152,12 @@ const BlogPost = ({ data }: BlogPostProps) => {
           alt={data.data.description}
           className="shadow-lg rounded-md object-cover"
           layout="fill"
-        /> */}
-        <img
+        />
+        {/* <img
           src={data.data.featuredImage}
           alt={data.data.description}
           className="shadow-lg rounded-md object-cover w-full h-full"
-        />
+        /> */}
       </div>
 
       <div className="mt-4">{parse(data.data.content)}</div>

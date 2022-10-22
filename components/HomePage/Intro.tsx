@@ -171,7 +171,7 @@ export const CardLayout = ({ post }: CardProps) => {
   return (
     <div className="relative">
       <div className="aspect-w-10 aspect-h-9 lg:aspect-w-16 lg:aspect-h-9">
-        {/* <Image
+        <Image
           src={post.featuredImage}
           className="object-cover shadow-lg rounded-lg"
           alt={post.title}
@@ -179,8 +179,8 @@ export const CardLayout = ({ post }: CardProps) => {
           // placeholder="blur"
           // // ? should we use blurDataURL same as src?
           // blurDataURL={post.featuredImage}
-        /> */}
-        <img src={post.featuredImage} className="w-full h-full object-cover shadow-lg rounded-lg" alt={post.title} />
+        />
+        {/* <img src={post.featuredImage} className="w-full h-full object-cover shadow-lg rounded-lg" alt={post.title} /> */}
       </div>
       <div className="absolute bottom-0 p-4 flex flex-col gap-2">
         <Link href={`/blog/${post.slug}`}>
@@ -190,12 +190,12 @@ export const CardLayout = ({ post }: CardProps) => {
         </Link>
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 relative">
-            {/* <Image
+            <Image
               src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo}
               layout="fill"
               className="rounded-full object-cover"
-            /> */}
-            <img src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo} className="w-full h-full rounded-full object-cover" />
+            />
+            {/* <img src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo} className="w-full h-full rounded-full object-cover" /> */}
           </div>
           <div className="text-white">
             <p>{post.anonymous ? "Anonymous" : post.user[0].name}</p>

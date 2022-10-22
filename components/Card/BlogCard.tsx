@@ -58,7 +58,7 @@ export const BlogCard = ({ blog }: Props) => {
       <div className="relative flex flex-col min-h-[380px] rounded-t-lg overflow-hidden w-full">
         {/* Card Image */}
         <div className="relative w-full h-[180px] bg-gray-300">
-          {/* <Image
+          <Image
             src={
               blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
             }
@@ -69,14 +69,14 @@ export const BlogCard = ({ blog }: Props) => {
             // placeholder="blur"
             // blurDataURL={blog.featuredImage}
             className="w-full h-full object-cover rounded-t-lg"
-          /> */}
-          <img
+          />
+          {/* <img
             src={
               blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
             }
             alt={blog.title}
             className="w-full h-full object-cover rounded-t-lg"
-          />
+          /> */}
         </div>
         {/* Card Content */}
         <div className="flex flex-col gap-1 p-3 min-h-[190px]">
