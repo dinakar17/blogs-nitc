@@ -19,6 +19,7 @@ import styles from "styles/MobileMenu.module.css";
 import dynamic from "next/dynamic";
 import MobileMenu from "./MobileMenu";
 import DropdownMenu from "./DropdownMenu";
+import { customLoader } from "../../../../helpers/customImageLoader";
 
 const Header = () => {
   const [mounted, setMounted] = React.useState(false);
@@ -66,6 +67,7 @@ const Header = () => {
               <Image
                 src="/static/logo-for-nitc.png"
                 alt="logo"
+                loader={customLoader}
                 width={100}
                 height={100}
                 objectFit="cover"
@@ -97,6 +99,7 @@ const Header = () => {
                     <Image
                       // Note: authData?.user is optional chaining, it means if authData is null then it will not throw an error
                       src={authData.photo ? authData.photo : "/static/default-avatar.png"}
+                      loader={customLoader}
                       alt="profile"
                       layout="fill"
                       className="rounded-full object-cover cursor-pointer block m-auto"

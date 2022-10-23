@@ -7,6 +7,7 @@ import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { useSelector } from "react-redux";
 import { RootState } from "../../store/store";
+import { customLoader } from "../../helpers/customImageLoader";
 
 export type BlogProps = {
   _id: string;
@@ -62,6 +63,7 @@ export const BlogCard = ({ blog }: Props) => {
             src={
               blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
             }
+            loader={customLoader}
             alt="blog image"
             layout="fill"
             objectFit="cover"

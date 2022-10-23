@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import React from "react";
 import { BlogPostDetails, RelatedBlog } from "../../pages/blog/[slug]";
+import { customLoader } from "../../helpers/customImageLoader";
 
 type RelatedPostsProps = {
   data: {
@@ -28,6 +29,7 @@ const RelatedPosts = ({ data }: RelatedPostsProps) => {
               <div className="relative w-full">
                 <Image
                   src={blog.featuredImage}
+                  loader={customLoader}
                   layout="fill"
                   objectFit="cover"
                 />

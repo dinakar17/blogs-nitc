@@ -2,6 +2,7 @@ import * as React from "react";
 import { styled } from "@mui/material/styles";
 import Tooltip, { TooltipProps, tooltipClasses } from "@mui/material/Tooltip";
 import Image from "next/image";
+import { customLoader } from "../../../helpers/customImageLoader";
 
 const HtmlTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -82,6 +83,7 @@ const CustomizedTooltip = ({ children, name, photo, bio }: Props) => {
               alt="author image"
               layout="fill"
               objectFit="cover"
+              loader={customLoader}
             />
             {/* <img src={photo!} alt="author image" className="w-full h-full object-cover" /> */}
           </div>
