@@ -45,11 +45,18 @@ const Publish = ({
       },
     };
 
+    const imageAxiosConfig = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_IMAGE_SERVER_KEY}`,
+      },
+    };
+
     try {
       setLoading(true);
       if (blogImgURL) {
         const fileName = blogImgURL.split("/").pop();
-        await api.deleteImage(fileName as string);
+        await api.deleteImage(fileName as string, imageAxiosConfig);
       }
       await api.deletePost(blogId, config);
       setLoading(false);
