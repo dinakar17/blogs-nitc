@@ -73,6 +73,13 @@ const Editor = (props: EditorProps) => {
     editor.current = sunEditor;
   };
 
+  const imageServerAxiosConfig = {
+    headers: {
+      "Content-Type": "multipart/form-data",
+      Authorization: `Bearer ${process.env.NEXT_PUBLIC_IMAGE_SERVER_KEY}`,
+    },
+  };
+
   // Todo: Add custom keyboard shortcuts
   // https://github.com/mkhstar/suneditor-react/issues/128
   // Sending uploaded images in the server to the backend
@@ -95,7 +102,7 @@ const Editor = (props: EditorProps) => {
     const formData = new FormData();
     formData.append("profile-file", newFile);
 
-    uploadImage(formData)
+    uploadImage(formData, imageServerAxiosConfig)
       .then((res) => {
         // console.log(res);
         res.data.result[0].url =
@@ -111,10 +118,11 @@ const Editor = (props: EditorProps) => {
 
   // Image upload to server
   const imageUpload = async (file: File) => {
+    
     const formData = new FormData();
     formData.append("profile-file", file);
     try {
-      const response: AxiosResponse = await api.uploadImage(formData);
+      const response: AxiosResponse = await api.uploadImage(formData, imageServerAxiosConfig);
       const url = response.data.result[0].url;
       const modified_url =
         process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");
@@ -143,7 +151,7 @@ const Editor = (props: EditorProps) => {
       // delete prev image if a new change is made
       if (editorForUpdate && !featuredImageURL) {
         const imageName = blogImgURL.split("/").pop();
-        await api.deleteImage(imageName as string);
+        await api.deleteImage(imageName as string, imageServerAxiosConfig);
       }
 
       let photoUrl = "";
