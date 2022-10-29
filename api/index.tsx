@@ -5,7 +5,7 @@ const API = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_URL });
 // https://stackoverflow.com/questions/41253228/preflight-or-cors-error-on-every-request
 // API.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 // Note: New browsers do not allow a wildcard auth header unless explicitly specified. So, we need to specify Access-Control-Allow-Headers: * in the response header.
-API.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+// API.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
 
 // --------------- IMAGE UPLOAD API --------------- //
 const API2 = axios.create({ baseURL: process.env.NEXT_PUBLIC_IMAGE_API_URL });
