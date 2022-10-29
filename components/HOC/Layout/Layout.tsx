@@ -1,9 +1,11 @@
 import { useRouter } from "next/router";
+import NextProgress from "next-progress";
 import React, { useEffect } from "react";
+import Fade from "@mui/material/Fade";
+import { toast } from "react-toastify";
+
 import Footer from "./Footer/Footer";
 import Header from "./Header/Header";
-import { toast } from "react-toastify";
-import Fade from "@mui/material/Fade";
 
 type Props = {
   children: React.ReactNode;
@@ -15,6 +17,33 @@ const Layout = ({ children, noLayoutRoutes }: Props) => {
   useEffect(() => {
     localStorage.setItem("createPost", "/blog/create");
   }, []);
+
+  // Todo: check wether the token is expired or not
+  // const {token} = useSelector((state: RootState) => state.user);
+
+  // useEffect(() => {
+  //   const checkToken = async () => {
+  //     // send a request to the server to check wether the token is expired or not
+  //     const res = await fetch("/api/auth/checkToken", {
+  //       method: "POST",
+  //       headers: {
+  //         "Content-Type": "application/json",
+  //       },
+  //       body: JSON.stringify({ token }),
+  //     });
+  //     const data = await res.json();
+  //     if (data.error) {
+  //       // if the token is expired, then redirect to the login page
+  //       router.push("/auth/login");
+  //       toast.error(data.error, {
+  //         position: "top-center",
+  //       });
+  //     }
+  //   };
+  //   if (token) {
+  //     checkToken();
+  //   }
+  // }, [token, router]);
 
   useEffect(() => {
     if (localStorage.getItem("createPost") === router.pathname) {
@@ -42,6 +71,11 @@ const Layout = ({ children, noLayoutRoutes }: Props) => {
             <div>{children}</div>
           ) : (
             <>
+              <NextProgress
+                delay={200}
+                color="#29D"
+                options={{ showSpinner: false }}
+              />
               <Header />
               <div>{children}</div>
               <Footer />

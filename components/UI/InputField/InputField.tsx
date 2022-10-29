@@ -21,13 +21,14 @@ const InputField = ({label, setState, placeholder, value}: Props) => {
         {label}
       </label>
       <input
+        required
         type="text"
-        id="default-input"
+        id="title"
+        data-cy="blog-title"
         value={value}
         className="bg-gray-50 border border-gray-300 rounded-sm focus:outline-none focus:ring-2 focus:ring-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500"
         onChange={(e) => dispatch(setState(e.target.value))}
         placeholder={placeholder}
-        required
       />
     </div>
   );

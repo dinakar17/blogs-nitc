@@ -1,0 +1,24 @@
+{
+  "title": "Blog for testing",
+  "description": "This is a sample description that helps in testing",
+  "featuredImage": "http://localhost:5001/uploads/632461d1416122fc5212c05b-29-10-2022-23-31-07-photo-1665686310429-ee43624978fa.avif",
+  "branch": {
+    "value": "general",
+    "label": "General"
+  },
+  "semester": {
+    "value": "",
+    "label": ""
+  },
+  "subject": {
+    "value": "",
+    "label": ""
+  },
+  "tags": ["cypress", "testing", "nextjs"],
+  "status": {
+    "draft": false,
+    "reviewed": false,
+    "anonymous": false
+  },
+  "slug": "blog-for-testing-23688efca476"
+}

@@ -3,6 +3,8 @@ import { BlogPost, SignInFormData, SignUpFormData } from "../types";
 
 const API = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_URL });
 // API.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
+// Note: New browsers do not allow a wildcard auth header unless explicitly specified. So, we need to specify Access-Control-Allow-Headers: * in the response header.
+API.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
 
 // --------------- IMAGE UPLOAD API --------------- //
 const API2 = axios.create({ baseURL: process.env.NEXT_PUBLIC_IMAGE_API_URL });
@@ -77,11 +79,10 @@ export const signIn = (formData: SignInFormData) =>
   API.post("/api/v1/users/login", formData);
 
 export const forgotPassword = (email: string) =>
-  API.post("/api/v1/users/forgotPassword", {email});
+  API.post("/api/v1/users/forgotPassword", { email });
 
-export const resendSignUpToken = (email: string) => 
-  API.post("/api/v1/users/resendSignupToken", {email})
-
+export const resendSignUpToken = (email: string) =>
+  API.post("/api/v1/users/resendSignupToken", { email });
 
 export const resetPassword = (
   token: string,
@@ -106,11 +107,11 @@ export const updateProfile = (updatedProfile: any, token: string) =>
   });
 
 // -------------------- ADMIN --------------------- //
-export const getUnReviewedBlogs = (url: string, token: string) =>
-  API.get(url, { headers: { Authorization: `Bearer ${token}` } });
+// export const getUnReviewedBlogs = (url: string, token: string) =>
+//   API.get(url, { headers: { Authorization: `Bearer ${token}` } });
 
-export const getUnReviewedBlog = (url: string, token: string) =>
-  API.get(url, { headers: { Authorization: `Bearer ${token}` } });
+// export const getUnReviewedBlog = (url: string, token: string) =>
+//   API.get(url, { headers: { Authorization: `Bearer ${token}` } });
 
 // ------------------ IMAGE ------------------  //
 export const uploadImage = (formData: FormData) =>
@@ -118,3 +119,9 @@ export const uploadImage = (formData: FormData) =>
 
 export const deleteImage = (query: string) =>
   API2.delete(`/delete-file?filePath=${query}`);
+
+/*
+  Access to XMLHttpRequest at 'https://imagev2api.linoxcloud.com/imagev2api/profile-upload-single' 
+  from origin 'https://blogs-nitc.vercel.app' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' 
+  header is present on the requested resource.
+*/

@@ -1,7 +1,11 @@
 import React, { useEffect } from "react";
 import { AppDispatch, RootState } from "../../store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { resetError, resetSignUpSuccess, signUp } from "../../store/StatesContainer/auth/AuthSlice";
+import {
+  resetError,
+  resetSignUpSuccess,
+  signUp,
+} from "../../store/StatesContainer/auth/AuthSlice";
 import {
   ConfirmPasswordValidator,
   PasswordValidator,
@@ -128,6 +132,7 @@ const signup = () => {
                 {/* UserName */}
                 <label>Username</label>
                 <input
+                  name="userName"
                   type="text"
                   // length of the username should be at least 3 characters long
                   minLength={4}
@@ -142,6 +147,7 @@ const signup = () => {
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Email</label>
                 <input
+                name="email"
                   required
                   type="email"
                   placeholder="Enter your email"
@@ -149,12 +155,15 @@ const signup = () => {
                   onChange={handleEmail}
                   className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
-                <p className="text-red-500 text-sm">{emailError}</p>
+                <p data-cy="signUp-emailError" className="text-red-500 text-sm">
+                  {emailError}
+                </p>
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Password</label>
                 <div className="relative">
                   <input
+                    name="password"
                     required
                     type={showPassword ? "text" : "password"}
                     placeholder="Enter your password"
@@ -193,11 +202,17 @@ const signup = () => {
                     </svg>
                   </div>
                 </div>
-                <p className="text-red-500 text-sm">{passwordError}</p>
+                <p
+                  data-cy="signUp-passwordError"
+                  className="text-red-500 text-sm"
+                >
+                  {passwordError}
+                </p>
               </div>
               <div className="flex flex-col gap-2">
                 <label htmlFor="password">Confirm Password</label>
                 <input
+                  name="confirmPassword"
                   required
                   type={showPassword ? "text" : "password"}
                   placeholder="Confirm your password"
@@ -205,9 +220,15 @@ const signup = () => {
                   onChange={handleConfirmPassword}
                   className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                 />
-                <p className="text-red-500 text-sm">{confirmPasswordError}</p>
+                <p
+                  data-cy="signUp-confirmPasswordError"
+                  className="text-red-500 text-sm"
+                >
+                  {confirmPasswordError}
+                </p>
               </div>
               <button
+                data-cy="signUp-submit"
                 type="submit"
                 className={`bg-blue-500 text-white p-2 rounded-md ${
                   loading ? "bg-blue-200 animate-pulse" : ""

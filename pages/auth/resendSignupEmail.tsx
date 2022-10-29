@@ -1,7 +1,6 @@
 import { useState } from "react";
 
 import Link from "next/link";
-import { OvalLoader } from "../../components/UI/Loader/Loader";
 import * as api from "../../api/index";
 import { toast } from "react-toastify";
 import { EmailValidator } from "../../helpers/Validators/EmailValidator";
@@ -23,7 +22,6 @@ const ResendSignUpToken = () => {
       setLoading(true);
       await api.resendSignUpToken(email);
       setLoading(false);
-      setEmail("");
       setMessageSent(true);
     } catch (error: any) {
       setLoading(false);

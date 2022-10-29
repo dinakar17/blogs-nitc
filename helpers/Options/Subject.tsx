@@ -241,7 +241,6 @@ const Subject = ({ branch, semester }: SubjectProps) => {
           <Select
             options={subjects}
             placeholder="Select Subject"
-            className="z-[11]"
             value={subject.value === "" ? null : subject}
             onChange={(e) => dispatch(setSubject(e))}
           />

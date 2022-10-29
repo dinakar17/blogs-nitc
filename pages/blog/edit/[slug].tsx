@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 import dynamic from "next/dynamic";
 import Head from "next/head";
@@ -7,8 +7,8 @@ import useSWR from "swr";
 import { NextPage } from "next";
 import { AxiosResponse } from "axios";
 
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../store/store";
+import { useDispatch } from "react-redux";
+import { AppDispatch } from "../../../store/store";
 import { setPost } from "../../../store/StatesContainer/post/PostSlice";
 import { setFilter } from "../../../store/StatesContainer/filters/FilterSlice";
 import * as api from "../../../api";
@@ -62,7 +62,7 @@ const EditBlog: NextPage = () => {
     }
   }, [error]);
 
-  if(error) return null;
+  if (error) return null;
   if (!data) return <Loader />;
 
   return (
@@ -71,7 +71,7 @@ const EditBlog: NextPage = () => {
         <title>Edit blog</title>
         <meta name="description" content="Edit blog page for Blog App" />
       </Head>
-      <h1 className="text-center text-3xl underline font-bold my-4 text-blue-500">
+      <h1 className="text-center text-3xl underline font-bold my-4 text-purple-500">
         Edit your Blog
       </h1>
       <Editor

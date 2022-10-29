@@ -1,0 +1,24 @@
+{
+  "user": {
+    "loading": false,
+    "authData": null,
+    "error": "",
+    "signUpSuccess": false,
+    "token": "",
+    "_persist": { "version": -1, "rehydrated": true }
+  },
+  "filter": {
+    "branch": { "value": "", "label": "" },
+    "semester": { "value": "", "label": "" },
+    "subject": { "value": "", "label": "" }
+  },
+  "post": {
+    "title": "",
+    "description": "",
+    "featuredImage": null,
+    "featuredImageURL": "",
+    "tags": [],
+    "content": "",
+    "status": { "reviewed": false, "draft": false, "anonymous": false }
+  }
+}
