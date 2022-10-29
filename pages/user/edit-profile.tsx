@@ -75,10 +75,17 @@ const Edit = () => {
     }
   );
   // ? Error: Rendered more hooks than during the previous render. This may be caused by an accidental early return statement.
-
+ // deploy with no access-control-origin
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
+
+    const axiosConfig = {
+      headers: {
+        "Content-Type": "multipart/form-data",
+        Authorization: `Bearer ${process.env.NEXT_PUBLIC_IMAGE_SERVER_KEY}`,
+      },
+    };
 
     try {
       let modified_url: string = "";
@@ -88,9 +95,9 @@ const Edit = () => {
         // Delete old image only if user has already uploaded a photo before
         if (data.data.user.photo) {
           const photoUrl = data.data.user.photo.split("/").pop();
-          await deleteImage(photoUrl);
+          await deleteImage(photoUrl, axiosConfig);
         }
-        const res: any = await uploadImage(formData);
+        const res: any = await uploadImage(formData, axiosConfig);
         const url = res.data.result[0].url;
         modified_url =
           process.env.NEXT_PUBLIC_IMAGE_API_URL + url.replace(/\\/g, "/");

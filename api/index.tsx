@@ -2,19 +2,19 @@ import axios, { AxiosRequestConfig } from "axios";
 import { BlogPost, SignInFormData, SignUpFormData } from "../types";
 
 const API = axios.create({ baseURL: process.env.NEXT_PUBLIC_BACKEND_URL });
+// https://stackoverflow.com/questions/41253228/preflight-or-cors-error-on-every-request
 // API.defaults.headers.post["Content-Type"] = "application/x-www-form-urlencoded";
 // Note: New browsers do not allow a wildcard auth header unless explicitly specified. So, we need to specify Access-Control-Allow-Headers: * in the response header.
 API.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
 
 // --------------- IMAGE UPLOAD API --------------- //
 const API2 = axios.create({ baseURL: process.env.NEXT_PUBLIC_IMAGE_API_URL });
-API2.defaults.headers.post["Content-Type"] = "multipart/form-data";
-API2.defaults.headers.post["Access-Control-Allow-Origin"] = "*";
+// API2.defaults.headers.post["Content-Type"] = "multipart/form-data";
 
-API2.interceptors.request.use((req: AxiosRequestConfig) => {
-  req.headers!.Authorization = `Bearer ${process.env.NEXT_PUBLIC_IMAGE_SERVER_KEY}`;
-  return req;
-});
+// API2.interceptors.request.use((req: AxiosRequestConfig) => {
+//   req.headers!.Authorization = `Bearer ${process.env.NEXT_PUBLIC_IMAGE_SERVER_KEY}`;
+//   return req;
+// });
 
 /*
 Access to XMLHttpRequest at 'Server' from origin 'Client' has been blocked by CORS policy: No 'Access-Control-Allow-Origin' header is present on the requested resource.
@@ -114,11 +114,11 @@ export const updateProfile = (updatedProfile: any, token: string) =>
 //   API.get(url, { headers: { Authorization: `Bearer ${token}` } });
 
 // ------------------ IMAGE ------------------  //
-export const uploadImage = (formData: FormData) =>
-  API2.post("/imagev2api/profile-upload-single", formData);
+export const uploadImage = (formData: FormData, config: AxiosRequestConfig) =>
+  API2.post("/imagev2api/profile-upload-single", formData, config);
 
-export const deleteImage = (query: string) =>
-  API2.delete(`/delete-file?filePath=${query}`);
+export const deleteImage = (query: string, config: AxiosRequestConfig) =>
+  API2.delete(`/delete-file?filePath=${query}`, config);
 
 /*
   Access to XMLHttpRequest at 'https://imagev2api.linoxcloud.com/imagev2api/profile-upload-single' 
