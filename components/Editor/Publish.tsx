@@ -13,6 +13,7 @@ import {
   setDraft,
 } from "../../store/StatesContainer/post/PostSlice";
 import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
+import CustomDialog from "../UI/CustomDialog/CustomDialog";
 
 type Props = {
   editorForUpdate: boolean;
@@ -61,9 +62,7 @@ const Publish = ({
       await api.deletePost(blogId, config);
       setLoading(false);
       setShowModal(false);
-      toast("Blog Deleted", {
-        type: "success",
-      });
+      toast.success("Blog deleted successfully", {toastId: "blogDeleted"});
       router.push(`/user/my-profile`);
     } catch (error: any) {
       setLoading(false);
@@ -97,11 +96,11 @@ const Publish = ({
       <div className="flex flex-col gap-5 border-2 border-gray-200 p-5 rounded-md">
         <h2 className="text-2xl font-semibold">Publish</h2>
         <p>
-          <span className="font-bold">Status:</span>{" "}
+          <span data-cy="blog-status" className="font-bold">Status:</span>{" "}
           {editorForUpdate ? blogStatus : "---"}
         </p>
         <p>
-          <span className="font-bold">Visibility:</span>{" "}
+          <span data-cy="blog-visibility" className="font-bold">Visibility:</span>{" "}
           {editorForUpdate ? visibility : "---"}
         </p>
         <div className="flex items-center gap-2">
@@ -126,6 +125,7 @@ const Publish = ({
           </button>
           {editorForUpdate ? (
             <button
+              id="update"
               type="submit"
               className={`text-white hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ${
                 publishing
@@ -141,10 +141,11 @@ const Publish = ({
             </button>
           ) : (
             <button
+              id="publish"
               type="submit"
               className={`text-white hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-green-300 dark:focus:ring-green-800 shadow-lg shadow-green-500/50 dark:shadow-lg dark:shadow-green-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ${
                 publishing
-                  ? "bg-gray-400"
+                  ? "bg-gray-400 cursor-not-allowed"
                   : "bg-gradient-to-r from-green-400 via-green-500 to-green-600"
               }`}
               onClick={() => {
@@ -158,6 +159,7 @@ const Publish = ({
           {editorForUpdate && (
             <>
               <button
+                id="delete"
                 // Note: type button won't submit the form and will only call the function
                 type="button"
                 className={`text-white hover:bg-gradient-to-br focus:ring-4 focus:outline-none focus:ring-red-300 dark:focus:ring-red-800 shadow-lg shadow-red-500/50 dark:shadow-lg dark:shadow-red-800/80 font-medium rounded-lg text-sm px-5 py-2.5 text-center mr-2 mb-2 ${
@@ -173,8 +175,9 @@ const Publish = ({
                 Delete
               </button>
               {showModal && (
-                <Modal
-                  setOpenModal={setShowModal}
+                <CustomDialog
+                  open={showModal}
+                  setOpen={setShowModal}
                   handleDelete={handleDelete}
                   loading={loading}
                 />
@@ -194,71 +197,6 @@ const Publish = ({
   );
 };
 
-type ModalProps = {
-  handleDelete: () => void;
-  setOpenModal: (open: boolean) => void;
-  loading: boolean;
-};
-
-const Modal = ({ setOpenModal, handleDelete, loading }: ModalProps) => {
-  return (
-    // Todo: Play with z-index for content editor, branch and this modal
-    <>
-      <div className="fixed inset-0 z-[10000] overflow-y-auto">
-        <div
-          className="fixed inset-0 w-full h-full bg-black opacity-40"
-          onClick={() => setOpenModal(false)}
-        ></div>
-        <div className="flex items-center min-h-screen px-4 py-8">
-          <div className="relative w-full max-w-lg p-4 mx-auto bg-white rounded-md shadow-lg">
-            <div className="mt-3 sm:flex">
-              <div className="flex items-center justify-center flex-none w-12 h-12 mx-auto bg-red-100 rounded-full">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  className="w-6 h-6 text-red-600"
-                  viewBox="0 0 20 20"
-                  fill="currentColor"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-              </div>
-              <div className="mt-2 text-center sm:ml-4 sm:text-left">
-                <h4 className="text-lg font-medium text-gray-800">
-                  Delete Blog ?
-                </h4>
-                <p className="mt-2 text-[15px] leading-relaxed text-gray-500">
-                  Deleting this blog will permanently remove it from the
-                  database. Are you sure you want to delete this blog?
-                </p>
-                <div className="items-center gap-2 mt-3 sm:flex">
-                  <button
-                    type="button"
-                    className="w-full mt-2 p-2.5 flex-1 text-white bg-red-600 rounded-md outline-none ring-offset-2 ring-red-600 focus:ring-2"
-                    onClick={handleDelete}
-                    disabled={loading}
-                  >
-                    Delete
-                  </button>
-                  <button
-                    type="button"
-                    className="w-full mt-2 p-2.5 flex-1 text-gray-800 rounded-md outline-none border ring-offset-2 ring-indigo-600 focus:ring-2"
-                    onClick={() => setOpenModal(false)}
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
-};
 
 export default Publish;
 

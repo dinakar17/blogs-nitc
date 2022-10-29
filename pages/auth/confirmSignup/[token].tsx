@@ -1,52 +1,52 @@
 // [token].tsx is the file that is called when the user clicks on the link in the email sent to him/her.
 // This file is used to confirm the user's email address.
 // The user is redirected to the login page after confirming his/her email address.
-// Note: Ran into a problem due to folder name of confirmSignup.tsx
 
-import { useEffect } from "react";
-import { useRouter } from "next/router";
-import * as api from "../../../api";
-
-import { GetServerSideProps } from "next";
 import type { NextPage } from "next";
+import { useEffect } from "react";
+import Router from "next/router";
+import { GetServerSideProps } from "next";
 import { toast } from "react-toastify";
+
+import * as api from "../../../api";
 
 type Props = {
   error: string;
   success: string;
 };
 
-const ConfirmSignup: NextPage<Props> = (props) => {
-  const router = useRouter();
-
+const ConfirmSignUp: NextPage<Props> = (props) => {
+  // Note: router inside useEffect is not working as expected
   useEffect(() => {
-    if (props.error) {
-      router.push("/auth/login");
-      toast.error(props.error, {
-        position: "top-center",
-        autoClose: false,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        progress: undefined,
-      });
-    } else if (props.success) {
-      router.push("/auth/login");
-      toast.success(
-        "Hurray! Email Confirmation Successful 😊. Please Login to continue",
-        {
+    if (Router.isReady) {
+      if (props.error) {
+        console.log(props.error);
+        toast.error(props.error, {
           position: "top-center",
           hideProgressBar: false,
           closeOnClick: true,
           pauseOnHover: true,
           draggable: true,
           progress: undefined,
-          toastId: "emailConfirmationSuccess",
-        }
-      );
+        });
+        Router.push("/auth/login");
+      } else if (props.success) {
+        toast.success(
+          "Hurray! Email Confirmation Successful 😊. Please Login to continue",
+          {
+            position: "top-center",
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            progress: undefined,
+            toastId: "emailConfirmationSuccess",
+          }
+        );
+        Router.push("/auth/login");
+      }
     }
-  }, [props.error, props.success, router]);
+  }, [props.error, props.success, Router]);
 
   return null;
 };
@@ -80,4 +80,4 @@ export const getServerSideProps: GetServerSideProps = async ({ query }) => {
   }
 };
 
-export default ConfirmSignup;
+export default ConfirmSignUp;

@@ -187,7 +187,7 @@ const Editor = (props: EditorProps) => {
             type: "success",
           });
         } else {
-          toast.success("Blog updated successfully");
+          toast.success("Blog updated successfully",{toastId: "blogUpdated"});
         }
       }
       // * When editor is in create mode
@@ -200,6 +200,7 @@ const Editor = (props: EditorProps) => {
         if (!response.data.data.draft) {
           toast.success(
             "Blog created successfully. We'll notify you through email once it is published on the website."
+            ,{toastId: "blogCreated"}
           );
         } else {
           toast.info("Blog saved as draft");
@@ -210,12 +211,13 @@ const Editor = (props: EditorProps) => {
       // * If any thing goes wrong during update or create mode or image upload it will be catched here
       setLoading(false);
       let errMessage;
+      // Todo: Fix this 
       if (error?.response?.data?.message) {
         errMessage = error.response.data.message;
       } else errMessage = error.message;
 
       if (!editorForUpdate && !featuredImage) {
-        toast.error("Featured image is required");
+        toast.error("Featured Image is required", {toastId: "featuredImageRequired"});
       } else if (!editorForUpdate) {
         // to prevent the data from being lost when an error occurs save the data in local storage
         // Note: dataToSend! prevents the error "Object is possibly 'undefined'"
@@ -269,7 +271,7 @@ const Editor = (props: EditorProps) => {
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-5 items-center">
           {/* Select the branch */}
-          <div className="flex flex-col gap-2 z-[1000]">
+          <div className="z-[1001] flex flex-col gap-2">
             <label className="flex gap-2 items-center">
               <span>Select the branch</span>
               <CustomizedTooltip name="branch">
@@ -293,6 +295,7 @@ const Editor = (props: EditorProps) => {
               </CustomizedTooltip>
             </label>
             <TagsInput
+              data-cy="tags-input"
               required
               value={tags}
               onChange={(tags: any) => dispatch(setTags(tags))}
@@ -366,3 +369,5 @@ export default Editor;
 //   console.log(targetImgElement, index, state, imageInfo, remainingFilesCount);
 //   // targetImgElement.src = "https://picsum.photos/200/300";
 // };
+
+// Todo: Replace tagsinput with tagify

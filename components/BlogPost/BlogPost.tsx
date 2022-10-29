@@ -115,7 +115,7 @@ const BlogPost = ({ data }: BlogPostProps) => {
                 placement="top"
                 style={{ backgroundColor: "skyblue" }}
               >
-                <div className="cursor-pointer rounded-full w-10 h-10 flex items-center justify-center">
+                <div data-cy="edit-btn" className="cursor-pointer rounded-full w-10 h-10 flex items-center justify-center">
                   <i className="fa-solid fa-pencil"></i>
                 </div>
               </Tooltip>

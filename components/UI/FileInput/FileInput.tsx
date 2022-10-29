@@ -98,6 +98,7 @@ const FileInput = ({ setImage, image }: Props) => {
         e.preventDefault();
       }}
       onDrop={handleDropUpload}
+      data-cy="file-input"
     >
       <label
         htmlFor="dropzone-file"
@@ -106,6 +107,7 @@ const FileInput = ({ setImage, image }: Props) => {
         {preview || featuredImageURL ? (
           <div className="flex justify-center items-center w-full h-full">
             <img
+              data-cy="file-input-image"
               src={preview ? preview.toString() : featuredImageURL}
               alt="preview"
               // if height set to auto then the image will be stretched to fit the container

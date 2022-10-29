@@ -45,7 +45,6 @@ const Semester = () => {
         options={semesterOptions}
         placeholder="Select Semester"
         onChange={(e: any) => dispatch(setSemester(e))}
-        className="z-[12]"
       />
     </div>
   );

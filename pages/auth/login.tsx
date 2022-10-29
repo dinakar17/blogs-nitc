@@ -95,7 +95,6 @@ const login = () => {
   }, [error]);
 
   return (
-    // create two columns using grid and make them responsive as well
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 min-h-screen font-default">
         {/* Grid Block 1 */}
@@ -115,8 +114,11 @@ const login = () => {
                 onChange={handleEmail}
                 placeholder="Enter your email"
                 className="border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+                data-cy="login-email"
               />
-              <p className="text-red-500 text-sm">{emailError && emailError}</p>
+              <p className="text-red-500 text-sm" data-cy="login-email-error">
+                {emailError}
+              </p>
             </div>
             <div className="flex flex-col gap-2">
               <label>Password</label>
@@ -128,6 +130,7 @@ const login = () => {
                   type={showPassword ? "text" : "password"}
                   className="w-full border border-gray-300 p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
                   onChange={handlePassword}
+                  data-cy="login-password"
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center text-sm leading-5 cursor-pointer">
                   <svg
@@ -140,6 +143,7 @@ const login = () => {
                     onClick={() => setShowPassword(!showPassword)}
                   >
                     <path
+                      data-cy="login-password-show"
                       fill="currentColor"
                       d="M572.52 241.4C518.29 135.59 410.93 64 288 64S57.68 135.64 3.48 241.41a32.35 32.35 0 0 0 0 29.19C57.71 376.41 165.07 448 288 448s230.32-71.64 284.52-177.41a32.35 32.35 0 0 0 0-29.19zM288 400a144 144 0 1 1 144-144 143.93 143.93 0 0 1-144 144zm0-240a95.31 95.31 0 0 0-25.31 3.79 47.85 47.85 0 0 1-66.9 66.9A95.78 95.78 0 1 0 288 160z"
                     ></path>
@@ -171,6 +175,7 @@ const login = () => {
               </p>
             </div>
             <button
+              data-cy="login-submit"
               disabled={
                 loading || !email || !password || emailError ? true : false
               }

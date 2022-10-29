@@ -30,11 +30,12 @@ const Branch = () => {
   return (
     <div className="text-black dark:text-white">
       <Select
+        id="react-select-branch"
         value={branch.value === "" ? null : branch}
         options={branches}
         onChange={(e: any) => dispatch(setBranch(e))}
         placeholder="Select Branch"
-        className="z-[10001] w-full"
+        className="w-full"
       />
     </div>
   );
