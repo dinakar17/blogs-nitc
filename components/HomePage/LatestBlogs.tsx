@@ -13,6 +13,8 @@ const LatestBlogs = () => {
   // make the api call only when the component is in the viewport
   const { data, error } = useSWR("api/v1/blogs/latest", fetcher, {
     revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateOnMount: true,
   });
 
   // useEffect(() => {

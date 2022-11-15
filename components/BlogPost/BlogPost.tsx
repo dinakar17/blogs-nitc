@@ -39,6 +39,9 @@ const BlogPost = ({ data }: BlogPostProps) => {
   const res = useSWR([`/api/v1/blogs/like/${data.data._id}`, config], fetcher, {
     // https://swr.vercel.app/docs/revalidation
     // refreshInterval: 1000,
+    revalidateOnFocus: false,
+    revalidateOnReconnect: false,
+    revalidateOnMount: true,
   });
 
   useEffect(() => {

@@ -163,6 +163,7 @@ const Home: NextPage<Props> = (props) => {
     fetcher,
     {
       revalidateOnFocus: false,
+      revalidateOnReconnect: false,
     }
   );
 
