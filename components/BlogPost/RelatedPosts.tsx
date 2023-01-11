@@ -30,6 +30,7 @@ const RelatedPosts = ({ data }: RelatedPostsProps) => {
                 <Image
                   src={blog.featuredImage}
                   loader={customLoader}
+                  alt={blog.title}
                   layout="fill"
                   objectFit="cover"
                 />

@@ -66,7 +66,7 @@ const Header = () => {
             <a className="relative">
               <Image
                 src="/static/logo-for-nitc.png"
-                alt="logo"
+                alt="NITC Blogging Site Logo"
                 loader={customLoader}
                 width={100}
                 height={100}
@@ -101,7 +101,7 @@ const Header = () => {
                       // Note: authData?.user is optional chaining, it means if authData is null then it will not throw an error
                       src={authData.photo ? authData.photo : "/static/default-avatar.png"}
                       loader={customLoader}
-                      alt="profile"
+                      alt= {authData?.name}
                       layout="fill"
                       className="rounded-full object-cover cursor-pointer block m-auto"
                     />

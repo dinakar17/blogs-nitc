@@ -80,7 +80,7 @@ const CustomizedTooltip = ({ children, name, photo, bio }: Props) => {
           <div className="relative w-48 h-48 ">
             <Image
               src={photo!}
-              alt="author image"
+              alt={name}
               layout="fill"
               objectFit="cover"
               loader={customLoader}

@@ -193,7 +193,8 @@ export const CardLayout = ({ post }: CardProps) => {
         <div className="flex items-center gap-2">
           <div className="w-10 h-10 relative">
             <Image
-              src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo}
+              src={post.anonymous ? "/static/about/1.jpg" : post.user[0].photo ? post.user[0].photo : "/static/about/1.jpg"}
+              alt={post.anonymous ? "Anonymous" : post?.user[0]?.name}
               loader={customLoader}
               layout="fill"
               className="rounded-full object-cover"

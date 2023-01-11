@@ -1,5 +1,10 @@
+/*
+This component is used to edit a blog
+*/
+
 import { useEffect } from "react";
 import { toast } from "react-toastify";
+import { useDispatch, useSelector } from "react-redux";
 import dynamic from "next/dynamic";
 import Head from "next/head";
 import { useRouter } from "next/router";
@@ -7,8 +12,7 @@ import useSWR from "swr";
 import { NextPage } from "next";
 import { AxiosResponse } from "axios";
 
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
+import { AppDispatch, RootState } from "../../../store/store";
 import { setPost } from "../../../store/StatesContainer/post/PostSlice";
 import { setFilter } from "../../../store/StatesContainer/filters/FilterSlice";
 import * as api from "../../../api";
@@ -23,6 +27,7 @@ const fetcher = (url: string, slug: string) =>
 const EditBlog: NextPage = () => {
   const dispatch = useDispatch<AppDispatch>();
   const router = useRouter();
+  const {authData} = useSelector((state: RootState) => state.user);
 
   useEffect(() => {
     toast("Reload the page if you are facing any issues", {
@@ -61,6 +66,15 @@ const EditBlog: NextPage = () => {
       });
     }
   }, [error]);
+
+  // redirect to blog url page if visited by a user who is not the owner of the blog
+  useEffect(() => {
+    if(data && data.data.user._id !== authData._id) {
+      toast.error("You are not authorized to edit this blog");
+      router.push(`/blog/${data.data.slug}`);
+    }
+  }, [data, authData._id]);
+  
 
   if (error) return null;
   if (!data) return <Loader />;

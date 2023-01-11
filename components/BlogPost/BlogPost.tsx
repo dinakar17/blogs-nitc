@@ -1,3 +1,8 @@
+/*
+Basically, this component is used to render the blog post in the blog/[slug].tsx page.
+*/
+
+
 import React, { useEffect } from "react";
 import parse from "html-react-parser";
 import LikeUI from "../UI/Like/LikeUI";
@@ -75,11 +80,11 @@ const BlogPost = ({ data }: BlogPostProps) => {
               ) : (
                 <CustomizedTooltip
                   name="author"
-                  photo={data.data.user.photo}
+                  photo={data.data.user.photo ? data.data.user.photo : "/static/about/1.jpg"}
                   bio={data.data.user.bio}
                 >
                   <Image
-                    src={data.data.user.photo}
+                    src={data.data.user.photo ? data.data.user.photo : "/static/about/1.jpg"}
                     alt={data.data.user.name}
                     loader={customLoader}
                     layout="fill"

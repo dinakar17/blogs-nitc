@@ -1,3 +1,7 @@
+/*
+This file consists of "BlogCard" component which is used to display a blog card 
+*/
+
 import Tooltip from "@mui/material/Tooltip";
 import Image from "next/image";
 import Link from "next/link";
@@ -64,7 +68,7 @@ export const BlogCard = ({ blog }: Props) => {
               blog.featuredImage ? blog.featuredImage : "/static/about/1.jpg"
             }
             loader={customLoader}
-            alt="blog image"
+            alt={blog.title}
             layout="fill"
             objectFit="cover"
             // ? Don't know whether it is a good idea to use blurDataURL same as src or not
@@ -107,10 +111,11 @@ export const BlogCard = ({ blog }: Props) => {
           {/* Card author */}
           <div className="absolute bottom-2 flex items-center  gap-2">
             {/* Rounded author image */}
-            <div className="h-7 w-7 rounded-full bg-gray-300">
-              <img
-                src={blog.anonymous ? "/static/about/1.jpg" : blog.user.photo}
-                alt="author image"
+            <div className="relative h-7 w-7 rounded-full bg-gray-300">
+              <Image
+                src={blog.anonymous ? "/static/about/1.jpg" : blog.user.photo ? blog.user.photo : "/static/about/1.jpg"}
+                alt={blog.anonymous ? "Anonymous" : blog.user.name}
+                layout="fill"
                 className="rounded-full object-cover w-full h-full"
               />
             </div>

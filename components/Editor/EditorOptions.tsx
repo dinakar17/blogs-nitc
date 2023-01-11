@@ -61,7 +61,7 @@ export const setOptions = {
             "image",
             "video",
             "audio",
-            "math",
+            // "math",
             // "imageGallery",
           ],
         ],
@@ -107,7 +107,7 @@ export const setOptions = {
             "image",
             "video",
             "audio",
-            "math",
+            // "math",
             // "imageGallery",
           ],
           [
@@ -165,7 +165,7 @@ export const setOptions = {
             "image",
             "video",
             "audio",
-            "math",
+            // "math",
             // "imageGallery",
           ],
           [

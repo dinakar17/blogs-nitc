@@ -55,11 +55,11 @@ const Publish = ({
 
     try {
       setLoading(true);
+      await api.deletePost(blogId, config);
       if (blogImgURL) {
         const fileName = blogImgURL.split("/").pop();
         await api.deleteImage(fileName as string, imageAxiosConfig);
       }
-      await api.deletePost(blogId, config);
       setLoading(false);
       setShowModal(false);
       toast.success("Blog deleted successfully", {toastId: "blogDeleted"});
