@@ -25,6 +25,8 @@ import Subject from "../../helpers/Options/Subject";
 import NoSearchResults from "../../components/UI/Search/NoSearchResults";
 import { resetFilters } from "../../store/StatesContainer/filters/FilterSlice";
 import SkeletonCard from "../../components/UI/Loader/SkeletonCard";
+import siteMetadata from "../../data/siteMetadata";
+import { PageSEO } from "../../components/SEO/SEO";
 
 type Props = {
   data: any;
@@ -221,15 +223,17 @@ const Home: NextPage<Props> = (props) => {
     }
   }, [res.isValidating]);
 
+  const metaData = {
+    title: "NITC Notes and Blogs",
+    description: siteMetadata.description,
+    tags: ["NITC", "NITC Blogs", "NITC Notes", "NITC Notes and Blogs"],
+    featuredImage: siteMetadata.socialBanner,
+    slug: "",
+  };
+
   return (
     <div className="min-h-screen w-[90%] mx-auto">
-      <Head>
-        <title>Blog App</title>
-        <meta
-          name="description"
-          content="All blogs list for blogging application Blog App"
-        />
-      </Head>
+      <PageSEO {...metaData} />
 
       <SearchInput
         handleSearch={handleSearch}

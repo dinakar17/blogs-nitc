@@ -1,5 +1,6 @@
 import { GetServerSideProps, NextPage } from "next";
 import { toast } from "react-toastify";
+import Head from "next/head";
 
 import * as api from "../../api";
 import { useEffect, useState } from "react";
@@ -7,7 +8,6 @@ import BlogPost from "../../components/BlogPost/BlogPost";
 import RelatedPosts from "../../components/BlogPost/RelatedPosts";
 import { BlogSEO } from "../../components/SEO/SEO";
 import siteMetadata from "../../data/siteMetadata";
-
 
 export type RelatedBlog = {
   _id: string;
@@ -78,14 +78,12 @@ const BlogDetail: NextPage<Props> = (props) => {
 
   const metaData = {
     title: data.data.title,
-    summary: data.data.description,
-    images: [data.data.featuredImage],
-    url : `${siteMetadata.siteUrl}blog/${data.data.slug}`,
-    canonicalUrl: `${siteMetadata.siteUrl}/blog/${data.data.slug}`,
-    date: data.data.createdAt,
-    lastmod: data.data.updatedAt,
-    authorDetails: [data.data.user],
-  }
+    description: data.data.description,
+    featuredImage: data.data.featuredImage,
+    tags: data.data.tags,
+    slug: data.data.slug,
+    user: { name: data.data.user.name },
+  };
   return (
     <>
       <BlogSEO {...metaData} />

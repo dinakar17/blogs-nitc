@@ -2,7 +2,6 @@
 Basically, this component is used to render the blog post in the blog/[slug].tsx page.
 */
 
-
 import React, { useEffect } from "react";
 import parse from "html-react-parser";
 import LikeUI from "../UI/Like/LikeUI";
@@ -20,6 +19,9 @@ import { ThreeDotsLoader } from "../UI/Loader/Loader";
 import CustomizedTooltip from "../UI/HTMLToolTip/HTMLTooltip";
 import siteMetadata from "../../data/siteMetadata";
 import { customLoader } from "../../helpers/customImageLoader";
+import Comments from "../comments/Comments";
+import { toast } from "react-toastify";
+import ScrollTopAndComment from "./ScrollTopAndComment";
 
 type BlogPostProps = {
   data: {
@@ -80,11 +82,19 @@ const BlogPost = ({ data }: BlogPostProps) => {
               ) : (
                 <CustomizedTooltip
                   name="author"
-                  photo={data.data.user.photo ? data.data.user.photo : "/static/about/1.jpg"}
+                  photo={
+                    data.data.user.photo
+                      ? data.data.user.photo
+                      : "/static/about/1.jpg"
+                  }
                   bio={data.data.user.bio}
                 >
                   <Image
-                    src={data.data.user.photo ? data.data.user.photo : "/static/about/1.jpg"}
+                    src={
+                      data.data.user.photo
+                        ? data.data.user.photo
+                        : "/static/about/1.jpg"
+                    }
                     alt={data.data.user.name}
                     loader={customLoader}
                     layout="fill"
@@ -123,7 +133,10 @@ const BlogPost = ({ data }: BlogPostProps) => {
                 placement="top"
                 style={{ backgroundColor: "skyblue" }}
               >
-                <div data-cy="edit-btn" className="cursor-pointer rounded-full w-10 h-10 flex items-center justify-center">
+                <div
+                  data-cy="edit-btn"
+                  className="cursor-pointer rounded-full w-10 h-10 flex items-center justify-center"
+                >
                   <i className="fa-solid fa-pencil"></i>
                 </div>
               </Tooltip>
@@ -241,6 +254,19 @@ const BlogPost = ({ data }: BlogPostProps) => {
           </a>
         </button>
       </div>
+
+      {/* Todo: Cover up Comments components i.e., make it not clickable if the user isn't logged in */}
+      <Comments blogId={data.data._id} />
+      {!authData && (
+        <p className="text-center text-gray-500">
+          Don't miss out on the latest thoughts and opinions,{" "}
+          <Link href="/auth/login" className="text-blue-500">
+            Login
+          </Link>{" "}
+          to view and post comments now!
+        </p>
+      )}
+      <ScrollTopAndComment/>
     </div>
   );
 };

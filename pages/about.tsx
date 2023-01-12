@@ -1,10 +1,20 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import siteMetadata from "../data/siteMetadata";
+import { PageSEO } from "../components/SEO/SEO";
 
 const about = () => {
+  const metaData = {
+    title: "About | NITC Notes and Blogs",
+    description: "About NITC Notes and Blogs",
+    tags: ["NITC", "NITC Blogs", "NITC Notes", "NITC Notes and Blogs"],
+    featuredImage: siteMetadata.socialBanner,
+    slug: '',
+  }
   return (
     <section className="prose prose-indigo max-w-none prose-sm md:prose-md lg:prose-lg min-h-screen lg:w-[70%] mx-auto w-[90%] flex flex-col gap-10 dark:prose-invert">
+      <PageSEO {...metaData} />
       <div>
         <h2 className="lg:text-left text-center">
           This website is a content-sharing platform where you can share/create

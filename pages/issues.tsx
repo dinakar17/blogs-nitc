@@ -1,11 +1,21 @@
 import Image from "next/image";
 import React from "react";
+import { PageSEO } from "../components/SEO/SEO";
 import LightBulb from "../components/svgs/light-bulb.svg";
 import siteMetadata from "../data/siteMetadata";
 
 const issues = () => {
+  const metaData = {
+    title: "Issues | NITC News and Blogs",
+    description:
+      "Found/Facing any issues? We are extremely sorry for the inconvenience caused. Please report the issue by either emailing us at Gmail or else you can also share your issues on by joining our Discord server.",
+    tags: ["NITC", "NITC Blogs", "NITC Notes", "NITC Notes and Blogs"],
+    featuredImage: siteMetadata.socialBanner,
+    slug: "",
+  };
   return (
     <div className="prose prose-indigo max-w-none prose-sm md:prose-base w-[90%] mx-auto md:w-[80%] dark:prose-invert">
+      <PageSEO {...metaData} />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div className="self-center order-last md:order-none">
           <h2>

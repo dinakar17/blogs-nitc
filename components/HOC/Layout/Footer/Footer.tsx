@@ -6,7 +6,7 @@ const Footer = () => {
     <footer className="p-4 bg-white rounded-lg shadow md:flex md:items-center md:justify-between md:p-6 dark:bg-gray-800">
       <span className="block text-sm text-gray-500 text-center dark:text-gray-400">
         © 2022{" "}
-        <a href="https://flowbite.com/" className="hover:underline">
+        <a href="https://nitcworld.com/" className="hover:underline">
           NITC™
         </a>
         . All Rights Reserved.

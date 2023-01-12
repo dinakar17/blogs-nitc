@@ -1,213 +1,60 @@
-import Head from "next/head";
-import { useRouter } from "next/router";
 import siteMetadata from "../../data/siteMetadata";
+import Head from 'next/head';
 
 type Props = {
   title: string;
   description: string;
-  ogType?: string;
-  ogImage: any;
-  twImage?: string;
-  canonicalUrl?: string;
-};
+  tags: string[];
+  featuredImage: string;
+  slug : string;
+  user ?: {
+    name ?: string;
+  }
+}
 
-const CommonSEO = ({
-  title,
-  description,
-  ogType,
-  ogImage,
-  twImage,
-  canonicalUrl,
-}: Props) => {
-  const router = useRouter();
+
+const CommonSEO = (props : Props) => {
+  const {title, description, tags, featuredImage, slug, user} = props;
   return (
     <Head>
-      <title>{title}</title>
-      {/* Here name="robots" content="follow, index" means that search engines should follow links on this page and index its content. */}
-      <meta name="robots" content="follow, index" />
-      {/* Here name="description" content={description} means that search engines should use this content as the page description for this page. */}
-      <meta name="description" content={description} />
-      {/* og:url in simple words is the URL of the page. */}
-      <meta
-        property="og:url"
-        content={`${siteMetadata.siteUrl}${router.asPath}`}
-      />
-      {/* property="og:type" content={ogType} means that the type of the page. For example, a website, an article, a video, etc. */}
-      <meta property="og:type" content={ogType} />
-      {/* property="og:title" content={title} means that the title of the page. */}
-      <meta property="og:site_name" content={siteMetadata.title} />
-      {/* property="og:description" content={description} means that the description of the page. */}
-      <meta property="og:description" content={description} />
-      <meta property="og:title" content={title} />
-      {ogImage.constructor.name === "Array" ? (
-        ogImage.map(({ url }: any) => (
-          <meta property="og:image" content={url} key={url} />
-        ))
-      ) : (
-        <meta property="og:image" content={ogImage} key={ogImage} />
-      )}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:site" content={siteMetadata.twitter} />
-      <meta name="twitter:title" content={title} />
-      <meta name="twitter:description" content={description} />
-      <meta name="twitter:image" content={twImage} />
-      <link
-        rel="canonical"
-        href={
-          canonicalUrl
-            ? canonicalUrl
-            : `${siteMetadata.siteUrl}${router.asPath}`
-        }
-      />
-    </Head>
-  );
-};
-
-type PageSEOProps = {
-  title: string;
-  description: string;
-};
-
-export const PageSEO = ({ title, description }: PageSEOProps) => {
-  const ogImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner;
-  const twImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner;
-  return (
-    <CommonSEO
-      title={title}
-      description={description}
-      ogType="website"
-      ogImage={ogImageUrl}
-      twImage={twImageUrl}
-    />
-  );
-};
-
-// export const TagSEO = ({ title, description }) => {
-//   const ogImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
-//   const twImageUrl = siteMetadata.siteUrl + siteMetadata.socialBanner
-//   const router = useRouter()
-//   return (
-//     <>
-//       <CommonSEO
-//         title={title}
-//         description={description}
-//         ogType="website"
-//         ogImage={ogImageUrl}
-//         twImage={twImageUrl}
-//       />
-//       <Head>
-//         <link
-//           rel="alternate"
-//           type="application/rss+xml"
-//           title={`${description} - RSS feed`}
-//           href={`${siteMetadata.siteUrl}${router.asPath}/feed.xml`}
-//         />
-//       </Head>
-//     </>
-//   )
-// }
-
-type BlogSEOProps = {
-  authorDetails: Array<Object>;
-  title: string;
-  summary: string;
-  date: string;
-  lastmod: string;
-  url: string;
-  images: any;
-  canonicalUrl?: string;
-};
-
-export const BlogSEO = ({
-  authorDetails,
-  title,
-  summary,
-  date,
-  lastmod,
-  url,
-  images = [],
-  canonicalUrl,
-}: BlogSEOProps) => {
-  const publishedAt = new Date(date).toISOString();
-  const modifiedAt = new Date(lastmod || date).toISOString();
-  let imagesArr =
-    images.length === 0
-      ? [siteMetadata.socialBanner]
-      : typeof images === "string"
-      ? [images]
-      : images;
-
-  const featuredImages = imagesArr.map((img: any) => {
-    return {
-      "@type": "ImageObject",
-      url: img.includes("http") ? img : siteMetadata.siteUrl + img,
-    };
-  });
-
-  let authorList;
-  if (authorDetails) {
-    authorList = authorDetails.map((author: any) => {
-      return {
-        "@type": "Person",
-        name: author.name,
-      };
-    });
-  } else {
-    authorList = {
-      "@type": "Person",
-      name: siteMetadata.author,
-    };
-  }
-
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    mainEntityOfPage: {
-      "@type": "WebPage",
-      "@id": url,
-    },
-    headline: title,
-    image: featuredImages,
-    datePublished: publishedAt,
-    dateModified: modifiedAt,
-    author: authorList,
-    publisher: {
-      "@type": "Organization",
-      name: siteMetadata.author,
-      logo: {
-        "@type": "ImageObject",
-        url: `${siteMetadata.siteUrl}${siteMetadata.siteLogo}`,
-      },
-    },
-    description: summary,
-  };
-
-  const twImageUrl = featuredImages[0].url;
-
-  return (
-    <>
-      <CommonSEO
-        title={title}
-        description={summary}
-        ogType="article"
-        ogImage={featuredImages}
-        twImage={twImageUrl}
-        canonicalUrl={canonicalUrl}
-      />
-      <Head>
-        {date && (
-          <meta property="article:published_time" content={publishedAt} />
-        )}
-        {lastmod && (
-          <meta property="article:modified_time" content={modifiedAt} />
-        )}
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify(structuredData, null, 2),
-          }}
-        />
+        {/* <script src={`https://keywords.mediavine.com/keyword/web.keywords.js?pageUrl=${siteMetadata.siteUrl}/blog/${slug}`}></script> */}
+        <script src="https://exchange.mediavine.com/usersync.min.js?s2sVersion=ADT-979-rm-tid-t" type="text/javascript"></script>
+        <script src="https://scripts.mediavine.com/tags/2.78.41/wrapper.min.js?bust=-1500007442" type="text/javascript"></script>
+        <meta name="robots" content="index, follow" />
+        <meta name="googlebot" content="index, follow" />
+        <title>{title}</title>
+        <meta name="description" content={description} />
+        <meta name="keywords" content={tags.join(", ")} />
+        <meta name="image" content={featuredImage} />
+        <meta property="og:url" content={`${siteMetadata.siteUrl}`} />
+        <meta property="og:title" content={title} />
+        <meta property="og:description" content={description} />
+        <meta property="og:image" content={featuredImage} />
+        <meta property="og:type" content="article" />
+        <meta property="og:site_name" content={siteMetadata.title} />
+        <meta property="og:locale" content="en_US" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content={siteMetadata.twitter} />
+        <meta name="twitter:creator" content={siteMetadata.twitter} />
+        <meta name="twitter:title" content={title} />
+        <meta name="twitter:description" content={description} />
+        <meta name="twitter:image" content={featuredImage} />
+        <meta name="twitter:image:alt" content={title} />
+        <meta name="twitter:label1" content="Written by" />
+        <meta name="twitter:data1" content={user?.name} />
+        <link rel="canonical" href={`${siteMetadata.siteUrl}/blog/${slug}`} />
       </Head>
-    </>
-  );
-};
+  )
+}
+
+export const PageSEO = (props : Props) => {
+  return (
+    <CommonSEO {...props} />
+  )
+}
+
+export const BlogSEO = (props : Props) => {
+  return (
+    <CommonSEO {...props} />
+  )
+}

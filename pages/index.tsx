@@ -2,6 +2,7 @@ import type { GetServerSideProps, NextPage } from "next";
 import * as api from "../api/index";
 import { Intro, LatestBlogs } from "../components";
 import { PageSEO } from "../components/SEO/SEO";
+import siteMetadata from "../data/siteMetadata";
 
 // Note: res.data === {data: [array of posts], currentBlogsCount: number}
 
@@ -16,8 +17,11 @@ type Props = {
 const Home: NextPage<Props> = ({ data, error }) => {
   // console.log(data); // Here data === res.data
   const metaData = {
-    title: "Blog Website for NITC",
-    description: "This is a blog website for NITC people",
+    title: siteMetadata.title,
+    description: siteMetadata.description,
+    tags: ["NITC", "NITC Blogs", "NITC Notes", "NITC Notes and Blogs"],
+    featuredImage: siteMetadata.socialBanner,
+    slug: '',
   }
   return (
     <>
